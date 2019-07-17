@@ -1,0 +1,17 @@
+Exemplo 1 - Nível físico (RS 232C DB25):
+Considerando a figura da página de número 40 da apostila e a pergunta de número 23 da lista de exercícios, faça uma animação para mostrar a interação entre Terminal Local (DTE-A), Modem Local (DCE-A), Modem Remoto (DCE-B) e Terminal Remoto (DTE-B). A "animação" deve considerar os pinos de números, 2, 3, 4, 5, 6, 8 e 20 da Interface de Comunicação Serial RS232C para um conector de 25 pinos. Veja na página de número 44 da apostila a descrição em inglês dos sinais do RS232 (DB25) mais usados.
+Postar no moodle um relatório descrevendo as atividades realizadas. Agendar a apresentação do relatório e desmosntração da animação para o professor.
+Um exemplo de trabalho realizado pode ser visto no link:
+http://www.inf.ufsc.br/~westphal/animacaoarrumada.gif
+
+Exemplo 2 - foi solicitada uma animação para polling e seclection, mostrando a ocorrência de erros nas transmissões das mensagens e solicitando retransmissões na parte do polling.
+- Do aluno "Adriano" ao aluno "Caio", CADA ALUNO deverá mostrar primeiro o polling no computador C1 (mostrando a ocorrência de erro na mensagem enviada e retransmissão) e depois o selection no C2 sem ocorrência de erro na mensagem;
+Ver um exemplo do trabalho realizado no link:
+http://www.inf.ufsc.br/~westphal/20161.gif
+
+Exemplo 3 - foi solicitada uma animação para selection e polling, mostrando a ocorrência de erros nas transmissões das mensagens e solicitando retransmissões na parte do selection.
+- Do aluno "Adan" ao aluno "Fábio", CADA ALUNO deverá mostrar primeiro o selection no computador C1 (mostrando a ocorrência de erro na mensagem enviada e retransmissão) e depois o polling no C2.
+Ver um exemplo do trabalho realizado no link:
+http://www.inf.ufsc.br/~carlos.westphall/20162.gif
+
+No semestre de 2019-1, para o dia 10/04/2019, os alunos apresentarão uma "animação", mostrando o funcionamento do protocolo Poll/Select (Polling e Selection). Para realizar o trabalho considerarão as informações contidas na apostila da disciplina. Para cada ação do protocolo de enlace (nivel 2) Poll/Select mostrarão a ocorrência das ações do protocolo de nível físico (nivel 1) do RS232C-DB25. Deverá ser mostrada a ocorrência de erros nas transmissões das mensagens e solicitando retransmissões na parte do polling e do selection (primeiro polling e depois selection). Mostre todas as ocorrências de polling(s) e depois todas ocorrências de selection(s) para três computadores, sendo que: o primeiro está danificado, o segundo não deseja transmistir e nem receber mensagens; e o terceiro deseja transmitir e receber mensagens. Na animação indique a ordem dos computadores, começando pela primeira letra do teu nome. Por exemplo: Carlos deverá indicar os computadores por CC, CD e CE; João deverá indicar os computadores por CJ, CK e CL, Adão por CA, CB e CC...
