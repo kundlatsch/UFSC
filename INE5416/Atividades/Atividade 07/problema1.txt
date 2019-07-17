@@ -1,0 +1,9 @@
+A)
+
+Classes primitivas são classes que não são definidas a partir de outras classes, ou seja, são primitivamente definidas na linguagem. Exemplos de classes primitivas são Enum, Monad e Functor.
+
+Classes secundárias, ao contrário das classes primitivas, são as classes definidas a partir de outras classes. São exemplos de classes secundárias as classes Ord, Num e Integral.
+
+B)
+
+Real, Integral, Fractional, Float, RealFrac e RealFLoat são as classes numéricas (que são classes secundárias). A classe Real instancia os tipos Int, Integer, Float e Double, e as demais classes apenas Float e Double.
