@@ -1,0 +1,27 @@
+<html>
+<table>
+<tr>
+<th>
+
+<u><b>Nome do NPC</b></u>
+<br/><br/>
+<b>Localizacao:<b> <br/>
+<br/><br/>
+<b>Historico:<b> <br/>
+<br/><br/>
+<b>Itens: </b> <br/>
+</th>
+<th></th><th></th><th></th><th></th>
+<th>
+
+<br/>
+<b>Habilidades: </b> <br/>
+<br/><br/>
+<b>Anotacoes: <b> <br/>
+<br/><br/>
+
+</th>
+
+</tr>
+</table>
+</html>

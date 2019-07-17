@@ -1,0 +1,41 @@
+<html>
+<table>
+<tr>
+<th>
+
+<u><b>Nome do Monstro</b></u>
+<br/><br/>
+<b>FOR: </b> 0 <br/>
+<b>DEX: </b> 0 <br/>
+<b>CON: </b> 0 <br/>
+<b>INT: </b> 0 <br/>
+<b>SAB: </b> 0 <br/>
+<b>CAR: </b> 0 <br/>
+<br/>
+
+<b>PV: </b> 0 <br/>
+<b>CA: </b> 0 <br/>
+
+<br/>
+<b>Ataque Corpo-a-Corpo: </b> <br/>
+<b>Ataque a Distancia: </b> <br/>
+
+</th>
+<th></th><th></th><th></th><th></th>
+<th>
+
+<br/>
+<b>Loot: </b> <br/>
+<br/><br/>
+<b>Habilidades: </b> <br/>
+<br/><br/>
+<b>Caracteristicas: </b> <br/>
+<br/><br/>
+<b>Anotacoes: <b> <br/>
+<br/><br/>
+
+</th>
+
+</tr>
+</table>
+</html>
