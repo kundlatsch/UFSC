@@ -1,0 +1,36 @@
+Atividade Prática - MPI
+Dicas úteis
+
+Para realizar os exercícios a seguir, você necessitará de:
+
+    Um editor de texto para escrever o seu código: escolha o editor de sua preferência (vim, emacs, nano, pico, gedit, ...)
+
+    Um compilador: usaremos o mpicc
+
+    Um terminal: para compilar e executar o seu programa.
+
+A sintaxe para compilar um programa em C é a seguinte:
+
+$ mpicc -o <nome_arquivo_binario> <nome_arquivo_contendo_o_código>
+
+Por exemplo: para criar um programa chamado meu_programa a partir de um
+código em C chamado meu_programa.c faça:
+
+$ mpicc -o meu_programa meu_programa.c
+
+Se tudo ocorrer bem, ao final da compilação será gerado um arquivo binário chamado meu_programa. Para executá-lo, digite (substituir XXXX pelo número de processos que desejar criar):
+
+$ mpirun -np XXXX ./meu_programa
+
+Você deverá incluir pelo menos as seguintes bibliotecas nos seus códigos:
+
+#include <stdio.h>
+#include <mpi.h>
+
+Exercício 1
+
+Faça um programa usando MPI que implemente o padrão mestre/escravo. Inicialmente, o processo mestre deverá enviar uma mensagem contendo um valor inteiro constante para cada um dos escravos. Ao receberem a mensagem, os processos escravos deverão somar o seu rank ao valor recebido pela mensagem e enviar uma mensagem contendo o valor resultante de volta ao processo mestre. Ao receber uma mensagem de um processo escravo, o processo mestre deverá imprimir o valor recebido pelo processo escravo.
+
+Exercício 2
+
+O valor de π pode ser aproximado utilizando-se o método de Monte Carlo. Considera-se um círculo de raio (r) igual a 1 inscrito em um quadrado com centro no ponto (0; 0) do plano cartesiano, como mostrado na Figura 1a. A área do círculo é igual a πr2 e a área do quadrado é igual a (2r)2. O método de Monte Carlo para aproximar o valor de π consiste em sortear pontos, ou seja, coordenadas (x; y) dentro do quadrado, e calcular a razão entre o número de pontos sorteados que caíram dentro do círculo (M) e o número total de pontos sorteados (N), como mostra a Figura 1b. A probabilidade de um ponto sorteado cair dentro do círculo é dada aproximadamente pela a razão entra área do círculo e a do quadrado, ou seja,  (πr2)/(2r)2= π/4 . Para N pontos sorteados e M pontos dentro do círculo temos: π/4 = MN. Logo, o valor aproximado de π pode ser obtido como segue: π ≈ 4NM . O programa disponível no Moodle implementa o método descrito para aproximar o valor de π. Tome como base essa implementação e utilize MPI para paralelizá-la de forma a obter uma solução concorrente. 

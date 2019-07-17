@@ -1,0 +1,68 @@
+// Fundo da simulação
+.game-root {
+    -fx-background-color: #faf8ef;
+}
+
+// background padrão de peças
+.piece {
+    -fx-background-position: center;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+}
+
+// background de peças para botões
+.king {
+    -fx-background-image: url("king.png");
+}
+
+.road {
+    -fx-background-image: url("road.png");
+ 	-fx-padding: 100 0 0 0;
+}
+
+.wall {
+    -fx-background-image: url("wall.png");
+}
+
+// Botões do tabuleiro
+
+// casas verdes
+// -fx-border-color: bisque;
+.game-button1 {
+    -fx-background-color: white;
+    -fx-border-color: black;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+}
+
+// casas vermelhas
+// -fx-border-color: burlywood;
+.game-button2 {
+    -fx-border-color: black;
+    -fx-background-color: white;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+}
+
+.azul {
+    -fx-background-color: cornflowerblue;
+}
+
+.vermelho {
+    -fx-background-color: lightsalmon;
+}
+
+
+// teste do evento clique
+
+.over  {
+    -fx-background-color: palegreen;
+}
+
+.click-button {
+    -fx-background-color: black;
+}

@@ -1,0 +1,22 @@
+Exercício 1
+
+Escreva um programa que receba um número como argumento na linha de comando (use argc e argv da função main). O programa deve ter uma variável global do tipo inteiro chamada "contador_global", que deve ser iniciada com zero. O programa deve criar o número de threads especificado no argumento. A função executada nas threads deve conter um laço que incremente o contador_global. O laço deve ser executado num_threads * 1000 vezes por cada thread, onde num_threads é o número de threads criadas. Este número deve ser passado como parâmetro para a thread (veja os argumentos da função pthread_create). O programa deve esperar todas as threads terminarem e então imprimir o valor do contador_global. Execute este programa e vá aumentando o número de threads a cada execução (ex.: 2, 5, 10, 30, 50, 100, ...). Observe o que acontece com o valor do contador_global conforme o número de threads aumenta.
+Exercício 2
+
+O programa sequencial “soma_vet.c” (disponível abaixo) aloca três vetores denominados “a”, “b” e “c” de tamanho “tam_vet” (fornecido pela linha de comando). Então, ele realiza a operação “c[i] = a[i] + b[i]” para todos os elementos “i” dos vetores. Desenvolva uma solução multithread para esse problema. Cada thread deverá ser responsável por realizar uma parte da computação.
+Exercício 3
+
+O programa sequencial “prod_escalar.c” (disponível abaixo) aloca dois vetores denominados “a” e “b” de tamanho “tam_vet” (fornecido pela linha de comando). Então, ele realiza o produto escalar dos dois vetores, ou seja, ele computa o somatório das multiplicações de “a[i]” por “b[i]” para todos os elementos “i” dos vetores. Desenvolva uma solução multithread para esse problema. Cada thread deverá ser responsável por realizar uma parte da computação.
+Dicas
+
+     Você vai precisar das seguintes bibliotecas:
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <pthread.h>
+
+     Se você estiver usando o gcc por linha de comando, vai ser necessário usar o parâmetro -lpthread:
+
+ gcc -o nome_do_executavel arquivo_fonte.c -lpthread

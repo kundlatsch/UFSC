@@ -1,0 +1,69 @@
+==================================================================
+
+-> RELEASE NOTES <-
+
+Tak v1.0 - 03/07/2019
+
+Projeto desenvolvidor por:
+- Gustavo Emanuel Kundlatsch
+- Victor Hugo Bonacina Pergher
+- Pedro José Vieira de Souza
+
+==================================================================
+
+Sumário
+
+1. Requisitos do Sistema
+2. Instação
+3. Versão Atual
+4. Bugs
+5. Verões Futuras
+
+==================================================================
+1) Requisitos do Sistema
+==================================================================
+
+Para executar o jogo é necessário:
+- Java Runtime Environment (JRE) instalado no computador, com alguma versão que venha com o JavaFX
+- Conexão com a internet caso deseja jogar em um servidor remoto
+- Executar o arquivo 'servidor.jar' provido junto com o jogo, na pasta de código, caso deseje jogar localmente
+
+==================================================================
+2) Instalação e Execução
+==================================================================
+
+- Extrair os arquivos de 'tak.zip'
+- O jogo pode ser executado sem instalação, das seguintes maneiras, na pasta jogo: 
+	Diretamente ao clicar duas vezes com o botão direito
+	Ou pelo terminal Windows ou Linux com o comando 'java -jar Tak.jar'
+
+==================================================================
+3) Versão Atual
+==================================================================
+
+- O jogo se encontra na primeira versão, mas é completamente jogável ĺocalmente ou através da rede
+- Ao menos dois jogadores devem se conectar ao jogo, através do menu dropdown encontrado no canto superior esquerdo da tela, para iniciar uma partida
+- O jogador que clicar para inicar uma partida receberá as peças azuis
+- O outro jogador verá a partida começar a partir do momento que o jogador azul fazer o primeiro lance
+- O jogador pode verificar se é seu turno no texto colorido acima do indicador de número de peças, na esquerda do tabuleiro
+- É possível posicionar peças, clicando nos botões a esquerda do tabuleiro
+- É possível mover peças, clicando em cima da peça desejada e selecionando quantas peças deseja mover
+- Ao passar o mouse por cima de uma casa que contém peças, a lista de peças será informada na tela de direita
+- O jogo encerra ao formar uma estrada Norte/Sul ou Leste/Oeste
+- O vencedor será informado no mesmo local de texto colorido onde é verificado quem é o jogador do turno atual
+- Ao desconectar, o tabuleiro será limpado para uma nova partida e o vencedor será informado na tela
+
+==================================================================
+4) Bugs
+==================================================================
+
+- Na medida do possível, o jogo foi testado exaustivamente para encontrar todos os bugs mais comuns
+- Todos os bugs encontrados foram removidos, mas outros que não foram encontrados podem ocorrer
+
+==================================================================
+5) Versões Futuras
+==================================================================
+
+- Tela de explicação do jogo: Atualmente os jogadores precisam conhecer o Tak, uma tela informativa pode ser adicionada
+- Modos de Jogo: É interessante adicionar um modo de jogo local em uma mesma tela, para dois jogadores, e um modo de jogo contra uma IA
+- Melhorias Visuais: os ícones das peças podem ser alterados para condizer mais com o jogo físico real

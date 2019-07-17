@@ -1,0 +1,18 @@
+Atividade Prática - Monitores
+
+Você deve simular o processo de fabricação de um produto utilizando threads e monitores em Java.
+Descrição do Problema
+
+O produto é composto por 2 peças iguais, que chamaremos de peças do tipo O, e por uma peça do tipo X. As peças do tipo O são manufaturadas por uma impressora 3D e colocadas por um braço robótico em um buffer com 10 lugares. Nesse mesmo buffer são colocadas as peças do tipo X, fabricadas por outra impressora 3D. Um robô com uma câmera acoplada ao seu braço mecânico faz a montagem do produto utilizando as peças contidas no buffer. Isso é feito colocando uma peça X sobre uma peça O e depois sobrepondo a elas outra peça O. Depois de montado, o produto é colocado em uma esteira, que o conduz até uma máquina embaladora. 
+
+Requsitos
+
+    Impeça o acesso simultâneo dos robôs ao buffer, de modo a evitar colisões que possam danificá-los.
+    Imprima mensagens ao final de cada etapa de produção.
+    A cada alteração no conteúdo do buffer, imprima na tela o seu conteúdo. 
+
+    O buffer deve ter no máximo 9 peças do tipo O, caso contrário não será possível montar um produto. De forma semelhante, podem haver somente 8 peças do tipo X no buffer. Atingidos esses limites, a impressora 3D que fabrica a peça deve ser colocada em modo de espera até que uma peça daquele tipo seja retirada do buffer.
+
+    As duas impressoras devem ser colocadas em espera quando o buffer estiver lotado.
+    O robô que faz a montagem do produto deve aguardar até que o buffer contenha pelo menos 2 peças do tipo O e 1 peça do tipo X. 
+

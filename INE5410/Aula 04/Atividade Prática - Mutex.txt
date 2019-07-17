@@ -1,0 +1,10 @@
+Atividade Prática - Mutex
+Exercício 1
+
+Utilize um Mutex para proteger a região crítica do código do Exercício 1 da atividade prática anterior, em que um contador era acessado concorrentemente por várias threads, resultando em um valor inconsistente. O Mutex deve ser utilizado de modo a controlar a concorrência entre as threads, fazendo com que o programa apresente o resultado esperado. 
+Exercício 2
+
+Altere o código do programa que faz a mutiplicação de matrizes, de modo que várias threads possam executar os passos necessários para calcular o resultado da multiplicação de forma concorrente. Utilize Mutex para controlar a concorrência e proteger a região crítica do código. 
+Exercício 3
+
+O programa stack disponível no Moodle recebe pela linha de comando o número de threads a serem criadas (N). Então, ele cria N threads que serão responsáveis por fazer, cada uma, MAX_PUSH inserções de maneira concorrente em uma estrutura de dados compartilhada do tipo pilha. Após o término dessas threads, o programa cria novamente N threads que serão responsáveis por remover todos os elementos da pilha de maneira concorrente. Faça as modificações necessárias na implementação da pilha para evitar condições de corrida.

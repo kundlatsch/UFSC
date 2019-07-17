@@ -1,0 +1,9 @@
+Atividade Prática - Deadlocks
+Exercício 1
+
+O programa impasse1.c contém duas threads  (worker1 e worker2) que realizam operações distintas. As duas threads devem manter uma lista das operações realizadas, bem como um total computado nestas operações (veja variáveis globais lista_de_operacoes e total_computado). No entanto, a implementação não foi feita de maneira adequada e o programa normalmente trava quando é executado. Verifique se os travamentos observados são devido a impasses e, em caso afirmativo, realize as alterações necessárias para que os impasses não ocorram.
+
+ 
+Exercício 2
+
+O programa impasse2.c simula uma agência bancária. Existem diversos caixas (cada caixa é representado por uma thread), que realizam operações de transferência entre as contas desta agência. Os caixas podem manipular as contas diferentes de maneira paralela (ex.: caixa 1 pode transferir valores da conta 2 para a 3 ao mesmo tempo que caixa 2 transfere da conta 0 para a 4). Entretanto, para manter a consistência do saldo das contas, quando um caixa está manipulando uma conta os outros caixas devem esperar antes de manipular essa mesma conta (ex.: se caixa 1 está transferindo valores da conta 2 para a 3, caixa 2 precisa esperar para poder transferir da conta 4 para a 3). A função transferir(Conta *origem, Conta *destino, double valor) é usada para fazer essas transferências. No entanto, observou-se que o programa não funciona adequadamente, apresentando travamentos. Verifique se os travamentos observados são devido a impasses e, em caso afirmativo, realize as alterações necessárias para que os impasses não ocorram. Você pode alterar apenas a função transferir, nenhuma outra parte do código pode ser modificada.

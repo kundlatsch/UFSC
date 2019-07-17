@@ -1,0 +1,62 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+    
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=blue,      
+    urlcolor=blue,
+    citecolor=black,
+}
+ 
+
+\begin{document}
+
+\title{O Sistema de Arquivos Unix File System\\
+{\footnotesize \textsuperscript{}Trabalho 3 da disciplina Sistemas Operacionais I}
+}
+
+\author{\IEEEauthorblockN{Gustavo Emanuel Kundlatsch}
+\IEEEauthorblockA{\textit{Departamento de Informática e Estatística} \\
+\textit{Universidade Federal de Santa Catarina}\\
+Florianópolis, Brasil \\
+gustavo.kundlatsch@gmail.com}
+\and
+\IEEEauthorblockN{Gustavo Raimundo}
+\IEEEauthorblockA{\textit{Departamento de Informática e Estatística} \\
+\textit{Universidade Federal de Santa Catarina}\\
+Florianópolis, Brasil \\
+incio.gusta@gmail.com}
+
+}
+
+\maketitle
+
+\begin{abstract}
+Esse trabalho foi desenvolvido para a matéria INE5412, no primeiro semestre do ano letivo de 2019. Nele, foram estudados os princípios teóricos e práticos do sistema de arquivos \textit{Unix File System} (UFS). Esse sistema de arquivos foi criado para suprir as demandas que surgiram com o avanço da tecnologia, que tornaram defasados os princípios do sistema de arquivos tradicional do Unix. 
+\end{abstract}
+
+\begin{IEEEkeywords}
+file system, unix, UFS
+\end{IEEEkeywords}
+
+\input{content/introduction.tex}
+\input{content/ufs.tex}
+\input{content/conclusion.tex}
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}

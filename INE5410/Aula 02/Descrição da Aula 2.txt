@@ -1,0 +1,37 @@
+Exercício 1
+
+Você deve escrever um programa em C em que o processo pai crie 2 processos filhos. 
+
+Para cada processo filho criado, o processo pai deve imprimir "Processo pai criou XXX", onde XXX é o PID do processo criado.
+
+Cada processo filho deve apenas imprimir "Processo filho XXX criado", onde XXX é o PID do processo corrente (use a função getpid() para isso).
+Exercício 2
+
+Você deve escrever um programa C em que:
+
+    O processo principal crie 2 processos filhos.
+    Cada um dos processos filhos deve, por sua vez, criar mais três processos.
+    Cada processo filho (tanto do processo principal quanto dos criados no passo anterior) deve imprimir "Processo XXX, filho de YYY", onde XXX é o PID do processo em questão e YYY o PID do processo que o criou (use as funções getpid() e getppid() para isso).
+    Os filhos de segundo nível (filhos dos filhos do processo princial) devem, após imprimir esta mensagem, aguardar 5 segundos antes de terminar (use a função sleep() para isso) 
+    Os processos que criaram filhos devem aguardar que seus filhos terminem de executar (utilize a função wait()).
+    Todos os processos filhos devem imprimir, ao finalizar, "Processo XXX finalizado", onde XXX é o PID do processo em questão. O processo principal deve imprimir "Processo principal finalizado".
+
+Exercício 3
+
+Modifique o código do exercício anterior de modo que os filhos de segundo nível alterem seu código binário (ou seja, façam uma chamada para uma função execl()) e executem o comando "/bin/date" para imprimir na tela a hora atual com precisão de nanossegundos (passe como argumento a opção +%H:%M:%S:%N). A chamada a ser utilizada é a seguinte: execl("/bin/date", "date", "+%H:%M:%S:%N", NULL).
+Dicas
+
+    Você deve fazer uma chamada da função wait() para cada processo filho criado. Esta função deve ser chamada somente depois de todos os filhos do processo em questão terem sido criados. 
+    A função exit(<status>) pode ser usada para encerrar um processo em qualquer ponto do código.
+    Para tornar o código mais simples, crie funções separadas para cada tipo de processo filho (uma função para filhos do processo principal, outra função para filhos dos filhos do processo principal)
+    Você vai precisar das seguintes bibliotecas em seu código:
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdio.h>
+
+    Se você usar o gcc por linha de comando, use o seguinte comando para compilar seu programa:
+
+ $ gcc -o nome_executavel arquivo_fonte.c

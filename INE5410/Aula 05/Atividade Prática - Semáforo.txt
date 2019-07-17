@@ -1,0 +1,12 @@
+Atividade Prática - Semáforo
+Exercício 1
+
+Você deve implementar um modelo de produtor/consumidor usando semáforos. Abaixo está o código fonte inicial deste programa, onde já está implementado o acesso a uma fila circular de elementos. O produtor deve adicionar produtos a essa fila, e o consumidor deve consumir os produtos depois de adicionados.
+
+Sua tarefa é alterar o código existente para que seja criada uma thread para o consumidor e outra thread para o produtor. Você deve usar semáforos para coordenar o acesso à fila de elementos, tanto no lado do produtor quanto no consumidor. Procure manter as threads o mínimo de tempo possível bloqueadas.
+Exercício 2
+
+Você deve alterar o código anterior de forma que possam ser criadas p threads de produtores e c threads de consumidores (entretanto, mantendo apenas uma fila circular de elementos). Os parâmetros p e c devem ser recebidos pela linha de comando, junto com o tamanho do buffer. Você deve fazer as alterações necessárias para sincronizar o acesso às variáveis globais e à fila de elementos.
+Exercício 3
+
+Considere duas threads, T1 e T2. A thread T1 executa o seguinte código: while(1) printf("A");. Por outro lado, a thread T2 executa o seguinte código: while(1) printf("B");. Utilize semáforos para sincronizar as duas threads de forma que, em qualquer momento, a diferença do número de A’s e B’s impressos na tela seja no máximo de 1. Por exemplo, a solução deve permitir um resultado ABBAABBABA mas impedir um resultado ABAABB.

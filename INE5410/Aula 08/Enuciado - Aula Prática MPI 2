@@ -1,0 +1,15 @@
+Segunda Atividade Prática de MPI
+Exercício 1
+
+Adapte o código fornecido "seq-mm.c" implementando o padrão mestre/escravo. Este programa gera duas matrizes aleatórias que são multiplicadas uma pela outra e gera uma nova matriz para ser multiplicada pela resultante. Essencialmente realizando uma multiplicação de N matrizes.
+
+    Na sua adaptação, o mestre deverar gerar as matrizes que serão processadas e enviá-las aos escravos, sem realizar a multiplicação.
+    Os escravos devem processar estas matrizes e devolvê-las ao mestre.
+    O mestre deve usar as matrizes resultado que obtiver dos escravos e enviá-las novamente em pares, dessa forma cada escravo recebe duas matrizes e devolve uma nova matriz resultado ao mestre.
+    Este comportamento deve se repetir até que todos os produtos tenham sido realizados.
+
+A corretude deve ser checada no mestre usando a função:
+
+size_t modular_sum(matrix_t * mat, size_t modulus)
+
+que deve ter o mesmo resultado nas versões sequencial e paralela.

@@ -1,0 +1,10 @@
+\section{Conclusão}
+
+O UFS, conforme foi descrito no trabalho atual, é um sistema de arquivos bastante antigo, com mais de 30 anos de idade. Sua proposta inicial foi evoluir o sistema de arquivos clássico do Unix, de forma a torná-lo configurável de acordo com o hardware em que se estava trabalhando.
+
+O UFS trouxe algumas inovações não só de otimização como de estruturação para o antigo FS, inovações que eram bastante procuradas pelos usuários, mas como implementar elas obrigaria os sistemas antigos a restaurar seus sistemas de arquivos, não eram viáveis de serem aplicadas. Como o UFS já iria requerer essa restauração de qualquer jeito, algumas coisas bastante interessantes passaram a ser padrão nos sistemas Unix. Ainda foi tomado um cuidado adicional para que essas mudanças não quebrassem programas antigos que foram feitos para o FS anterior.
+
+Essas inovações incluem coisas como nomes de arquivos longos, que a partir do UFS passaram a poder ser quase arbitrariamente longos, tendo na época de sua criação um tamanho máximo de 255 caracteres. Outra inovação são os links simbólicos, que já haviam sido concebidos de maneira similar anteriormente mas no UFS foram implementados literalmente como ``um arquivo que contém um pathname''. Além disso, o UFS criou a operação de renomear, para evitar que operações desnecessárias fossem usadas para isso.
+
+Algumas distribuições de Unix adotaram o UFS como padrão, mas em geral esse sistema de arquivos foi adaptado de acordo com a necessidade de cada fornecedor, no fim gerando diversos outros sistemas de arquivos.
+

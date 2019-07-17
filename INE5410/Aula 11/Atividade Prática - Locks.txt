@@ -1,0 +1,36 @@
+Atividade Prática - Locks
+
+Você deve implementar um web crawler em Java. O objetivo de um crawler é navegar em páginas web coletando informações sobre elas. Para cada página visitada, os links que levam a outras páginas são extraídos para que sejam visitados posteriormente. Como o número de páginas é potencialmente muito grande, o código deve ser organizado com duas filas: uma de links a visitar e uma de documentos baixados. Serão também dois tipos de threads: um tipo retira um link da fila de links a visitar, faz o download do link e adiciona o HTML na lista de documentos baixados. O segundo tipo retira documentos da lista de documentos baixados, extrai os links do HTML, salva os links num arquivo de texto e os adiciona à lista de links a visitar. Como os documentos baixados podem ser grandes, a lista de documentos baixados deve ser limitada a no máximo 200 entradas. Você deve usar Locks e Conditions para controlar o acesso às listas. O programa deve contar com 20 threads que visitam links e 2 threads que extraem os links dos documentos HTML.
+Informações
+
+    Os links devem ser salvos em um arquivo de texto no formato:
+
+<Link de origem> (<número de links de destino)
+<Link de destino 1>
+<Link de destino 2>
+<Link de destino n>
+
+    Use como primeiro link a visitar a página do CCO: http://cco.inf.ufsc.br/
+    Use a biblioteca Jsoup para fazer o download dos documentos HTML e extrair os links. Você pode adicioná-la ao seu projeto ou usar algum gerenciador de dependências como o Maven. Veja abaixo como usá-la:
+
+private String downloadLink(String link) {
+    try {
+        String document = Jsoup.connect(link).get().html();
+        return document;
+    } catch (Throwable e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+
+private List<String> extractDocumentLinks(String html) {
+   ArrayList<String> result = new ArrayList<String>();
+   Document doc = Jsoup.parse(html);
+   Elements links = doc.select("a[href]");
+   for (Element link : links) {
+      String url = link.attr("abs:href");
+      if (url.length() > 0 && url.startsWith("http"))
+            result.add(url);
+   }
+   return result;
+}
