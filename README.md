@@ -1,6 +1,6 @@
 # UFSC
 
-Esse repositório contém os arquivos produzidos em todas as disciplinas cursadas no curso de Ciência da Computação da Universidade Federal de Santa Catarina por mim.
+Esse repositório contém os arquivos produzidos em todas as disciplinas cursadas por mim no curso de Ciência da Computação da Universidade Federal de Santa Catarina.
 
 ### Conteúdos
 
