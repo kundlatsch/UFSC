@@ -1,0 +1,16 @@
+\section{Máquinas de Turing Multifitas}
+
+\begin{enumerate}[label=(\alph*)]
+
+\item L = $\{ww^Rw^Rw \vert w \in \{0,1\}^*\}$  ($w^R$ é o reverso da cadeia w)
+
+Para implementar uma máquina de turing multifitas que aceita tal linguagem, primeiro,
+vamos copiar o conteúdo da cadeia w na fita 1 para uma fita 2. Depois,
+percorremos a fita 1 até o final, para comparar o final de w com o conteúdo da fita 2. 
+Ao terminar de percorrer essas fitas, vamos comparar w com w reverso. Caso a cadeia esteja
+correta, o cabeçote da fita 2 deve retornar para o começo, para comparar w reverso com w.
+
+Para tais comparações, iremos ir trocando a's por A's, e b's por B's. Ao final das duas comparações,
+devem haver apenas A's e B's e, nesse caso, a entrada é válida.
+
+\end{enumerate}

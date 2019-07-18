@@ -1,0 +1,73 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% How to use writeLaTeX: 
+%
+% You edit the source code here on the left, and the preview on the
+% right shows you the result withi.n a few seconds.
+%
+% Bookmark this page and share the URL with your co-authors. They can
+% edit at the same time!
+%
+% You can upload figures, bibliographies, custom classes and
+% styles using the files menu.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+
+\usepackage{graphicx,url}
+\usepackage{amsthm}
+
+%\usepackage[brazil]{babel}   
+\usepackage[utf8]{inputenc}  
+
+     
+\sloppy
+
+\title{Prova da NP Completude de
+\\The Legend of Zelda: A Link to the Past}
+
+\author{Gustavo Kundlatsch e Gustavo Raimundo}
+
+
+\address{Departamento de Informática e Estatística (INE)
+\\Universidade Federal de Santa Catarina(UFSC)}
+
+\begin{document} 
+
+\maketitle
+
+\begin{abstract}
+  This paper has the objective to prove the NP completude of the game The Legend of Zelda: a Link to The Past,
+  a classic game of the serie, released for the Super Nintendo Entertainment System (SNES).
+  That is, if the game was played by an algorithm, the complexity to solve certain problems
+  during it's run would be NP-Complete, so the game as a whole is NP-Complete. For this, we 
+  will use a proof framework, used to make similar proofs to other games of the same company.
+\end{abstract}
+     
+\begin{resumo} 
+  Este artigo tem como objetivo provar a NP completude do jogo The Legend Of Zelda: a Link to The Past,
+  um dos clássicos da franquia, lançado para o Super Nintendo Entertainment System (SNES). 
+  Isto é, caso fosse jogado por um algoritmo, a complexidade
+  para resolver certos problemas durante seu decorrer são NP-Completo, e assim,
+  o jogo como um todo pode ser dito NP-Completo. Para isso, utilizaremos um framework
+  que é utilizado para realizar provas semelhantes em diversos jogos da mesma empresa.
+\end{resumo}
+
+\input{introduction.tex}
+
+\input{presentation.tex}
+
+\input{framework.tex}
+
+\input{proof.tex}
+
+\input{conclusion.tex}
+
+%\section*{Agradecimentos}
+
+\bibliographystyle{sbc}
+\bibliography{sbc-template}
+
+\end{document}

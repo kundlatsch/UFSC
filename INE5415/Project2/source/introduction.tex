@@ -1,0 +1,17 @@
+\section{Introdução}
+
+Diversos artigos acadêmicos falam da NP Completude da jogabilidade
+de variados tipos de jogos \cite{cormodehardness} \cite{forivsek2010computational}
+\cite{viglietta2014gaming}. Neste trabalho, vamos provar a NP Completude do clássico jogo 
+da Nintendo "The Legend of Zelda: a Link to The Past", de 1991. Para isso, vamos usar a definição de \cite{aloupis2015classic}
+para caracterizar sua jogabilidade: 
+
+\begin{quote}
+    Nós consideramos o problema de decisão de acessibilidade: dado uma fase ou \textit{dungeon}, é possível
+    alcançar o ponto de objetivo t a partir do ponto de início s?
+\end{quote}
+
+Para isso, vamos reduzi-lo ao problema 3SAT (problema da satisfação booleana com três elementos), através de um framework, que será apresentado mais tarde.
+
+Em tal prova, vamos assumir que nenhum \textit{bug} ou \textit{glitch} será utilizado para driblar
+qualquer mecânica do jogo, respeitando a coerência das mecânicas implementadas pelos desenvolvedores.

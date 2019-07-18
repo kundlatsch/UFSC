@@ -1,0 +1,38 @@
+
+\section{Máquinas de Turing de Fita Única}
+
+\begin{enumerate}[label=(\alph*)]
+\item L = $\{a^ib^jc^k \vert i, j, k \in N, i^2 \cdot j = k\}$
+
+Para implementar uma máquina que reconhece esta linguagem, utilizamos um algoritmo como descrito a seguir:
+
+Primeiro, é necessário fazer $i^2$, caso i maior que zero. Para isso, lemos o primeiro a que aparecer na fita, e
+o substituímos por A. A partir disso, avançamos na fita até encontrar um espaço vazio, onde escrevemos 1
+para fazer a contagem de a's necessários para fazer a primeira iteração de $i^2$. Depois de escrever o primeiro
+1, voltamos na fita até o primeiro a e repitimos o processo até todos os a's serem substituídos por A. Nesse momento,
+voltamos até o começo da fita e trocamos o primeiro A por a, mostrando que uma iteração já foi feita. Para cada A restante,
+faremos um processo similar ao inicial, mas dessa vez replicando os 1's no final da fita, por i - 1 vezes. Assim
+obtemos o quadrado de i.
+
+Depois, precisamos multiplicar esse número por j. para isso, repetiremos a sequência de 1's feita j vezes.
+Desta maneira, teremos uma longa cadeia de 1's que representa $i^2$ vezes j. 
+
+Por fim, basta comparar o número de dígitos dessa cadeia com o número de k's.
+É necessário tratar os casos de i, j e/ou k ser zero. (se i ou j for zero não podem haver k's na fita).
+
+\item L = $\{\#x_1\#x_2\#...\#xn \vert \in (0,1)^*, \nexists x_i = x_j, j > i\}$
+
+A Máquina de Turing que aceita essa linguagem deverá comparar cada x com cada um dos elementos subsequentes,
+e caso encontre qualquer $x_i$ = $x_j$, com j $>$ i, a entrada será considerada válida (contanto que cada
+x seja composto por $\{0, 1\}^*$). No início, iremos verificar se existem dois x's vazios, e aproveitamos para
+testar se todos os x's são constituídos apenas por zeros e uns. Depois, para continuar a comparação, a máquina
+irá ler os x's em ordem. 
+Para cada 0 que ela encontrar, irá substituir por x, e buscar na entrada outros x's que contém 0 como primeiro caractere. 
+Quando encontrar, ela substituirá por A. Quando tiver feito esse processo em todos os x's, o cabeçote retorna para o x que 
+está sendo lido atualmente (único que contém x ou y), e repete esse processo. Para cada 1 que encontrar, o processo
+será o mesmo, mas no x atual será substituído por y e nos x's comparados será substituído por B. Quando um x não tiver
+o caractere correto, todos os A's serão trocados para a e todos os B's para b (para sabermos que o x é inválido).
+No momento que um x for averiguado como igual o outro, a máquina irá aceitar a entrada.
+
+
+\end{enumerate}

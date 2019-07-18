@@ -14,6 +14,7 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | INE5410 | [Programação Concorrente](https://github.com/kundlatsch/UFSC/tree/master/INE5410) |
 | INE5412 | [Sistemas Operacionais I](https://github.com/kundlatsch/UFSC/tree/master/INE5412) |
 | INE5414 | [Redes de Computadores I](https://github.com/kundlatsch/UFSC/tree/master/INE5414) |
+| INE5415 | [Teoria da Computação](https://github.com/kundlatsch/UFSC/tree/master/INE5415) |
 | INE5416 | [Paradigmas de Programação](https://github.com/kundlatsch/UFSC/tree/master/INE5416) |
 | INE5417 | [Engenharia de Software I](https://github.com/kundlatsch/UFSC/tree/master/INE5417) |
 

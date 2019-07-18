@@ -1,0 +1,27 @@
+\section{Máquinas de Turing em Blocos}
+
+Uma máquina de turing em blocos é uma máquina de turing que utiliza
+outras máquinas de turing previamente construídas, que recebem uma entrada
+qualquer e funcionam como uma caixa preta para processar essa entrada, como
+funções ou procedimentos.
+
+\begin{enumerate}[label=(\alph*)]
+
+\item L = $\{0^{2^n} \vert n \geq 0\}$
+
+Para implementar uma Máquina de Turing em blocos que aceita essa lingugagem,
+vamos primeiro varrer a fita da esquerda para a direita. Se tiver um único zero,
+vamos aceitar a entrada. Caso o número de zeros for maior que um, mas for um
+número ímpar, rejeitamos a entrada. Depois disso, terminamos a primeira iteração,
+e retornamos o cabeçote para o começo.
+
+Para cada iteração que acontecer, vamos cortar a fita no meio. Se o número de zeros
+da fita cortada pela metade for ímpar e maior que um, a fita original não tem como
+ter número ímpar de zeros, caso contrário, o número original é par, e aceitamos a entrada.
+
+\item 
+Dada uma entrada com uma sequência de "a", que representa n, a máquina retorna o n-ésimo valor de Fibonacci representado por uma sequência de "c".
+
+Para uma máquina de turing em blocos realizar essa operação, em cada iteração, um "a" é trocado por um "A" e é feita uma concatenação de "c" igual a quantidade de "c" antes, e incluindo, de "\#" e coloca "\#" no último "c" que fazia parte do número anterior, podendo assim guardar o valor para a soma do próximo número.
+
+\end{enumerate}
