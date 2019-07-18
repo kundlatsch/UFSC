@@ -1,0 +1,31 @@
+Para rodar o poetry:
+% poetry develop
+% poetry shell
+
+-----
+
+% pytest
+
+-----
+
+mapa = dicionário (python)
+dada uma chave de entrada, retorna um valor fixo
+chaves : valores
+
+-----
+
+sempre colocar o mínimo de código possível em
+uma região que sabe-se que pode dar erro
+
+-----
+
+um programa no linux tem duas saídas: stdout e stderr
+
+------- AULA 3 --------
+
+execução: init -> main
+init também roda quando importa (como no código de teste)
+
+-----------------------
+
+Função de segunda ordem: função operada dentro de outra

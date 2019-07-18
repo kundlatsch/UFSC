@@ -1,0 +1,13 @@
+Para rodar o poetry:
+% poetry develop
+% poetry shell
+
+-----
+
+% pytest
+
+-----
+
+mapa = dicionário (python)
+dada uma chave de entrada, retorna um valor fixo
+chaves : valores

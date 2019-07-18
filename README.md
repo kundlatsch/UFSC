@@ -2,7 +2,7 @@
 
 Esse repositório contém os arquivos produzidos em todas as disciplinas cursadas por mim no curso de Ciência da Computação da Universidade Federal de Santa Catarina.
 
-### Conteúdos
+### Disciplinas da Graduação
 
 
 | Código  | Disciplina                |
@@ -17,6 +17,15 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | INE5415 | [Teoria da Computação](https://github.com/kundlatsch/UFSC/tree/master/INE5415) |
 | INE5416 | [Paradigmas de Programação](https://github.com/kundlatsch/UFSC/tree/master/INE5416) |
 | INE5417 | [Engenharia de Software I](https://github.com/kundlatsch/UFSC/tree/master/INE5417) |
+
+### Minicursos
+
+
+| Pasta   | Minicurso                |
+| ------  | :-----------------------: |
+| MiniNode | [NodeJS](https://github.com/kundlatsch/UFSC/tree/master/MiniNode) |
+| MiniPy | [Python](https://github.com/kundlatsch/UFSC/tree/master/MiniPython) |
+| MiniShell | [Shell Script](https://github.com/kundlatsch/UFSC/tree/master/MiniShell) |
 
 ### Links Adicionais
 
