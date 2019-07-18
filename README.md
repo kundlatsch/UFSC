@@ -24,7 +24,7 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | Pasta   | Minicurso                |
 | ------  | :-----------------------: |
 | MiniNode | [NodeJS](https://github.com/kundlatsch/UFSC/tree/master/MiniNode) |
-| MiniPy | [Python](https://github.com/kundlatsch/UFSC/tree/master/MiniPython) |
+| MiniPy | [Python](https://github.com/kundlatsch/UFSC/tree/master/MiniPy) |
 | MiniShell | [Shell Script](https://github.com/kundlatsch/UFSC/tree/master/MiniShell) |
 
 ### Links Adicionais
