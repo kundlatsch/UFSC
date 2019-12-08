@@ -17,6 +17,9 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | INE5415 | [Teoria da Computação](https://github.com/kundlatsch/UFSC/tree/master/INE5415) |
 | INE5416 | [Paradigmas de Programação](https://github.com/kundlatsch/UFSC/tree/master/INE5416) |
 | INE5417 | [Engenharia de Software I](https://github.com/kundlatsch/UFSC/tree/master/INE5417) |
+| INE5418 | [Computação Distribuída](https://github.com/kundlatsch/UFSC/tree/master/INE5418) |
+| INE5421 | [Linguagens Formais e Compiladores](https://github.com/kundlatsch/UFSC/tree/master/INE5421) |
+| INE5423 | [Banco de Dados I](https://github.com/kundlatsch/UFSC/tree/master/INE5423) |
 
 ### Minicursos
 
@@ -26,7 +29,9 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | MiniNode | [NodeJS](https://github.com/kundlatsch/UFSC/tree/master/MiniNode) |
 | MiniPy | [Python](https://github.com/kundlatsch/UFSC/tree/master/MiniPy) |
 | MiniShell | [Shell Script](https://github.com/kundlatsch/UFSC/tree/master/MiniShell) |
+| MiniPLI | [Programação Linear e Inteira](https://github.com/kundlatsch/UFSC/tree/master/MiniPLI) |
 
 ### Links Adicionais
 
 + [Currículo do Curso](http://cagr.sistemas.ufsc.br/relatorios/curriculoCurso?curso=208)
++ [Árvore de Disciplinas](https://github.com/CalicoUFSC/ufsc-cco-reformulado/blob/master/grafo-curricular.svg)
