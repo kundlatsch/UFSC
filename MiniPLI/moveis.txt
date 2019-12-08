@@ -1,0 +1,6 @@
+Maximize p = 5x1 + 4x2 + 3x3
+subject to
+
+2x1 + 3x2 + 1x3 <= 55
+4x1 + 1x2 + 2x3 <= 110
+3x1 + 4x2 + 2x3 <= 80

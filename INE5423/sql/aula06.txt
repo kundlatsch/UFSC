@@ -1,0 +1,15 @@
+1) Escreva uma visão que contenha o nome do medico, o nome do paciente e a data da consulta
+2) Escreva uma visão que contenha o numero dos ambulatórios que nenhum médico atende
+3) Escreva uma visão que recupere os funcionários que nunca consultaram
+
+3.5) Crie  4 usuarios: um dba, medico, estagiario e secretaria
+
+4) O usuário estagiário pode ver o nome do medico, o nome do paciente e a data da consulta, 
+mas não podem ver a doença  do paciente
+5) Somente o estagiario pode incluir novos funcionários
+6) Somente o medico tem acesso completo aos dados do paciente,
+ tanto para cadastro quanto para alteração.
+7) Somente o usuário dba pode consultar e alterar o salário dos funcionários
+8) O usuário “secretaria”  somente pode ter acesso aos médicos que trabalham no ambulatório do 4 andar
+9) Crie um papel chamado consultas. Este papel poderá consultar as tabelas paciente e medico.
+Crie 2 usuarios u1 e u2 que tenham o mesmo papel  de consulta

@@ -1,0 +1,25 @@
+Questões:
+
+Inserir um registro em empregados cuja idade seja menor que 16 e observe a mensagem. Tente cadastrar um empregado com um estado civil que não esteja no check.
+
+Cadastrar um cliente com o RG nulo.
+
+Cadastrar as cidades de Florianopolis e BIguacu
+
+Cadastrar o empregado Pedro que é casado e mora numa cidade que não esteja cadastrada e observe o erro. Corrija a cidade para Florianopolis
+
+Cadastre o empregado Mario que é solteiro e mora em Florianopolis
+
+Faca  uma consulta na tabela empregados e observe o numero de registros e o código das cidades onde moram
+
+Tente excluir a cidade de Florianopolis e observe o que acontece. Tente excluir Biguacu. Faça uma consulta na tabela de empregados e na tabela cidade.
+
+Cadastrar o cliente Airton que mora em Biguacu
+
+Tente excluir a cidade de Biguaçu e observe a diferença em relação a exclusão de Florianopolis. O que você observou?
+
+Cadastrar uma conta para o cliente Airton
+
+Criar uma trigger que insira automaticamente uma tupla em emprestimo  quando o saldo da conta do cliente atingir um valor negativo.
+
+Modificar o valor do saldo da conta do cliente Airton para -1000. Verifique se um registro foi inserido na tabela emprestimo.

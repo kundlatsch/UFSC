@@ -1,0 +1,15 @@
+# COMPILED WITH https://www.zweigmedia.com/RealWorld/simplex.html
+
+Minimize y = 5x1 + 15x2 + 8x3 + 2.5x4 + 9.75x5 + 18x6 
+subject to
+
+x1 <= 4
+x2 <= 2
+x3 <= 2
+x4 <= 8
+x5 <= 3
+x6 <= 1
+
+110x1 + 550x2 + 260x3 + 160x4 + 420x5 + 650x6 >= 2000
+4x1 + 40x2 + 16x3 + 8x4 + 4x5 + 37x6 >= 55
+2x1 + 20x2 + 73x3 + 150x4 + 22x5 + 80x6 >= 800

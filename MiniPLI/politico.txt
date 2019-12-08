@@ -1,0 +1,6 @@
+Minimize y = x1 + x2 + x3 + x4
+subject to
+
+-2x1 + 8x2 + x3 + 10x4 >= 50
+5x1 + 6x2 + 3x4 >= 100
+3x1 - 5x2 + 10x3 + x4 >= 10

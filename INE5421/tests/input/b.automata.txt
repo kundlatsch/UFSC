@@ -1,0 +1,4 @@
+*Q: a - A, B, C; b - C;
+A: a - A; & - B;
+B: a - C; b - C;
+*C: c - C;
