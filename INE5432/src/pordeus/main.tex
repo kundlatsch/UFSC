@@ -1,0 +1,92 @@
+\section{JSON}
+\subsection{O que é?}
+JSON, um acrônimo para \textit{\textbf{J}ava\textbf{S}cript \textbf{O}bject \textbf{N}otation}, é um formato leve para troca de dados baseado em um subconjunto do padrão ECMA-262, terceira edição (dezembro de 1999). Se propõe a ser fácil de ler e escrever para humanos e fácil de analisar e gerar para máquinas. É um formato de texto independente de linguagem, mas utiliza convenções familiares à programadores de linguagens de programação da família do C. \cite{jsonorg}.\\
+Segundo o seu "descobridor", como Douglas Crockford se define, o JSON \textbf{não} é  \cite{jsonsaga}: 
+\begin{itemize}
+  \item um formato de documento.
+  \item uma linguagem de marcação
+  \item uma linguagem de serialização geral, já que não possui suporte direto à grafos cíclicos, estruturas binárias ou funções.
+\end{itemize}
+
+\subsection{Sintaxe}
+O JSON é construído em cima de duas estruturas: uma coleção de pares nome/valor e uma lista ordenada de valores, É definido como: \cite{jsonorg}
+\begin{itemize}
+    \item Um objeto JSON é delimitado por chaves ({, }) e composto por pares string/valor, separados por vírgula (,).
+    \item Uma string é uma cadeia de zero ou mais caracteres Unicode, delimitada por aspas duplas (") e usando a barra invertida (\textbackslash) como escape para aspas e caracteres de controle.
+    \item Um valor pode ser uma string, um número, um objeto, uma array, true, false ou null.
+    \item Um número é uma cadeia de dígitos, também delimitada por aspas ("), contendo ou não um ponto (.) e mais dígitos à direita, fracionários. Pode conter, também parte exponencial com um e (e, E) seguido de sinal (+,-) e mais digitos.
+    \item Uma array é uma lista ordenada de valores, delimitada por colchetes ([, ]) e separada por vírgula (,).
+\end{itemize}
+Demonstração \cite{jsonexample}:
+\begin{minted}[linenos]
+{json}
+{"widget": {
+    "debug": "on",
+    "window": {
+        "title": "Sample Konfabulator Widget",
+        "name": "main_window",
+        "width": 500,
+        "height": 500
+    },
+    "image": { 
+        "src": "Images/Sun.png",
+        "name": "sun1",
+        "hOffset": 250,
+        "vOffset": 250,
+        "alignment": "center"
+    },
+    "text": {
+        "data": "Click Here",
+        "size": 36,
+        "style": "bold",
+        "name": "text1",
+        "hOffset": 250,
+        "vOffset": 100,
+        "alignment": "center",
+        "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+    }
+}}
+\end{minted}
+Mesmo texto, em XML \cite{jsonexample}:
+\begin{minted}[linenos]
+{xml}
+<widget>
+    <debug>on</debug>
+    <window title="Sample Konfabulator Widget">
+        <name>main_window</name>
+        <width>500</width>
+        <height>500</height>
+    </window>
+    <image src="Images/Sun.png" name="sun1">
+        <hOffset>250</hOffset>
+        <vOffset>250</vOffset>
+        <alignment>center</alignment>
+    </image>
+    <text data="Click Here" size="36" style="bold">
+        <name>text1</name>
+        <hOffset>250</hOffset>
+        <vOffset>100</vOffset>
+        <alignment>center</alignment>
+        <onMouseUp>
+            sun1.opacity = (sun1.opacity / 100) * 90;
+        </onMouseUp>
+    </text>
+</widget>
+\end{minted}
+
+\subsection{Para que Serve?}
+JSON serve para a transmissão de dados entre quaisquer tipos de programas que precisem se comunicar, sendo o programador o responsável por manter a consistência semântica \cite{jsonsaga}.
+
+Mais especificamente, é especialmente útil em cenários de comunicação com navegadores ou aplicações mobile nativas. Pode ser útil em comunicação servidor-a-servidor ou ser deixado de lado em favor de frameworks de serialização \cite{jsonbetterformat}.
+
+No caso de bancos de dado NoSQL, é necessário trabalhar com os dados fornecidos no formato fornecido. Já bancos de dados relacionais são melhor adaptados a dados mais estruturados, com um schema específico\cite{jsonbetterformat}, 
+
+
+
+
+\subsection{Quais as Implicações?}
+Nos anos 2000, a interação com a web começou a se transformar. Na época, o navegador apenas exibia a informação que o servidor trabalhava. Quando se clicava em um link, um pedido era enviado ao servidor, que processava e devolvia a informação como HTML, recarregando a página. Esse processo é ineficiente, precisando-se alterar tudo mesmo quando as diferenças afetam apenas uma pequena porção da página \cite{jsonbetterformat}.
+
+Dentre as novas tecnologias para resolver esse problema, surge o Javascript, que eventualmente se torna a linguagem de programação universal nos navegadores \cite{jsonbetterformat}, com excelente sintaxe para objetos e literais de array \cite{jsonnotjavascript} e o JSON, como uma forma de comunicação leve por onde se dá essa comunicação e representação de tipos fundamentais de dados \cite{jsonnotjavascript}.
+
+Outro exemplo de aplicação de JSON é a técnica AJAX (\textit{Asynchronous Javascript and XML}), que apesar de inicialmente planejada para XML, pode muito bem ser utilizado com JSON, muitas vezes mais eficientemente \cite{jsonajax}. Assim como as APIs REST, que - apesar de poderem utilizar XML ou YAML, são mais comumente implementadas com JSON \cite{jsonrest}.

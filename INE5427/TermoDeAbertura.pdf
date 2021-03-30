@@ -1,0 +1,157 @@
+%PDF-1.3
+1 0 obj
+<< /Type /Catalog
+/Outlines 2 0 R
+/Pages 3 0 R >>
+endobj
+2 0 obj
+<< /Type /Outlines /Count 0 >>
+endobj
+3 0 obj
+<< /Type /Pages
+/Kids [6 0 R
+10 0 R
+]
+/Count 2
+/Resources <<
+/ProcSet 4 0 R
+/Font << 
+/F1 8 0 R
+/F2 9 0 R
+>>
+>>
+/MediaBox [0.000 0.000 595.280 841.890]
+ >>
+endobj
+4 0 obj
+[/PDF /Text ]
+endobj
+5 0 obj
+<<
+/Creator (DOMPDF)
+/CreationDate (D:20201102222128-02'00')
+/ModDate (D:20201102222128-02'00')
+/Title (Project Charter)
+>>
+endobj
+6 0 obj
+<< /Type /Page
+/Parent 3 0 R
+/Contents 7 0 R
+>>
+endobj
+7 0 obj
+<<
+/Length 3910 >>
+stream
+
+0.000 0.000 0.000 rg
+BT 248.878 747.449 Td /F2 13.5 Tf  [(Project Charter)] TJ ET
+1.000 1.000 1.000 rg
+BT 355.537 714.276 Td /F1 0.8 Tf  [(Empresa)] TJ ET
+0.753 0.753 0.753 rg
+BT 358.538 714.276 Td /F1 8.2 Tf  [(Empresa)] TJ ET
+BT 391.546 714.276 Td /F1 8.2 Tf  [(: Empresa - Grupo_1242)] TJ ET
+BT 419.043 704.622 Td /F1 8.2 Tf  [(Data)] TJ ET
+BT 436.467 704.622 Td /F1 8.2 Tf  [(: 02/11/2020)] TJ ET
+0.000 0.000 0.000 rg
+BT 112.943 658.640 Td /F2 8.2 Tf  [(Título do projeto: )] TJ ET
+BT 112.943 646.888 Td /F1 8.2 Tf  [(Analise sobre erro quântico no computador da IBMQ)] TJ ET
+BT 112.943 623.585 Td /F2 8.2 Tf  [(Gerente do projeto:)] TJ ET
+BT 112.943 611.833 Td /F1 8.2 Tf  [(Grupo 1242)] TJ ET
+BT 112.943 588.531 Td /F2 8.2 Tf  [(Justificativa: )] TJ ET
+BT 112.943 576.779 Td 2.066 Tw /F1 8.2 Tf  [(O IBMQ, computador quântica da IBM, é uma solução de computação quântica disponível via )] TJ ET
+BT 112.943 565.027 Td 0.986 Tw /F1 8.2 Tf  [(nuvem. Embora amplamente utilizado em diversos experimentos, ele ainda possui erros inerentes )] TJ ET
+BT 112.943 553.275 Td 1.333 Tw /F1 8.2 Tf  [(ao hardware. Em decorrência disso, o trabalho visa quantificar o erro das portas lógicas e gerar )] TJ ET
+BT 112.943 541.523 Td 0.000 Tw /F1 8.2 Tf  [(uma análise utilizando um benchmark.)] TJ ET
+BT 112.943 518.221 Td /F2 8.2 Tf  [(Objetivos:)] TJ ET
+BT 112.943 506.468 Td /F1 8.2 Tf  [(Fazer uma revisão sistemática do estado da arte na área de análise de erro quântico. )] TJ ET
+BT 112.943 494.716 Td /F1 8.2 Tf  [(Aprender a utilizar a plataforma do IBMQ. )] TJ ET
+BT 112.943 482.964 Td /F1 8.2 Tf  [(Implementar o algoritmo de Grover para utilizar como benchmark.)] TJ ET
+BT 112.943 459.662 Td /F2 8.2 Tf  [(Resultados esperados: )] TJ ET
+BT 112.943 447.910 Td /F1 8.2 Tf  [(Revisão completa do estado da arte. )] TJ ET
+BT 112.943 436.158 Td /F1 8.2 Tf  [(Implementação correta do algoritmo de Grover. )] TJ ET
+BT 112.943 424.406 Td /F1 8.2 Tf  [(Análise de erro quântico das portas lógicas da plataforma IBMQ )] TJ ET
+BT 112.943 412.654 Td /F1 8.2 Tf  [(Entrega da proposta do projeto para a disciplina de Introdução ao TCC, )] TJ ET
+BT 112.943 400.901 Td /F1 8.2 Tf  [(Relatório de TCC 1 e o relatório final.)] TJ ET
+BT 112.943 377.599 Td /F2 8.2 Tf  [(Premissas: )] TJ ET
+BT 112.943 365.847 Td 0.727 Tw /F1 8.2 Tf  [(O aluno utilizará o próprio computador. A monografia será escrita em português, utilizando LaTeX. )] TJ ET
+BT 112.943 354.095 Td 1.310 Tw /F1 8.2 Tf  [(O aluno deve, ao fim do período de bolsa PIBIC de 12 meses, escrever um relatório relativo ao )] TJ ET
+BT 112.943 342.343 Td 1.133 Tw /F1 8.2 Tf  [(trabalho realizado até a data de término da bolsa, bem como um vídeo para sua participação no )] TJ ET
+BT 112.943 330.591 Td 0.000 Tw /F1 8.2 Tf  [(Seminário de Iniciação Científica. Ter acesso ao IBMQ durante a execução do projeto.)] TJ ET
+BT 112.943 307.289 Td /F2 8.2 Tf  [(Restrições:)] TJ ET
+BT 112.943 295.537 Td /F1 8.2 Tf  [(Os testes devem ser realizados no IBMQ. )] TJ ET
+BT 112.943 283.784 Td 1.679 Tw /F1 8.2 Tf  [(As entregas parciais devem ser entregues até as datas limites estabelecidas nas disciplinas de )] TJ ET
+BT 112.943 272.032 Td 0.000 Tw /F1 8.2 Tf  [(Introdução a TCC e TCC I. )] TJ ET
+BT 112.943 260.280 Td /F1 8.2 Tf  [(O projeto deverá ser finalizado até a data limite da disciplina de TCC II.)] TJ ET
+BT 112.943 236.978 Td /F2 8.2 Tf  [(Orçamento \(R$\): )] TJ ET
+BT 112.943 225.226 Td /F1 8.2 Tf  [(4.800,00)] TJ ET
+BT 112.943 201.924 Td /F2 8.2 Tf  [(Data de início: )] TJ ET
+BT 112.943 190.172 Td /F1 8.2 Tf  [(10/09/2020)] TJ ET
+BT 112.943 166.870 Td /F2 8.2 Tf  [(Data de encerramento: )] TJ ET
+BT 112.943 155.117 Td /F1 8.2 Tf  [(07/12/2021)] TJ ET
+BT 112.943 131.815 Td /F2 8.2 Tf  [(Marcos: )] TJ ET
+BT 112.943 96.963 Td /F2 8.2 Tf  [(Critérios de aceite: )] TJ ET
+BT 112.943 85.211 Td /F1 8.2 Tf  [(Implementação correta do algoritmo de Grover. )] TJ ET
+endstream
+endobj
+8 0 obj
+<< /Type /Font
+/Subtype /Type1
+/Name /F1
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+>>
+endobj
+9 0 obj
+<< /Type /Font
+/Subtype /Type1
+/Name /F2
+/BaseFont /Helvetica-Bold
+/Encoding /WinAnsiEncoding
+>>
+endobj
+10 0 obj
+<< /Type /Page
+/Parent 3 0 R
+/Contents 11 0 R
+>>
+endobj
+11 0 obj
+<<
+/Length 506 >>
+stream
+
+0.000 0.000 0.000 rg
+BT 112.943 735.899 Td /F1 8.2 Tf  [(Coletar dados suficientes para produzir uma análise acurada em relação aos erros quânticos.)] TJ ET
+BT 276.322 701.047 Td /F2 8.2 Tf  [(Signatures)] TJ ET
+0.000 0.000 0.000 RG
+267.148 650.726 m 325.839 650.726 l 325.839 649.976 l 267.148 649.976 l  f
+BT 267.148 643.095 Td /F1 8.2 Tf  [(Project Sponsor)] TJ ET
+263.246 604.324 m 332.034 604.324 l 332.034 603.574 l 263.246 603.574 l  f
+BT 263.246 596.693 Td /F1 8.2 Tf  [(Gerente do projeto)] TJ ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000008 00000 n 
+0000000073 00000 n 
+0000000119 00000 n 
+0000000290 00000 n 
+0000000319 00000 n 
+0000000458 00000 n 
+0000000521 00000 n 
+0000004483 00000 n 
+0000004590 00000 n 
+0000004702 00000 n 
+0000004767 00000 n 
+trailer
+<<
+/Size 12
+/Root 1 0 R
+/Info 5 0 R
+>>
+startxref
+5325
+%%EOF

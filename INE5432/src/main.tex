@@ -1,0 +1,45 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+% Pacotes %
+
+\usepackage{graphicx}
+\usepackage[portuguese]{babel}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{minted}
+% \usemintedstyle{monokai}
+
+\title{Bancos de Dados Semi-Estruturados}
+\author{
+Gabriel Pordeus Santos \\ % -> \\ é quebra de linha
+Gabriel Simonetto \\
+Gustavo Kundlatsch
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    Neste trabalho, feito para a matéria de Bancos de Dados II, do curso de Ciências da Computação da Universidade Federal de Santa Catarina, apresentaremos a diferença entre dados tradicionais e dados semi-estruturados, o que eles são, para que servem e quais suas implicações. Para explicar o tema, serão utilizados dois exemplos: XML e JSON.
+\end{abstract}
+
+\input{gustavo/main}
+\input{cross/main}
+\input{pordeus/main}
+
+\section{Conclusão}
+
+O objetivo desse trabalho foi apresentar os bancos de dados semi-estruturados, seu conceito, onde ele estão presentes e para que servem. Para isso, apresentamos dois estudos de caso, as linguagens XML e JSON, explicando a sintaxe de cada uma com exemplos de código, para que surgiram e como são utilizadas.
+
+Hoje em dia os dados semi-estruturados estão presentes no dia-a-dia de todas as pessoas que utilizam a internet, seja através de navegadores que utilizam o HTML ou através de aplicativos (desktop e mobile) que fazem requisições a servidores utilizando o padrão REST. Por conta disso, as pesquisas em banco de dados semi-estruturados são de suma importância para a otimização de consultas e melhorias no design desse tipo de banco, uma vez que uma pequena melhora pode afetar milhões de aplicações, gerando uma experiência melhor para os usuários e economizando dados de armazenamento dos servidores e da transferência das informações. 
+
+\newpage
+
+\bibliographystyle{ieeetr}
+\bibliography{bib}
+
+\end{document}

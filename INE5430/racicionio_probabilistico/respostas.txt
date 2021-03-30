@@ -1,0 +1,177 @@
+PARTE 1
+
+1) Qual é a probabilidade de ter NÃO haver uma compra de gasolina dado que o cartão foi fraudado? Mostre os cálculos e as probabilidades que você está computando e dê uma resposta numérica.
+
+P(Gn | Fs) = 80%
+
+2) Qual a probabilidade do mundo estar no seguinte estado: (F=sim, G=sim, I > 50, S=fem, C=não)? Mostre os cálculos e as probabilidades que você está computando e dê uma resposta numérica.
+
+P(Fs, Gs, I>50, Sfem, Cn) = 
+P(Fs) * P(Gs | Fs) * P(I>50) * P(Sfem) * P(Cn | Fs, I>50, Sfem) =
+0.1 * 20 * 35 * 50 *  5 =
+17500 / 100 ^ 5 =
+0.00000175
+
+3) Qual a probabilidade de haver uma compra de gasolina nas últimas 24 horas? Mostre os cálculos e as probabilidades que você está computando e dê uma resposta numérica.
+
+P(Gs) = 
+P(Fs) * P(Gs | Fs) + P(Fn) * P(Gs | Fn) =
+0.001 * 0.2 + 0.999 * 0.01 =
+0.01019
+
+4) Qual a probabilidade de haver uma compra de créditos para celular nas últimas 24 horas? Mostre os cálculos e as probabilidades que você está computando e dê uma resposta numérica.
+
+P(Cs) = 
+P(Cs | Fs, I<30, Smasc) * P(Fs) * P(I<30) * P(Smasc) +
+P(Cs | Fs, I<30, Sfem) * P(Fs) * P(I<30) * P(Sfem) +
+P(Cs | Fs, I intermediario, Smasc) * P(Fs) * P(I intermediario) * P(Smasc) +
+P(Cs | Fs, I intermediario, Sfem) * P(Fs) * P(I intermediario) * P(Sfem) +
+P(Cs | Fs, I > 50, Smasc) * P(Fs) * P(I intermediario) * P(Smasc) +
+P(Cs | Fs, I > 50, Sfem) * P(Fs) * P(I intermediario) * P(Sfem) +
+
+P(Cs | Fn, I<30, Smasc) * P(Fn) * P(I<30) * P(Smasc) +
+P(Cs | Fn, I<30, Sfem) * P(Fn) * P(I<30) * P(Sfem) +
+P(Cs | Fn, I intermediario, Smasc) * P(Fn) * P(I intermediario) * P(Smasc) +
+P(Cs | Fn, I intermediario, Sfem) * P(Fn) * P(I intermediario) * P(Sfem) +
+P(Cs | Fn, I > 50, Smasc) * P(Fn) * P(I intermediario) * P(Smasc) +
+P(Cs | Fn, I > 50, Sfem) * P(Fn) * P(I intermediario) * P(Sfem)
+
+P(Cs) = 
+0.95 * 0.001 * 0.25 * 0.5 +
+0.95 * 0.001 * 0.25 * 0.5 +
+0.95 * 0.001 * 0.40 * 0.5 +
+0.95 * 0.001 * 0.40 * 0.5 +
+0.95 * 0.001 * 0.35 * 0.5 +
+0.95 * 0.001 * 0.35 * 0.5 +
+
+0.80 * 0.999 * 0.25 * 0.5 +
+0.75 * 0.999 * 0.25 * 0.5 +
+0.75 * 0.999 * 0.40 * 0.5 +
+0.75 * 0.999 * 0.40 * 0.5 +
+0.50 * 0.999 * 0.35 * 0.5 +
+0.60 * 0.999 * 0.35 * 0.5
+
+P(Cs) = 0.68651375
+
+5) Qual a probabilidade de haver uma compra de créditos para celular nas últimas 24 horas, dado que a houve a compra de gasolina? Mostre os cálculos e as probabilidades que você está computando e dê uma resposta numérica.
+
+P(h | e)=P(e | h) * P(h) / P(e)
+P(Cs | Gs) = (P(Cs) * P(Gs | Cs)) / P(Gs)
+
+P(Cs) = 0.68651375
+P(Gs) = 0.01019
+
+P(Gs | Cs) = 
+P(Gs | Fs) * P(Fs) * P(I<30) * P(Smasc) * P(Cs) + 
+P(Gs | Fs) * P(Fs) * P(I intermediario) * P(Smasc) * P(Cs) + 
+P(Gs | Fs) * P(Fs) * P(I>50) * P(Smasc) * P(Cs) + 
+P(Gs | Fs) * P(Fs) * P(I<30) * P(Sfem) * P(Cs) + 
+P(Gs | Fs) * P(Fs) * P(I intermediario) * P(Sfem) * P(Cs) + 
+P(Gs | Fs) * P(Fs) * P(I>50) * P(Sfem) * P(Cs) + 
+P(Gs | Fn) * P(Fn) * P(I<30) * P(Smasc) * P(Cs) + 
+P(Gs | Fn) * P(Fn) * P(I intermediario) * P(Smasc) * P(Cs) + 
+P(Gs | Fn) * P(Fn) * P(I>50) * P(Smasc) * P(Cs) + 
+P(Gs | Fn) * P(Fn) * P(I<30) * P(Sfem) * P(Cs) + 
+P(Gs | Fn) * P(Fn) * P(I intermediario) * P(Sfem) * P(Cs) + 
+P(Gs | Fn) * P(Fn) * P(I>50) * P(Sfem) * P(Cs)
+
+P(Gs | Cs) = 
+0.2 * 0.001 * 0.25 * 0.5 * 0.95 +
+0.2 * 0.001 * 0.40 * 0.5 * 0.95 +
+0.2 * 0.001 * 0.35 * 0.5 * 0.95 +
+0.2 * 0.001 * 0.25 * 0.5 * 0.95 +
+0.2 * 0.001 * 0.40 * 0.5 * 0.95 +
+0.2 * 0.001 * 0.35 * 0.5 * 0.95 +
+0.2 * 0.999 * 0.25 * 0.5 * 0.8 +
+0.2 * 0.999 * 0.40 * 0.5 * 0.75 +
+0.2 * 0.999 * 0.35 * 0.5 * 0.5 +
+0.2 * 0.999 * 0.25 * 0.5 * 0.75 +
+0.2 * 0.999 * 0.40 * 0.5 * 0.75 +
+0.2 * 0.999 * 0.35 * 0.5 * 0.6
+
+P(Gs | Cs) = 0.0070456375
+
+P(Cs | Gs) = (P(Cs) * P(Gs | Cs)) / P(Gs)
+P(Cs | Gs) = (0.68651375 *  0.0070456375) / 0.01019
+P(Cs | Gs) = 0.47467389806335875
+
+6) Qual a probabilidade um cartão de crédito ter sido fraudado, dado que houve a compra de créditos para celular, mas não houve a compra de gasolina nas últimas 24 horas? Mostre os cálculos e as probabilidades que você está computando e dê uma resposta numérica.
+
+P(Fs | Cs, Gn) = P(Fs) * P(Cs, Gn | Fs) / P(Cs, Gn)
+P(Cs, Gn | Fs) = P(Cs | Fs) * P(Gn | Fs)
+
+P(Cs | Fs) = 
+P(Fs) * P(I<30) * P(Sm) * P(Cs) + 
+P(Fs) * P(I intermediario) * P(Sm) * P(Cs) +
+P(Fs) * P(I > 50) * P(Sm) * P(Cs) +
+P(Fs) * P(I<30) * P(Sf) * P(Cs) +
+P(Fs) * P(I intermediario) * P(Sf) * P(Cs) +
+P(Fs) * P(I > 50) * P(Sf) * P(Cs)
+
+P(Cs | Fs) = 
+0.001 * 0.25 * 0.5 * 0.95 +
+0.001 * 0.40 * 0.5 * 0.95 +
+0.001 * 0.35 * 0.5 * 0.95 +
+0.001 * 0.25 * 0.5 * 0.95 +
+0.001 * 0.40 * 0.5 * 0.95 +
+0.001 * 0.35 * 0.5 * 0.95
+
+P(Cs | Fs) = 0.00095
+
+P(Fs | Cs, Gn) = P(Fs) * P(Cs, Gn | Fs) / P(Cs, Gn)
+P(Fs | Cs, Gn) = (0.001 * 0.00095 *0.8) / (0.68651375 * 0.98981)
+P(Fs | Cs, Gn) = 0.00000111843954744231
+
+-----------------------------------------------------------------------------------------------------
+
+PARTE 2
+
+1) Modele a situação anterior com uma Rede Bayesiana, indicando as variáveis aleatórias, seus domínios, topologia da rede e tabelas de probabilidade condicionais.
+
+Em anexo na entrega, modelado utilzando o Netica.
+
+2) Calcule a probabilidade de um aluno colar.
+
+P(Cs) = P(Cs | Af) * P(Af) + P(Cs | As) * P(As) + P(Cs | Au) * P(Au)
+P(Cs) = 0 * 0.6 + 0.8 * 0.3 + 0.6 * 0.1
+P(Cs) = 0.3
+
+3) Calcule a probabilidade de um aluno frequentar o ensino Secundário dado que ele viu algum colega colando e que se sentiu penalizado na nota.
+
+P(As | Vs, Ns) = (P(As) * P(Vs, Ns | As)) / P(Vs, Ns)
+
+P(Ns | As) = 
+P(As, Vs, Cs, Es, Ns) +
+P(As, Vs, Cs, En, Ns) +
+P(As, Vs, Cn, Es, Ns) + 
+P(As, Vs, Cn, En, Ns)
+
+P(Ns | As) = 
+0.3 * 1 * 0.8 * 0.5 * 0.1 +
+0 +
+0.3 * 1 * 0.2 * 0.5 * 0.01 +
+0
+
+-> P(Ns | As) = 0.0123
+
+P(Vs) = P(Vs | Af) * P(Af) + P(Vs | As) * P(Af) + P(Vs | Au) * P(Au)
+P(Vs) = 0.1 * 0.6 + 1 * 0.3 + 0.8 * 0.1
+-> P(Vs) = 0.44
+
+P(Ns) =
+P(Cs) * P(Es) * P(Ns | Cs, Es) + 
+P(Cs) * P(En) * P(Ns | Cs, En) + 
+P(Cn) * P(Es) * P(Ns | Cn, Es) + 
+P(Cn) * P(En) * P(Ns | Cn, En)
+
+P(Ns) =
+0.3 * 0.2 * 0.1 +
+0 +
+0.7 * 0.2 * 0.001 +
+0
+
+-> P(Ns) = 0.0614
+
+P(As | Vs, Ns) = (P(As) * P(Vs, Ns | As)) / P(Vs, Ns)
+P(As | Vs, Ns) = (0.6 * 1 * 0.0123) / (0.0614 * 0.44)
+-> P(As | Vs, Ns) = 0.273171
