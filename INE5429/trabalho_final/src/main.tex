@@ -1,0 +1,68 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% How to use writeLaTeX: 
+%
+% You edit the source code here on the left, and the preview on the
+% right shows you the result within a few seconds.
+%
+% Bookmark this page and share the URL with your co-authors. They can
+% edit at the same time!
+%
+% You can upload figures, bibliographies, custom classes and
+% styles using the files menu.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage{graphicx,url}
+\usepackage[utf8]{inputenc}  
+\usepackage[brazil]{babel}
+\usepackage{hyperref}
+\usepackage{dsfont}
+\usepackage{tabularx}
+\usepackage{minted}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=black
+}
+
+\sloppy
+
+\title{Segurança em Computação -- Trabalho Prático:\\ Classic McEliece}
+
+\author{Gustavo Emanuel Kundlatsch\inst{1}}
+
+
+\address{Departamento de Informática e Estatística -- \\Universidade Federal de Santa Catarina
+  (UFSC)}
+
+\begin{document} 
+
+\maketitle
+
+\chapter{Entrega 1}
+\input{content/entrega1} 
+\newpage
+
+\chapter{Entrega 2}
+\input{content/entrega2}
+\newpage
+
+\chapter{Entrega 3}
+\input{content/entrega3}
+\newpage
+
+\bibliographystyle{sbc}
+\bibliography{sbc-template}
+\newpage
+
+% \appendix
+% \input{content/apendice_parametros}
+
+\end{document}

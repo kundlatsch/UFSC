@@ -1,0 +1,53 @@
+\section*{Em que problema matemático o algoritmo é baseado? Apresente um exemplo}
+
+O algoritmo é baseado na dificuldade de resolução de códigos lineares, um problema que é provado ser NP-Hard. Na teoria de códigos, um código linear é um código de correção de erros para o qual qualquer combinação linear de code words também é uma code word. Nesse contexto, uma code word é um elemento de uma codificação ou protocolo padronizado. Cada code word é montada de acordo com as regras específicas de sua codificação e a ela é atribuído um significado único.
+
+A definição formal de código linear é: Um código linear de comprimento n e posto k é um subespaço linear C com dimensão k do espaço vetorial $\mathds{F}_q^n$ onde $\mathds{F}_q$ é o corpo finito com q elementos. Esse código é chamado de código q-ário. Se q = 2 ou q = 3, o código é descrito como um código binário ou um código ternário, respectivamente. Os vetores em C são chamados de palavras-código. O tamanho de um código é o número de palavras-código e é igual a $q^k$. O peso de uma palavra-código é o número de seus elementos que são diferentes de zero e a distância entre duas palavras-código é a distância de Hamming entre elas, ou seja, o número de elementos em que diferem. A distância d do código linear é o peso mínimo de suas palavras-código diferentes de zero ou, de forma equivalente, a distância mínima entre palavras-código distintas. Um código linear de comprimento n, dimensão k e distância d é chamado de código [n, k, d].
+
+Um exemplo de código linear são os códigos de Hamming, amplamente utilizados em sistemas de comunicação digital. Essa classe de códigos de correção de erros foi inventada por Richard Hamming no começo da década de 40, e utiliza o conceito de bit de paridade para repartir um bloco de bits em áreas e fazer verificações para detectar e corrigir possiveis erros \cite{HammingVideo}. Alternativemente, uma matriz de Hamming pode ser construida para que o código de correção de erros possa ser computado com técnicas de álgebra linear. Para isso, uma matriz de geração (G) e uma matriz de paridade (H) são construidas com os dados a serem verificados (ambas matrizes binárias, onde todas as entradas são zero ou um). O produto da matriz de paridade pela matriz de geração transposta deve ser igual a uma matriz onde todas as entradas são zero, para que não hajam erros.
+
+\section*{Como este problema foi modificado de forma a permitir a criação de um algoritmo de chave-pública pós-quântico?}
+
+O trabalho que apresentou originalmente o McEliece é de 1978. Mesmo após 40 anos de desenvolvimento da área de segurança, o algoritmo se mostrou sólido e estável ao longo das décadas. Isso porque o algoritmo original possui parêmetros que foram definidos pensando apenas para a segurança $2^64$, mas como esses parâmetros são variáveis, diversas propostas para esses valores foram feitas pelos autores que o submeteram ao concurso do NIST. O problema matemático em que o algoritmo se baseia foi mantido, e as mudanças para o tornar seguro para um cenário pós-quântico focam na alteração dos parâmetros e alguns outros aspectos, como um KEM (Key encapsulation mechanism).
+
+Mais detalhes sobre os parâmetros do algoritmo estão disponíveis no anexo A, ao final do documento.
+
+\section*{Quais observações foram feitas nas rodadas anteriores em relação a este algoritmo?}
+
+Na segunda rodada, o NIST requisitou mais níveis de segurança, e algumas variantes dos parâmetros apresentados na submissão original foram apresentadas. Essa submissão também incluiu uma alternativa para a geração de chaves mais complicado mas mais rápido, como uma proposta de modificação para ser avaliada.
+
+Na terceira rodada, os parâmetros propostos na segunda foram incorporados ao trabalho, e o método de geração de chaves foi alterado, com o objetivo de modularizar a corretude e confiabilidade do mapa utilizado (da entrada ao texto cifrado) e a segurança da fonte de bytes aleatórios.
+
+\section*{Quais ataques ou falhas de segurança foram apresentados (incluindo as rodadas anteriores)?}
+
+Existem diversas tentativas de quebrar a criptogravia do McEliece, uma vez que é um algoritmo bastante antigo. Na primeira submissão para o NIST, os autores realizaram um apanhado das principais táticas.
+
+Os ataques mais rápidos conhecidos usam decodificação de conjunto de informações (information-set decoding ou ISD). A forma mais simples de ISD tenta adivinhar um conjunto de informações livre de erros no código. Um conjunto de informações é, por definição, um conjunto de posições que determina uma palavra-código inteira. O conjunto está livre de erros, por definição, se evitar todas as posições de erro na “palavra recebida”, ou seja, o texto cifrado; então, o texto cifrado nessas posições é exatamente a palavra-código nessas posições. O invasor determina o resto da palavra-código por álgebra linear e vê se o ataque foi bem-sucedido verificando se o peso do erro é correto. No entanto, a chance de o conjunto estar livre de erros cai rapidamente à medida que o número de erros aumenta, e por conta disso a segurança do McEliece com os parâmetros apresentados nessa submissão é considerada alta. Além disso, na prática, esse tipo de ataque possui um gargalo que é a quantidade de memória RAM que precisa, pois são realizados acessos aleatórios a um array gigantesco, muito maior que a chave publica sendo utilizada. Segundo os autores, a mudança de parâmetros é o suficiente até mesmo para evitar ataques de computadores quânticos.
+
+Uma estratégia de inversão diferente é encontrar a chave privada, não por força bruta, mas sabendo o polinômio $\mathds{F}_q[x]$ g, descobrir os valores subsequentes da chave ou vice-versa. Porém, o número de escolhas para a combinação mais fraca de parâmetros do algoritmo é $2^{1600}$. Em um cenário de ataque com várias mensagens, o custo de encontrar a chave privada é distribuído por várias mensagens. Existem também ataques de várias mensagens mais rápidos que não dependem da localização da chave privada. Em vez de analisar a segurança de várias mensagens em detalhes. Os autores da submissão acreditam que o ataque a n alvos não tem um ganho maior do que um fator n. Segundo eles, o nível de segurança do McEliece alto o suficiente para que isso não seja um problema para qualquer valor rasoável de n.
+
+Por fim, existem os ataques de texto cifrado escolhido (chosen-ciphertext), um modelo de ataque para criptanálise em que o criptanalista pode coletar informações ao obter as descriptografias dos textos cifrados escolhidos. A partir dessas informações, o adversário pode tentar recuperar a chave secreta oculta usada para descriptografar. Contra o sistema McEliece tradicionalmente é adicionado dois erros a um texto cifrado Gm + e, sendo e uma sequência de bits de comprimento n e peso de Hamming t (onde t é a capacidade garantida de correção de erros, um dos parâmetros do algoritmo). Isso é equivalente a adicionar dois erros a e. A criptografia é bem-sucedida se e somente se o vetor de erro resultante tiver peso t, ou seja, exatamente uma das duas posições de erro já estava em e. Esse tipo de ataque não funciona por conta do KEM modificado que os autores desenvolveram para a submissão, que adiciona um hash em e (que não tem como ser computado pelo atacante).
+
+Outros ataques ou falhas de segurança não foram apontados, mas os autores foram requisitados a aumentar a segurança do modelo, e por isso algumas escolhas de parâmetros foram alteradas como descrito na pergunta sobre modificações do algoritmo.
+
+\section*{Quais modificações foram realizadas para resolver os problemas apontados?}
+
+Como foi descrito anteriormente, a escolha de parâmetros mais robustos para o algoritmo clássico e a implementação de um KEM mais seguro resolve o problema dos ataques conhecidos.
+
+\section*{Quais são as vantagens e desvantagens em relação aos outros algoritmos concorrendo no concurso de padronização do NIST?}
+
+O Classic McEliece é o único algoritmo dos finalistas que é baseado em código. Algoritmos de criptografia pós-quântica podem ser geralmente categorizados em quatro tipos \cite{criptTypes}:
+
+\begin{itemize}
+    \item \textbf{Criptografia baseada em hash:} Nesse tipo de algoritmo, um número aleatório é gerado para cada cada assinatura possível, então esse valor é passado por uma função de hash e publicado. As assinaturas são esses números aleatórios.
+    
+    \item \textbf{Criptografia baseada em código:} O McEliece foi o primeiro algoritmo de criptografia desse tipo. Engloba todos os algoritmos que tem uma abordagem de verificação de erros em uma dada matriz. 
+    
+    \item \textbf{Criptografia baseada em reticulados (lettice):} Reticulados são conjuntos de pontos uniformes, gerados a partir de uma base B formada por vetores. Modelos de criptografia que se baseiam em reticulados utilizam dois problemas difíceis para serem resolvidos, encontrar o menor vetor do reticulado e encontrar a distância entre um vetor arbitrário e um vetor no reticulado.
+    
+    \item \textbf{Criptografia baseada em equação quadrática multivariante}: Baseados na dificuldade de resolver sistemas de equações não lineares em campos finitos.
+\end{itemize}
+
+Os outros finalistas na categoria de criptografia de chave públicas e mecanismo de encapsulamento de chaves (CRYSTALS-KYBER, NTRU e SABER) todos utilizam algoritmo baseado em reticulados. Além disso, na categoria de assinaturas, os algoritmos CRYSTALS-DILITHIUM e FALCON são também baseados em reticulados, e o Rainbow baseado em multivariantes. 
+
+O Classic McEliece, por ter sido o primeiro de seu tipo e bastante antigo, já foi testado inúmeras vezes ao longo das décadas, e mesmo havendo diversos artigos propondo ataques ele se mantém consistente e com um alto padrão de segurança. Todavia, o custo disso é que as chaves geradas por esse sistema são muito grandes, da ordem de alguns megabytes. Por conta disso também, é considerado um algoritmo de alto custo para gerar chaves. Outros modelos de criptografia baseada em código foram apresentados ao longo dos anos, para tentar reduzir o tamanho das chaves, mas eles se mostraram menos robustos e seguros.

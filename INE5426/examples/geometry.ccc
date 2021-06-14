@@ -1,0 +1,119 @@
+def triangle_area(int b, int h) {
+	if (b < 1) {
+		print "Insira um valor válido para a base\n";
+		return;
+	}
+	
+	if (h < 1) {
+		print "Insira um valor válido para a altura\n";
+		return;
+	}
+	
+    int product;
+	int result;
+    product = b * h;
+    result = product / 2;
+	
+	print "O resultado é: ";
+    print result;
+    print "\n";
+	
+	return;
+}
+
+def form_triangle(int l1, int l2, int l3) {
+    int sum1;
+    sum1 = l2 + l3;
+    if (l1 > sum1) {
+        print "Não formam triângulo\n";
+        return;
+    }
+
+    int sum2;
+    sum2 = l1 + l3;
+    if (l2 > sum2) {
+        print "Não formam triângulo\n";
+        return;
+    }
+
+    int sum3;
+    sum3 = l1 + l2;
+    if (l3 > sum3) {
+        print "Não formam triângulo\n";
+        return;
+    }
+
+    print "Formam triângulo\n";
+    return;
+}
+
+def calc_circle_circumference(float radius) {
+    if (radius <= 0.0) {
+        print "Valor do raio inválido\n";
+        return;
+    }
+
+    float circunference;
+    circunference = 2.0 * 3.14 * radius;
+    print "Valor da circunferência:\n";
+    print circunference;
+    print "\n";
+    return;
+}
+
+def calc_circle_area(float radius) {
+    if (radius <= 0.0) {
+        print "Valor do raio inválido\n";
+        return;
+    }
+
+    float area;
+    area = 3.14 * radius * radius;
+    print "Área do círculo:\n";
+    print area;
+    print "\n";
+    return;
+}
+
+def calc_square_area(int side) {
+    if (side < 1) {
+		print "Insira um valor válido para o lado do quadrado\n";
+		return;
+	}
+
+    int area;
+    area = side * side;
+    print "Área do quadrado:\n";
+	print area;
+    print "\n";
+    return;
+}
+
+def main() {
+    int aux_a;
+    int aux_b;
+    int aux_c;
+
+    print "Área do triângulo de base 10 e altura 5:\n";
+    aux_a = 10;
+    aux_b = 5;
+    aux_a = triangle_area(aux_a, aux_b);
+
+    aux_a = 10;
+    aux_b = 5;
+    aux_c = 6;
+    print "Segmentos dos tamanhos 3, 6 e 9 podem formar um triângulo?\n";
+    aux_a = form_triangle(aux_a, aux_b, aux_c);
+
+    float radius;
+    print "Qual é a circunferência do círculo de raio 3?\n";
+    radius = 3.0;
+    aux_a = calc_circle_circumference(radius);
+
+    print "Qual é a área do círculo de raio 3?\n";
+    aux_a = calc_circle_area(radius);
+
+    radius = 6.0;
+    print "Qual é a área do quadrado de lado 6?\n";
+    aux_a = calc_square_area(radius);
+}

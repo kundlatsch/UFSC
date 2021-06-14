@@ -1,0 +1,16 @@
+def main() {
+    int a;
+    float c;
+    int b;
+    
+    b = a + 4 * c + 2;
+
+    string d;
+    string e;
+
+    d = "test";
+    e = d + "not_error";
+
+    e = e + a;
+    return;
+}

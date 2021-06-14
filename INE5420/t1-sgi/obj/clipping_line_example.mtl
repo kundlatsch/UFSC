@@ -1,0 +1,10 @@
+newmtl Line_0_mtl
+Kd 0.0 0.6666666666666666 0.0 1.0
+newmtl Line_2_mtl
+Kd 1.0 1.0 0.0 1.0
+newmtl Line_4_mtl
+Kd 1.0 0.3333333333333333 0.0 1.0
+newmtl Line_5_mtl
+Kd 0.0 0.0 0.4980392156862745 1.0
+newmtl Line_6_mtl
+Kd 1.0 0.3333333333333333 1.0 1.0

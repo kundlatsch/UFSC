@@ -1,0 +1,3419 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> PROGRAM
+Rule 1     empty -> <empty>
+Rule 2     new_scope -> <empty>
+Rule 3     new_loop_scope -> <empty>
+Rule 4     PROGRAM -> new_scope STATEMENT
+Rule 5     PROGRAM -> new_scope FUNCLIST
+Rule 6     PROGRAM -> empty
+Rule 7     FUNCLIST -> FUNCDEF FUNCLISTAUX
+Rule 8     FUNCLISTAUX -> FUNCLIST
+Rule 9     FUNCLISTAUX -> empty
+Rule 10    FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+Rule 11    PARAMLIST -> DATATYPE IDENT PARAMLISTAUX
+Rule 12    PARAMLIST -> empty
+Rule 13    PARAMLISTAUX -> COMMA PARAMLIST
+Rule 14    PARAMLISTAUX -> empty
+Rule 15    DATATYPE -> INT_KEYWORD
+Rule 16    DATATYPE -> FLOAT_KEYWORD
+Rule 17    DATATYPE -> STRING_KEYWORD
+Rule 18    STATEMENT -> VARDECL SEMICOLON
+Rule 19    STATEMENT -> ATRIBSTAT SEMICOLON
+Rule 20    STATEMENT -> PRINTSTAT SEMICOLON
+Rule 21    STATEMENT -> READSTAT SEMICOLON
+Rule 22    STATEMENT -> RETURNSTAT SEMICOLON
+Rule 23    STATEMENT -> IFSTAT
+Rule 24    STATEMENT -> FORSTAT
+Rule 25    STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS
+Rule 26    STATEMENT -> BREAK SEMICOLON
+Rule 27    STATEMENT -> SEMICOLON
+Rule 28    VARDECL -> DATATYPE IDENT OPT_VECTOR
+Rule 29    OPT_VECTOR -> LSQBRACKETS INT_CONSTANT RSQBRACKETS OPT_VECTOR
+Rule 30    OPT_VECTOR -> empty
+Rule 31    ATRIBSTAT -> LVALUE ATTRIBUTION ATRIB_RIGHT
+Rule 32    ATRIB_RIGHT -> FUNCCALL_OR_EXPRESSION
+Rule 33    ATRIB_RIGHT -> ALLOCEXPRESSION
+Rule 34    FUNCCALL_OR_EXPRESSION -> PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 35    FUNCCALL_OR_EXPRESSION -> MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 36    FUNCCALL_OR_EXPRESSION -> INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 37    FUNCCALL_OR_EXPRESSION -> FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 38    FUNCCALL_OR_EXPRESSION -> STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 39    FUNCCALL_OR_EXPRESSION -> NULL REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 40    FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 41    FUNCCALL_OR_EXPRESSION -> IDENT FOLLOW_IDENT
+Rule 42    FOLLOW_IDENT -> OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+Rule 43    FOLLOW_IDENT -> LPAREN PARAMLISTCALL RPAREN
+Rule 44    PARAMLISTCALL -> IDENT PARAMLISTCALLAUX
+Rule 45    PARAMLISTCALL -> empty
+Rule 46    PARAMLISTCALLAUX -> COMMA PARAMLISTCALL
+Rule 47    PARAMLISTCALLAUX -> empty
+Rule 48    PRINTSTAT -> PRINT EXPRESSION
+Rule 49    READSTAT -> READ LVALUE
+Rule 50    RETURNSTAT -> RETURN
+Rule 51    IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+Rule 52    OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS
+Rule 53    OPT_ELSE -> empty
+Rule 54    FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+Rule 55    STATELIST -> STATEMENT OPT_STATELIST
+Rule 56    OPT_STATELIST -> STATELIST
+Rule 57    OPT_STATELIST -> empty
+Rule 58    ALLOCEXPRESSION -> NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+Rule 59    OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+Rule 60    OPT_ALLOC_NUMEXP -> empty
+Rule 61    EXPRESSION -> NUMEXPRESSION OPT_REL_OP_NUM_EXPR
+Rule 62    OPT_REL_OP_NUM_EXPR -> REL_OP NUMEXPRESSION
+Rule 63    OPT_REL_OP_NUM_EXPR -> empty
+Rule 64    REL_OP -> LOWER_THAN
+Rule 65    REL_OP -> GREATER_THAN
+Rule 66    REL_OP -> LOWER_OR_EQUALS_THAN
+Rule 67    REL_OP -> GREATER_OR_EQUALS_THAN
+Rule 68    REL_OP -> EQ_COMPARISON
+Rule 69    REL_OP -> NEQ_COMPARISON
+Rule 70    NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM
+Rule 71    REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+Rule 72    REC_PLUS_MINUS_TERM -> empty
+Rule 73    PLUS_OR_MINUS -> PLUS
+Rule 74    PLUS_OR_MINUS -> MINUS
+Rule 75    TERM -> UNARYEXPR REC_UNARYEXPR
+Rule 76    REC_UNARYEXPR -> UNARYEXPR_OP TERM
+Rule 77    REC_UNARYEXPR -> empty
+Rule 78    UNARYEXPR_OP -> TIMES
+Rule 79    UNARYEXPR_OP -> MODULE
+Rule 80    UNARYEXPR_OP -> DIVIDE
+Rule 81    UNARYEXPR -> PLUS_OR_MINUS FACTOR
+Rule 82    UNARYEXPR -> FACTOR
+Rule 83    FACTOR -> INT_CONSTANT
+Rule 84    FACTOR -> FLOAT_CONSTANT
+Rule 85    FACTOR -> STRING_CONSTANT
+Rule 86    FACTOR -> NULL
+Rule 87    FACTOR -> LVALUE
+Rule 88    FACTOR -> LPAREN NUMEXPRESSION RPAREN
+Rule 89    LVALUE -> IDENT OPT_ALLOC_NUMEXP
+
+Terminals, with rules where they appear
+
+ATTRIBUTION          : 31
+BREAK                : 26
+COMMA                : 13 46
+DEF                  : 10
+DIVIDE               : 80
+ELSE                 : 52
+EQ_COMPARISON        : 68
+FLOAT_CONSTANT       : 37 84
+FLOAT_KEYWORD        : 16
+FOR                  : 54
+GREATER_OR_EQUALS_THAN : 67
+GREATER_THAN         : 65
+IDENT                : 10 11 28 41 44 89
+IF                   : 51
+INT_CONSTANT         : 29 36 83
+INT_KEYWORD          : 15
+LBRACKETS            : 10 25 51 52 54
+LOWER_OR_EQUALS_THAN : 66
+LOWER_THAN           : 64
+LPAREN               : 10 40 43 51 54 88
+LSQBRACKETS          : 29 58 59
+MINUS                : 35 74
+MODULE               : 79
+NEQ_COMPARISON       : 69
+NEW                  : 58
+NULL                 : 39 86
+PLUS                 : 34 73
+PRINT                : 48
+RBRACKETS            : 10 25 51 52 54
+READ                 : 49
+RETURN               : 50
+RPAREN               : 10 40 43 51 54 88
+RSQBRACKETS          : 29 58 59
+SEMICOLON            : 18 19 20 21 22 26 27 54 54
+STRING_CONSTANT      : 38 85
+STRING_KEYWORD       : 17
+TIMES                : 78
+error                : 
+
+Nonterminals, with rules where they appear
+
+ALLOCEXPRESSION      : 33
+ATRIBSTAT            : 19 54 54
+ATRIB_RIGHT          : 31
+DATATYPE             : 11 28 58
+EXPRESSION           : 48 51 54
+FACTOR               : 34 35 81 82
+FOLLOW_IDENT         : 41
+FORSTAT              : 24
+FUNCCALL_OR_EXPRESSION : 32
+FUNCDEF              : 7
+FUNCLIST             : 5 8
+FUNCLISTAUX          : 7
+IFSTAT               : 23
+LVALUE               : 31 49 87
+NUMEXPRESSION        : 40 58 59 61 62 88
+OPT_ALLOC_NUMEXP     : 42 58 59 89
+OPT_ELSE             : 51
+OPT_REL_OP_NUM_EXPR  : 34 35 36 37 38 39 40 42 61
+OPT_STATELIST        : 55
+OPT_VECTOR           : 28 29
+PARAMLIST            : 10 13
+PARAMLISTAUX         : 11
+PARAMLISTCALL        : 43 46
+PARAMLISTCALLAUX     : 44
+PLUS_OR_MINUS        : 71 81
+PRINTSTAT            : 20
+PROGRAM              : 0
+READSTAT             : 21
+REC_PLUS_MINUS_TERM  : 34 35 36 37 38 39 40 42 70 71
+REC_UNARYEXPR        : 34 35 36 37 38 39 40 42 75
+REL_OP               : 62
+RETURNSTAT           : 22
+STATELIST            : 10 25 51 52 54 56
+STATEMENT            : 4 55
+TERM                 : 70 71 76
+UNARYEXPR            : 75
+UNARYEXPR_OP         : 76
+VARDECL              : 18
+empty                : 6 9 12 14 30 45 47 53 57 60 63 72 77
+new_loop_scope       : 54
+new_scope            : 4 5 10 25 51 52
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . PROGRAM
+    (4) PROGRAM -> . new_scope STATEMENT
+    (5) PROGRAM -> . new_scope FUNCLIST
+    (6) PROGRAM -> . empty
+    (2) new_scope -> .
+    (1) empty -> .
+
+    BREAK           reduce using rule 2 (new_scope -> .)
+    SEMICOLON       reduce using rule 2 (new_scope -> .)
+    PRINT           reduce using rule 2 (new_scope -> .)
+    READ            reduce using rule 2 (new_scope -> .)
+    RETURN          reduce using rule 2 (new_scope -> .)
+    IF              reduce using rule 2 (new_scope -> .)
+    FOR             reduce using rule 2 (new_scope -> .)
+    DEF             reduce using rule 2 (new_scope -> .)
+    INT_KEYWORD     reduce using rule 2 (new_scope -> .)
+    FLOAT_KEYWORD   reduce using rule 2 (new_scope -> .)
+    STRING_KEYWORD  reduce using rule 2 (new_scope -> .)
+    IDENT           reduce using rule 2 (new_scope -> .)
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    $end            reduce using rule 1 (empty -> .)
+
+    PROGRAM                        shift and go to state 1
+    new_scope                      shift and go to state 2
+    empty                          shift and go to state 3
+
+state 1
+
+    (0) S' -> PROGRAM .
+
+
+
+state 2
+
+    (4) PROGRAM -> new_scope . STATEMENT
+    (5) PROGRAM -> new_scope . FUNCLIST
+    (18) STATEMENT -> . VARDECL SEMICOLON
+    (19) STATEMENT -> . ATRIBSTAT SEMICOLON
+    (20) STATEMENT -> . PRINTSTAT SEMICOLON
+    (21) STATEMENT -> . READSTAT SEMICOLON
+    (22) STATEMENT -> . RETURNSTAT SEMICOLON
+    (23) STATEMENT -> . IFSTAT
+    (24) STATEMENT -> . FORSTAT
+    (25) STATEMENT -> . new_scope LBRACKETS STATELIST RBRACKETS
+    (26) STATEMENT -> . BREAK SEMICOLON
+    (27) STATEMENT -> . SEMICOLON
+    (7) FUNCLIST -> . FUNCDEF FUNCLISTAUX
+    (28) VARDECL -> . DATATYPE IDENT OPT_VECTOR
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (48) PRINTSTAT -> . PRINT EXPRESSION
+    (49) READSTAT -> . READ LVALUE
+    (50) RETURNSTAT -> . RETURN
+    (51) IFSTAT -> . IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (54) FORSTAT -> . FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+    (10) FUNCDEF -> . DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    BREAK           shift and go to state 15
+    SEMICOLON       shift and go to state 8
+    PRINT           shift and go to state 20
+    READ            shift and go to state 21
+    RETURN          shift and go to state 22
+    IF              shift and go to state 23
+    FOR             shift and go to state 24
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    DEF             shift and go to state 25
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    IDENT           shift and go to state 18
+
+    new_scope                      shift and go to state 4
+    STATEMENT                      shift and go to state 5
+    FUNCLIST                       shift and go to state 6
+    VARDECL                        shift and go to state 7
+    ATRIBSTAT                      shift and go to state 9
+    PRINTSTAT                      shift and go to state 10
+    READSTAT                       shift and go to state 11
+    RETURNSTAT                     shift and go to state 12
+    IFSTAT                         shift and go to state 13
+    FORSTAT                        shift and go to state 14
+    FUNCDEF                        shift and go to state 16
+    DATATYPE                       shift and go to state 17
+    LVALUE                         shift and go to state 19
+
+state 3
+
+    (6) PROGRAM -> empty .
+
+    $end            reduce using rule 6 (PROGRAM -> empty .)
+
+
+state 4
+
+    (25) STATEMENT -> new_scope . LBRACKETS STATELIST RBRACKETS
+
+    LBRACKETS       shift and go to state 29
+
+
+state 5
+
+    (4) PROGRAM -> new_scope STATEMENT .
+
+    $end            reduce using rule 4 (PROGRAM -> new_scope STATEMENT .)
+
+
+state 6
+
+    (5) PROGRAM -> new_scope FUNCLIST .
+
+    $end            reduce using rule 5 (PROGRAM -> new_scope FUNCLIST .)
+
+
+state 7
+
+    (18) STATEMENT -> VARDECL . SEMICOLON
+
+    SEMICOLON       shift and go to state 30
+
+
+state 8
+
+    (27) STATEMENT -> SEMICOLON .
+
+    $end            reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    BREAK           reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    SEMICOLON       reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    PRINT           reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    READ            reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    RETURN          reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    IF              reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    FOR             reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    INT_KEYWORD     reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    FLOAT_KEYWORD   reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    STRING_KEYWORD  reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    IDENT           reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    LBRACKETS       reduce using rule 27 (STATEMENT -> SEMICOLON .)
+    RBRACKETS       reduce using rule 27 (STATEMENT -> SEMICOLON .)
+
+
+state 9
+
+    (19) STATEMENT -> ATRIBSTAT . SEMICOLON
+
+    SEMICOLON       shift and go to state 31
+
+
+state 10
+
+    (20) STATEMENT -> PRINTSTAT . SEMICOLON
+
+    SEMICOLON       shift and go to state 32
+
+
+state 11
+
+    (21) STATEMENT -> READSTAT . SEMICOLON
+
+    SEMICOLON       shift and go to state 33
+
+
+state 12
+
+    (22) STATEMENT -> RETURNSTAT . SEMICOLON
+
+    SEMICOLON       shift and go to state 34
+
+
+state 13
+
+    (23) STATEMENT -> IFSTAT .
+
+    $end            reduce using rule 23 (STATEMENT -> IFSTAT .)
+    BREAK           reduce using rule 23 (STATEMENT -> IFSTAT .)
+    SEMICOLON       reduce using rule 23 (STATEMENT -> IFSTAT .)
+    PRINT           reduce using rule 23 (STATEMENT -> IFSTAT .)
+    READ            reduce using rule 23 (STATEMENT -> IFSTAT .)
+    RETURN          reduce using rule 23 (STATEMENT -> IFSTAT .)
+    IF              reduce using rule 23 (STATEMENT -> IFSTAT .)
+    FOR             reduce using rule 23 (STATEMENT -> IFSTAT .)
+    INT_KEYWORD     reduce using rule 23 (STATEMENT -> IFSTAT .)
+    FLOAT_KEYWORD   reduce using rule 23 (STATEMENT -> IFSTAT .)
+    STRING_KEYWORD  reduce using rule 23 (STATEMENT -> IFSTAT .)
+    IDENT           reduce using rule 23 (STATEMENT -> IFSTAT .)
+    LBRACKETS       reduce using rule 23 (STATEMENT -> IFSTAT .)
+    RBRACKETS       reduce using rule 23 (STATEMENT -> IFSTAT .)
+
+
+state 14
+
+    (24) STATEMENT -> FORSTAT .
+
+    $end            reduce using rule 24 (STATEMENT -> FORSTAT .)
+    BREAK           reduce using rule 24 (STATEMENT -> FORSTAT .)
+    SEMICOLON       reduce using rule 24 (STATEMENT -> FORSTAT .)
+    PRINT           reduce using rule 24 (STATEMENT -> FORSTAT .)
+    READ            reduce using rule 24 (STATEMENT -> FORSTAT .)
+    RETURN          reduce using rule 24 (STATEMENT -> FORSTAT .)
+    IF              reduce using rule 24 (STATEMENT -> FORSTAT .)
+    FOR             reduce using rule 24 (STATEMENT -> FORSTAT .)
+    INT_KEYWORD     reduce using rule 24 (STATEMENT -> FORSTAT .)
+    FLOAT_KEYWORD   reduce using rule 24 (STATEMENT -> FORSTAT .)
+    STRING_KEYWORD  reduce using rule 24 (STATEMENT -> FORSTAT .)
+    IDENT           reduce using rule 24 (STATEMENT -> FORSTAT .)
+    LBRACKETS       reduce using rule 24 (STATEMENT -> FORSTAT .)
+    RBRACKETS       reduce using rule 24 (STATEMENT -> FORSTAT .)
+
+
+state 15
+
+    (26) STATEMENT -> BREAK . SEMICOLON
+
+    SEMICOLON       shift and go to state 35
+
+
+state 16
+
+    (7) FUNCLIST -> FUNCDEF . FUNCLISTAUX
+    (8) FUNCLISTAUX -> . FUNCLIST
+    (9) FUNCLISTAUX -> . empty
+    (7) FUNCLIST -> . FUNCDEF FUNCLISTAUX
+    (1) empty -> .
+    (10) FUNCDEF -> . DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+
+    $end            reduce using rule 1 (empty -> .)
+    DEF             shift and go to state 25
+
+    FUNCDEF                        shift and go to state 16
+    FUNCLISTAUX                    shift and go to state 36
+    FUNCLIST                       shift and go to state 37
+    empty                          shift and go to state 38
+
+state 17
+
+    (28) VARDECL -> DATATYPE . IDENT OPT_VECTOR
+
+    IDENT           shift and go to state 39
+
+
+state 18
+
+    (89) LVALUE -> IDENT . OPT_ALLOC_NUMEXP
+    (59) OPT_ALLOC_NUMEXP -> . LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+    (60) OPT_ALLOC_NUMEXP -> . empty
+    (1) empty -> .
+
+    LSQBRACKETS     shift and go to state 41
+    ATTRIBUTION     reduce using rule 1 (empty -> .)
+    TIMES           reduce using rule 1 (empty -> .)
+    MODULE          reduce using rule 1 (empty -> .)
+    DIVIDE          reduce using rule 1 (empty -> .)
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RSQBRACKETS     reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_ALLOC_NUMEXP               shift and go to state 40
+    empty                          shift and go to state 42
+
+state 19
+
+    (31) ATRIBSTAT -> LVALUE . ATTRIBUTION ATRIB_RIGHT
+
+    ATTRIBUTION     shift and go to state 43
+
+
+state 20
+
+    (48) PRINTSTAT -> PRINT . EXPRESSION
+    (61) EXPRESSION -> . NUMEXPRESSION OPT_REL_OP_NUM_EXPR
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    EXPRESSION                     shift and go to state 44
+    NUMEXPRESSION                  shift and go to state 45
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 21
+
+    (49) READSTAT -> READ . LVALUE
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    IDENT           shift and go to state 18
+
+    LVALUE                         shift and go to state 58
+
+state 22
+
+    (50) RETURNSTAT -> RETURN .
+
+    SEMICOLON       reduce using rule 50 (RETURNSTAT -> RETURN .)
+
+
+state 23
+
+    (51) IFSTAT -> IF . LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+
+    LPAREN          shift and go to state 59
+
+
+state 24
+
+    (54) FORSTAT -> FOR . LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+
+    LPAREN          shift and go to state 60
+
+
+state 25
+
+    (10) FUNCDEF -> DEF . IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+
+    IDENT           shift and go to state 61
+
+
+state 26
+
+    (15) DATATYPE -> INT_KEYWORD .
+
+    IDENT           reduce using rule 15 (DATATYPE -> INT_KEYWORD .)
+    LSQBRACKETS     reduce using rule 15 (DATATYPE -> INT_KEYWORD .)
+
+
+state 27
+
+    (16) DATATYPE -> FLOAT_KEYWORD .
+
+    IDENT           reduce using rule 16 (DATATYPE -> FLOAT_KEYWORD .)
+    LSQBRACKETS     reduce using rule 16 (DATATYPE -> FLOAT_KEYWORD .)
+
+
+state 28
+
+    (17) DATATYPE -> STRING_KEYWORD .
+
+    IDENT           reduce using rule 17 (DATATYPE -> STRING_KEYWORD .)
+    LSQBRACKETS     reduce using rule 17 (DATATYPE -> STRING_KEYWORD .)
+
+
+state 29
+
+    (25) STATEMENT -> new_scope LBRACKETS . STATELIST RBRACKETS
+    (55) STATELIST -> . STATEMENT OPT_STATELIST
+    (18) STATEMENT -> . VARDECL SEMICOLON
+    (19) STATEMENT -> . ATRIBSTAT SEMICOLON
+    (20) STATEMENT -> . PRINTSTAT SEMICOLON
+    (21) STATEMENT -> . READSTAT SEMICOLON
+    (22) STATEMENT -> . RETURNSTAT SEMICOLON
+    (23) STATEMENT -> . IFSTAT
+    (24) STATEMENT -> . FORSTAT
+    (25) STATEMENT -> . new_scope LBRACKETS STATELIST RBRACKETS
+    (26) STATEMENT -> . BREAK SEMICOLON
+    (27) STATEMENT -> . SEMICOLON
+    (28) VARDECL -> . DATATYPE IDENT OPT_VECTOR
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (48) PRINTSTAT -> . PRINT EXPRESSION
+    (49) READSTAT -> . READ LVALUE
+    (50) RETURNSTAT -> . RETURN
+    (51) IFSTAT -> . IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (54) FORSTAT -> . FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    BREAK           shift and go to state 15
+    SEMICOLON       shift and go to state 8
+    PRINT           shift and go to state 20
+    READ            shift and go to state 21
+    RETURN          shift and go to state 22
+    IF              shift and go to state 23
+    FOR             shift and go to state 24
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    IDENT           shift and go to state 18
+
+    new_scope                      shift and go to state 4
+    STATELIST                      shift and go to state 62
+    STATEMENT                      shift and go to state 63
+    VARDECL                        shift and go to state 7
+    ATRIBSTAT                      shift and go to state 9
+    PRINTSTAT                      shift and go to state 10
+    READSTAT                       shift and go to state 11
+    RETURNSTAT                     shift and go to state 12
+    IFSTAT                         shift and go to state 13
+    FORSTAT                        shift and go to state 14
+    DATATYPE                       shift and go to state 17
+    LVALUE                         shift and go to state 19
+
+state 30
+
+    (18) STATEMENT -> VARDECL SEMICOLON .
+
+    $end            reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    BREAK           reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    SEMICOLON       reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    PRINT           reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    READ            reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    RETURN          reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    IF              reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    FOR             reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    INT_KEYWORD     reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    FLOAT_KEYWORD   reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    STRING_KEYWORD  reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    IDENT           reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    LBRACKETS       reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+    RBRACKETS       reduce using rule 18 (STATEMENT -> VARDECL SEMICOLON .)
+
+
+state 31
+
+    (19) STATEMENT -> ATRIBSTAT SEMICOLON .
+
+    $end            reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    BREAK           reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    SEMICOLON       reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    PRINT           reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    READ            reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    RETURN          reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    IF              reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    FOR             reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    INT_KEYWORD     reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    FLOAT_KEYWORD   reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    STRING_KEYWORD  reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    IDENT           reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    LBRACKETS       reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+    RBRACKETS       reduce using rule 19 (STATEMENT -> ATRIBSTAT SEMICOLON .)
+
+
+state 32
+
+    (20) STATEMENT -> PRINTSTAT SEMICOLON .
+
+    $end            reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    BREAK           reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    SEMICOLON       reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    PRINT           reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    READ            reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    RETURN          reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    IF              reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    FOR             reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    INT_KEYWORD     reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    FLOAT_KEYWORD   reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    STRING_KEYWORD  reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    IDENT           reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    LBRACKETS       reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+    RBRACKETS       reduce using rule 20 (STATEMENT -> PRINTSTAT SEMICOLON .)
+
+
+state 33
+
+    (21) STATEMENT -> READSTAT SEMICOLON .
+
+    $end            reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    BREAK           reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    SEMICOLON       reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    PRINT           reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    READ            reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    RETURN          reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    IF              reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    FOR             reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    INT_KEYWORD     reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    FLOAT_KEYWORD   reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    STRING_KEYWORD  reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    IDENT           reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    LBRACKETS       reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+    RBRACKETS       reduce using rule 21 (STATEMENT -> READSTAT SEMICOLON .)
+
+
+state 34
+
+    (22) STATEMENT -> RETURNSTAT SEMICOLON .
+
+    $end            reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    BREAK           reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    SEMICOLON       reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    PRINT           reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    READ            reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    RETURN          reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    IF              reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    FOR             reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    INT_KEYWORD     reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    FLOAT_KEYWORD   reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    STRING_KEYWORD  reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    IDENT           reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    LBRACKETS       reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+    RBRACKETS       reduce using rule 22 (STATEMENT -> RETURNSTAT SEMICOLON .)
+
+
+state 35
+
+    (26) STATEMENT -> BREAK SEMICOLON .
+
+    $end            reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    BREAK           reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    SEMICOLON       reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    PRINT           reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    READ            reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    RETURN          reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    IF              reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    FOR             reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    INT_KEYWORD     reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    FLOAT_KEYWORD   reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    STRING_KEYWORD  reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    IDENT           reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    LBRACKETS       reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+    RBRACKETS       reduce using rule 26 (STATEMENT -> BREAK SEMICOLON .)
+
+
+state 36
+
+    (7) FUNCLIST -> FUNCDEF FUNCLISTAUX .
+
+    $end            reduce using rule 7 (FUNCLIST -> FUNCDEF FUNCLISTAUX .)
+
+
+state 37
+
+    (8) FUNCLISTAUX -> FUNCLIST .
+
+    $end            reduce using rule 8 (FUNCLISTAUX -> FUNCLIST .)
+
+
+state 38
+
+    (9) FUNCLISTAUX -> empty .
+
+    $end            reduce using rule 9 (FUNCLISTAUX -> empty .)
+
+
+state 39
+
+    (28) VARDECL -> DATATYPE IDENT . OPT_VECTOR
+    (29) OPT_VECTOR -> . LSQBRACKETS INT_CONSTANT RSQBRACKETS OPT_VECTOR
+    (30) OPT_VECTOR -> . empty
+    (1) empty -> .
+
+    LSQBRACKETS     shift and go to state 65
+    SEMICOLON       reduce using rule 1 (empty -> .)
+
+    OPT_VECTOR                     shift and go to state 64
+    empty                          shift and go to state 66
+
+state 40
+
+    (89) LVALUE -> IDENT OPT_ALLOC_NUMEXP .
+
+    ATTRIBUTION     reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    TIMES           reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    MODULE          reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    DIVIDE          reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    PLUS            reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    MINUS           reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    LOWER_THAN      reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    GREATER_THAN    reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    LOWER_OR_EQUALS_THAN reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    GREATER_OR_EQUALS_THAN reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    EQ_COMPARISON   reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    NEQ_COMPARISON  reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    SEMICOLON       reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    RSQBRACKETS     reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+    RPAREN          reduce using rule 89 (LVALUE -> IDENT OPT_ALLOC_NUMEXP .)
+
+
+state 41
+
+    (59) OPT_ALLOC_NUMEXP -> LSQBRACKETS . NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    NUMEXPRESSION                  shift and go to state 67
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 42
+
+    (60) OPT_ALLOC_NUMEXP -> empty .
+
+    ATTRIBUTION     reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    TIMES           reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    MODULE          reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    DIVIDE          reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    PLUS            reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    MINUS           reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    LOWER_THAN      reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    GREATER_THAN    reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    LOWER_OR_EQUALS_THAN reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    GREATER_OR_EQUALS_THAN reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    EQ_COMPARISON   reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    NEQ_COMPARISON  reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    SEMICOLON       reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    RSQBRACKETS     reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+    RPAREN          reduce using rule 60 (OPT_ALLOC_NUMEXP -> empty .)
+
+
+state 43
+
+    (31) ATRIBSTAT -> LVALUE ATTRIBUTION . ATRIB_RIGHT
+    (32) ATRIB_RIGHT -> . FUNCCALL_OR_EXPRESSION
+    (33) ATRIB_RIGHT -> . ALLOCEXPRESSION
+    (34) FUNCCALL_OR_EXPRESSION -> . PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (35) FUNCCALL_OR_EXPRESSION -> . MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (36) FUNCCALL_OR_EXPRESSION -> . INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (37) FUNCCALL_OR_EXPRESSION -> . FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (38) FUNCCALL_OR_EXPRESSION -> . STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (39) FUNCCALL_OR_EXPRESSION -> . NULL REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (40) FUNCCALL_OR_EXPRESSION -> . LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (41) FUNCCALL_OR_EXPRESSION -> . IDENT FOLLOW_IDENT
+    (58) ALLOCEXPRESSION -> . NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 71
+    MINUS           shift and go to state 72
+    INT_CONSTANT    shift and go to state 73
+    FLOAT_CONSTANT  shift and go to state 74
+    STRING_CONSTANT shift and go to state 75
+    NULL            shift and go to state 76
+    LPAREN          shift and go to state 77
+    IDENT           shift and go to state 78
+    NEW             shift and go to state 79
+
+    ATRIB_RIGHT                    shift and go to state 68
+    FUNCCALL_OR_EXPRESSION         shift and go to state 69
+    ALLOCEXPRESSION                shift and go to state 70
+
+state 44
+
+    (48) PRINTSTAT -> PRINT EXPRESSION .
+
+    SEMICOLON       reduce using rule 48 (PRINTSTAT -> PRINT EXPRESSION .)
+
+
+state 45
+
+    (61) EXPRESSION -> NUMEXPRESSION . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 80
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 46
+
+    (70) NUMEXPRESSION -> TERM . REC_PLUS_MINUS_TERM
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RSQBRACKETS     reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 89
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 47
+
+    (75) TERM -> UNARYEXPR . REC_UNARYEXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RSQBRACKETS     reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 92
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 48
+
+    (81) UNARYEXPR -> PLUS_OR_MINUS . FACTOR
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    FACTOR                         shift and go to state 98
+    LVALUE                         shift and go to state 56
+
+state 49
+
+    (82) UNARYEXPR -> FACTOR .
+
+    TIMES           reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    MODULE          reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    DIVIDE          reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    PLUS            reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    MINUS           reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    LOWER_THAN      reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    GREATER_THAN    reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    LOWER_OR_EQUALS_THAN reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    GREATER_OR_EQUALS_THAN reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    EQ_COMPARISON   reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    NEQ_COMPARISON  reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    SEMICOLON       reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    RSQBRACKETS     reduce using rule 82 (UNARYEXPR -> FACTOR .)
+    RPAREN          reduce using rule 82 (UNARYEXPR -> FACTOR .)
+
+
+state 50
+
+    (73) PLUS_OR_MINUS -> PLUS .
+
+    INT_CONSTANT    reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+    FLOAT_CONSTANT  reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+    STRING_CONSTANT reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+    NULL            reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+    LPAREN          reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+    IDENT           reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+    PLUS            reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+    MINUS           reduce using rule 73 (PLUS_OR_MINUS -> PLUS .)
+
+
+state 51
+
+    (74) PLUS_OR_MINUS -> MINUS .
+
+    INT_CONSTANT    reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+    FLOAT_CONSTANT  reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+    STRING_CONSTANT reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+    NULL            reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+    LPAREN          reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+    IDENT           reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+    PLUS            reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+    MINUS           reduce using rule 74 (PLUS_OR_MINUS -> MINUS .)
+
+
+state 52
+
+    (83) FACTOR -> INT_CONSTANT .
+
+    TIMES           reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    MODULE          reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    DIVIDE          reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    PLUS            reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    MINUS           reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    LOWER_THAN      reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    GREATER_THAN    reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    LOWER_OR_EQUALS_THAN reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    GREATER_OR_EQUALS_THAN reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    EQ_COMPARISON   reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    NEQ_COMPARISON  reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    SEMICOLON       reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    RSQBRACKETS     reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+    RPAREN          reduce using rule 83 (FACTOR -> INT_CONSTANT .)
+
+
+state 53
+
+    (84) FACTOR -> FLOAT_CONSTANT .
+
+    TIMES           reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    MODULE          reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    DIVIDE          reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    PLUS            reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    MINUS           reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    LOWER_THAN      reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    GREATER_THAN    reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    LOWER_OR_EQUALS_THAN reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    GREATER_OR_EQUALS_THAN reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    EQ_COMPARISON   reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    NEQ_COMPARISON  reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    SEMICOLON       reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    RSQBRACKETS     reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+    RPAREN          reduce using rule 84 (FACTOR -> FLOAT_CONSTANT .)
+
+
+state 54
+
+    (85) FACTOR -> STRING_CONSTANT .
+
+    TIMES           reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    MODULE          reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    DIVIDE          reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    PLUS            reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    MINUS           reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    LOWER_THAN      reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    GREATER_THAN    reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    LOWER_OR_EQUALS_THAN reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    GREATER_OR_EQUALS_THAN reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    EQ_COMPARISON   reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    NEQ_COMPARISON  reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    SEMICOLON       reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    RSQBRACKETS     reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+    RPAREN          reduce using rule 85 (FACTOR -> STRING_CONSTANT .)
+
+
+state 55
+
+    (86) FACTOR -> NULL .
+
+    TIMES           reduce using rule 86 (FACTOR -> NULL .)
+    MODULE          reduce using rule 86 (FACTOR -> NULL .)
+    DIVIDE          reduce using rule 86 (FACTOR -> NULL .)
+    PLUS            reduce using rule 86 (FACTOR -> NULL .)
+    MINUS           reduce using rule 86 (FACTOR -> NULL .)
+    LOWER_THAN      reduce using rule 86 (FACTOR -> NULL .)
+    GREATER_THAN    reduce using rule 86 (FACTOR -> NULL .)
+    LOWER_OR_EQUALS_THAN reduce using rule 86 (FACTOR -> NULL .)
+    GREATER_OR_EQUALS_THAN reduce using rule 86 (FACTOR -> NULL .)
+    EQ_COMPARISON   reduce using rule 86 (FACTOR -> NULL .)
+    NEQ_COMPARISON  reduce using rule 86 (FACTOR -> NULL .)
+    SEMICOLON       reduce using rule 86 (FACTOR -> NULL .)
+    RSQBRACKETS     reduce using rule 86 (FACTOR -> NULL .)
+    RPAREN          reduce using rule 86 (FACTOR -> NULL .)
+
+
+state 56
+
+    (87) FACTOR -> LVALUE .
+
+    TIMES           reduce using rule 87 (FACTOR -> LVALUE .)
+    MODULE          reduce using rule 87 (FACTOR -> LVALUE .)
+    DIVIDE          reduce using rule 87 (FACTOR -> LVALUE .)
+    PLUS            reduce using rule 87 (FACTOR -> LVALUE .)
+    MINUS           reduce using rule 87 (FACTOR -> LVALUE .)
+    LOWER_THAN      reduce using rule 87 (FACTOR -> LVALUE .)
+    GREATER_THAN    reduce using rule 87 (FACTOR -> LVALUE .)
+    LOWER_OR_EQUALS_THAN reduce using rule 87 (FACTOR -> LVALUE .)
+    GREATER_OR_EQUALS_THAN reduce using rule 87 (FACTOR -> LVALUE .)
+    EQ_COMPARISON   reduce using rule 87 (FACTOR -> LVALUE .)
+    NEQ_COMPARISON  reduce using rule 87 (FACTOR -> LVALUE .)
+    SEMICOLON       reduce using rule 87 (FACTOR -> LVALUE .)
+    RSQBRACKETS     reduce using rule 87 (FACTOR -> LVALUE .)
+    RPAREN          reduce using rule 87 (FACTOR -> LVALUE .)
+
+
+state 57
+
+    (88) FACTOR -> LPAREN . NUMEXPRESSION RPAREN
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    NUMEXPRESSION                  shift and go to state 99
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 58
+
+    (49) READSTAT -> READ LVALUE .
+
+    SEMICOLON       reduce using rule 49 (READSTAT -> READ LVALUE .)
+
+
+state 59
+
+    (51) IFSTAT -> IF LPAREN . EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (61) EXPRESSION -> . NUMEXPRESSION OPT_REL_OP_NUM_EXPR
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    EXPRESSION                     shift and go to state 100
+    NUMEXPRESSION                  shift and go to state 45
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 60
+
+    (54) FORSTAT -> FOR LPAREN . ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    IDENT           shift and go to state 18
+
+    ATRIBSTAT                      shift and go to state 101
+    LVALUE                         shift and go to state 19
+
+state 61
+
+    (10) FUNCDEF -> DEF IDENT . new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+
+    LPAREN          reduce using rule 2 (new_scope -> .)
+
+    new_scope                      shift and go to state 102
+
+state 62
+
+    (25) STATEMENT -> new_scope LBRACKETS STATELIST . RBRACKETS
+
+    RBRACKETS       shift and go to state 103
+
+
+state 63
+
+    (55) STATELIST -> STATEMENT . OPT_STATELIST
+    (56) OPT_STATELIST -> . STATELIST
+    (57) OPT_STATELIST -> . empty
+    (55) STATELIST -> . STATEMENT OPT_STATELIST
+    (1) empty -> .
+    (18) STATEMENT -> . VARDECL SEMICOLON
+    (19) STATEMENT -> . ATRIBSTAT SEMICOLON
+    (20) STATEMENT -> . PRINTSTAT SEMICOLON
+    (21) STATEMENT -> . READSTAT SEMICOLON
+    (22) STATEMENT -> . RETURNSTAT SEMICOLON
+    (23) STATEMENT -> . IFSTAT
+    (24) STATEMENT -> . FORSTAT
+    (25) STATEMENT -> . new_scope LBRACKETS STATELIST RBRACKETS
+    (26) STATEMENT -> . BREAK SEMICOLON
+    (27) STATEMENT -> . SEMICOLON
+    (28) VARDECL -> . DATATYPE IDENT OPT_VECTOR
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (48) PRINTSTAT -> . PRINT EXPRESSION
+    (49) READSTAT -> . READ LVALUE
+    (50) RETURNSTAT -> . RETURN
+    (51) IFSTAT -> . IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (54) FORSTAT -> . FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    RBRACKETS       reduce using rule 1 (empty -> .)
+    BREAK           shift and go to state 15
+    SEMICOLON       shift and go to state 8
+    PRINT           shift and go to state 20
+    READ            shift and go to state 21
+    RETURN          shift and go to state 22
+    IF              shift and go to state 23
+    FOR             shift and go to state 24
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    IDENT           shift and go to state 18
+
+    STATEMENT                      shift and go to state 63
+    OPT_STATELIST                  shift and go to state 104
+    STATELIST                      shift and go to state 105
+    empty                          shift and go to state 106
+    VARDECL                        shift and go to state 7
+    ATRIBSTAT                      shift and go to state 9
+    PRINTSTAT                      shift and go to state 10
+    READSTAT                       shift and go to state 11
+    RETURNSTAT                     shift and go to state 12
+    IFSTAT                         shift and go to state 13
+    FORSTAT                        shift and go to state 14
+    new_scope                      shift and go to state 4
+    DATATYPE                       shift and go to state 17
+    LVALUE                         shift and go to state 19
+
+state 64
+
+    (28) VARDECL -> DATATYPE IDENT OPT_VECTOR .
+
+    SEMICOLON       reduce using rule 28 (VARDECL -> DATATYPE IDENT OPT_VECTOR .)
+
+
+state 65
+
+    (29) OPT_VECTOR -> LSQBRACKETS . INT_CONSTANT RSQBRACKETS OPT_VECTOR
+
+    INT_CONSTANT    shift and go to state 107
+
+
+state 66
+
+    (30) OPT_VECTOR -> empty .
+
+    SEMICOLON       reduce using rule 30 (OPT_VECTOR -> empty .)
+
+
+state 67
+
+    (59) OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION . RSQBRACKETS OPT_ALLOC_NUMEXP
+
+    RSQBRACKETS     shift and go to state 108
+
+
+state 68
+
+    (31) ATRIBSTAT -> LVALUE ATTRIBUTION ATRIB_RIGHT .
+
+    SEMICOLON       reduce using rule 31 (ATRIBSTAT -> LVALUE ATTRIBUTION ATRIB_RIGHT .)
+    RPAREN          reduce using rule 31 (ATRIBSTAT -> LVALUE ATTRIBUTION ATRIB_RIGHT .)
+
+
+state 69
+
+    (32) ATRIB_RIGHT -> FUNCCALL_OR_EXPRESSION .
+
+    SEMICOLON       reduce using rule 32 (ATRIB_RIGHT -> FUNCCALL_OR_EXPRESSION .)
+    RPAREN          reduce using rule 32 (ATRIB_RIGHT -> FUNCCALL_OR_EXPRESSION .)
+
+
+state 70
+
+    (33) ATRIB_RIGHT -> ALLOCEXPRESSION .
+
+    SEMICOLON       reduce using rule 33 (ATRIB_RIGHT -> ALLOCEXPRESSION .)
+    RPAREN          reduce using rule 33 (ATRIB_RIGHT -> ALLOCEXPRESSION .)
+
+
+state 71
+
+    (34) FUNCCALL_OR_EXPRESSION -> PLUS . FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    FACTOR                         shift and go to state 109
+    LVALUE                         shift and go to state 56
+
+state 72
+
+    (35) FUNCCALL_OR_EXPRESSION -> MINUS . FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    FACTOR                         shift and go to state 110
+    LVALUE                         shift and go to state 56
+
+state 73
+
+    (36) FUNCCALL_OR_EXPRESSION -> INT_CONSTANT . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 111
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 74
+
+    (37) FUNCCALL_OR_EXPRESSION -> FLOAT_CONSTANT . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 112
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 75
+
+    (38) FUNCCALL_OR_EXPRESSION -> STRING_CONSTANT . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 113
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 76
+
+    (39) FUNCCALL_OR_EXPRESSION -> NULL . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 114
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 77
+
+    (40) FUNCCALL_OR_EXPRESSION -> LPAREN . NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    NUMEXPRESSION                  shift and go to state 115
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 78
+
+    (41) FUNCCALL_OR_EXPRESSION -> IDENT . FOLLOW_IDENT
+    (42) FOLLOW_IDENT -> . OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (43) FOLLOW_IDENT -> . LPAREN PARAMLISTCALL RPAREN
+    (59) OPT_ALLOC_NUMEXP -> . LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+    (60) OPT_ALLOC_NUMEXP -> . empty
+    (1) empty -> .
+
+    LPAREN          shift and go to state 118
+    LSQBRACKETS     shift and go to state 41
+    TIMES           reduce using rule 1 (empty -> .)
+    MODULE          reduce using rule 1 (empty -> .)
+    DIVIDE          reduce using rule 1 (empty -> .)
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    FOLLOW_IDENT                   shift and go to state 116
+    OPT_ALLOC_NUMEXP               shift and go to state 117
+    empty                          shift and go to state 42
+
+state 79
+
+    (58) ALLOCEXPRESSION -> NEW . DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+
+    DATATYPE                       shift and go to state 119
+
+state 80
+
+    (61) EXPRESSION -> NUMEXPRESSION OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 61 (EXPRESSION -> NUMEXPRESSION OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 61 (EXPRESSION -> NUMEXPRESSION OPT_REL_OP_NUM_EXPR .)
+
+
+state 81
+
+    (62) OPT_REL_OP_NUM_EXPR -> REL_OP . NUMEXPRESSION
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    NUMEXPRESSION                  shift and go to state 120
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 82
+
+    (63) OPT_REL_OP_NUM_EXPR -> empty .
+
+    SEMICOLON       reduce using rule 63 (OPT_REL_OP_NUM_EXPR -> empty .)
+    RPAREN          reduce using rule 63 (OPT_REL_OP_NUM_EXPR -> empty .)
+
+
+state 83
+
+    (64) REL_OP -> LOWER_THAN .
+
+    PLUS            reduce using rule 64 (REL_OP -> LOWER_THAN .)
+    MINUS           reduce using rule 64 (REL_OP -> LOWER_THAN .)
+    INT_CONSTANT    reduce using rule 64 (REL_OP -> LOWER_THAN .)
+    FLOAT_CONSTANT  reduce using rule 64 (REL_OP -> LOWER_THAN .)
+    STRING_CONSTANT reduce using rule 64 (REL_OP -> LOWER_THAN .)
+    NULL            reduce using rule 64 (REL_OP -> LOWER_THAN .)
+    LPAREN          reduce using rule 64 (REL_OP -> LOWER_THAN .)
+    IDENT           reduce using rule 64 (REL_OP -> LOWER_THAN .)
+
+
+state 84
+
+    (65) REL_OP -> GREATER_THAN .
+
+    PLUS            reduce using rule 65 (REL_OP -> GREATER_THAN .)
+    MINUS           reduce using rule 65 (REL_OP -> GREATER_THAN .)
+    INT_CONSTANT    reduce using rule 65 (REL_OP -> GREATER_THAN .)
+    FLOAT_CONSTANT  reduce using rule 65 (REL_OP -> GREATER_THAN .)
+    STRING_CONSTANT reduce using rule 65 (REL_OP -> GREATER_THAN .)
+    NULL            reduce using rule 65 (REL_OP -> GREATER_THAN .)
+    LPAREN          reduce using rule 65 (REL_OP -> GREATER_THAN .)
+    IDENT           reduce using rule 65 (REL_OP -> GREATER_THAN .)
+
+
+state 85
+
+    (66) REL_OP -> LOWER_OR_EQUALS_THAN .
+
+    PLUS            reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+    MINUS           reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+    INT_CONSTANT    reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+    FLOAT_CONSTANT  reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+    STRING_CONSTANT reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+    NULL            reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+    LPAREN          reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+    IDENT           reduce using rule 66 (REL_OP -> LOWER_OR_EQUALS_THAN .)
+
+
+state 86
+
+    (67) REL_OP -> GREATER_OR_EQUALS_THAN .
+
+    PLUS            reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+    MINUS           reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+    INT_CONSTANT    reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+    FLOAT_CONSTANT  reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+    STRING_CONSTANT reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+    NULL            reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+    LPAREN          reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+    IDENT           reduce using rule 67 (REL_OP -> GREATER_OR_EQUALS_THAN .)
+
+
+state 87
+
+    (68) REL_OP -> EQ_COMPARISON .
+
+    PLUS            reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+    MINUS           reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+    INT_CONSTANT    reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+    FLOAT_CONSTANT  reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+    STRING_CONSTANT reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+    NULL            reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+    LPAREN          reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+    IDENT           reduce using rule 68 (REL_OP -> EQ_COMPARISON .)
+
+
+state 88
+
+    (69) REL_OP -> NEQ_COMPARISON .
+
+    PLUS            reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+    MINUS           reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+    INT_CONSTANT    reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+    FLOAT_CONSTANT  reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+    STRING_CONSTANT reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+    NULL            reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+    LPAREN          reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+    IDENT           reduce using rule 69 (REL_OP -> NEQ_COMPARISON .)
+
+
+state 89
+
+    (70) NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .
+
+    LOWER_THAN      reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    GREATER_THAN    reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    LOWER_OR_EQUALS_THAN reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    GREATER_OR_EQUALS_THAN reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    EQ_COMPARISON   reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    NEQ_COMPARISON  reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    SEMICOLON       reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    RSQBRACKETS     reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+    RPAREN          reduce using rule 70 (NUMEXPRESSION -> TERM REC_PLUS_MINUS_TERM .)
+
+
+state 90
+
+    (71) REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    PLUS_OR_MINUS                  shift and go to state 48
+    TERM                           shift and go to state 121
+    UNARYEXPR                      shift and go to state 47
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 91
+
+    (72) REC_PLUS_MINUS_TERM -> empty .
+
+    LOWER_THAN      reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    GREATER_THAN    reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    LOWER_OR_EQUALS_THAN reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    GREATER_OR_EQUALS_THAN reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    EQ_COMPARISON   reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    NEQ_COMPARISON  reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    SEMICOLON       reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    RSQBRACKETS     reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+    RPAREN          reduce using rule 72 (REC_PLUS_MINUS_TERM -> empty .)
+
+
+state 92
+
+    (75) TERM -> UNARYEXPR REC_UNARYEXPR .
+
+    PLUS            reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    MINUS           reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    LOWER_THAN      reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    GREATER_THAN    reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    LOWER_OR_EQUALS_THAN reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    GREATER_OR_EQUALS_THAN reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    EQ_COMPARISON   reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    NEQ_COMPARISON  reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    SEMICOLON       reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    RSQBRACKETS     reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+    RPAREN          reduce using rule 75 (TERM -> UNARYEXPR REC_UNARYEXPR .)
+
+
+state 93
+
+    (76) REC_UNARYEXPR -> UNARYEXPR_OP . TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    TERM                           shift and go to state 122
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 94
+
+    (77) REC_UNARYEXPR -> empty .
+
+    PLUS            reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    MINUS           reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    LOWER_THAN      reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    GREATER_THAN    reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    LOWER_OR_EQUALS_THAN reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    GREATER_OR_EQUALS_THAN reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    EQ_COMPARISON   reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    NEQ_COMPARISON  reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    SEMICOLON       reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    RSQBRACKETS     reduce using rule 77 (REC_UNARYEXPR -> empty .)
+    RPAREN          reduce using rule 77 (REC_UNARYEXPR -> empty .)
+
+
+state 95
+
+    (78) UNARYEXPR_OP -> TIMES .
+
+    PLUS            reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+    MINUS           reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+    INT_CONSTANT    reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+    FLOAT_CONSTANT  reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+    STRING_CONSTANT reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+    NULL            reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+    LPAREN          reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+    IDENT           reduce using rule 78 (UNARYEXPR_OP -> TIMES .)
+
+
+state 96
+
+    (79) UNARYEXPR_OP -> MODULE .
+
+    PLUS            reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+    MINUS           reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+    INT_CONSTANT    reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+    FLOAT_CONSTANT  reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+    STRING_CONSTANT reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+    NULL            reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+    LPAREN          reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+    IDENT           reduce using rule 79 (UNARYEXPR_OP -> MODULE .)
+
+
+state 97
+
+    (80) UNARYEXPR_OP -> DIVIDE .
+
+    PLUS            reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+    MINUS           reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+    INT_CONSTANT    reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+    FLOAT_CONSTANT  reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+    STRING_CONSTANT reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+    NULL            reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+    LPAREN          reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+    IDENT           reduce using rule 80 (UNARYEXPR_OP -> DIVIDE .)
+
+
+state 98
+
+    (81) UNARYEXPR -> PLUS_OR_MINUS FACTOR .
+
+    TIMES           reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    MODULE          reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    DIVIDE          reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    PLUS            reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    MINUS           reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    LOWER_THAN      reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    GREATER_THAN    reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    LOWER_OR_EQUALS_THAN reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    GREATER_OR_EQUALS_THAN reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    EQ_COMPARISON   reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    NEQ_COMPARISON  reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    SEMICOLON       reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    RSQBRACKETS     reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+    RPAREN          reduce using rule 81 (UNARYEXPR -> PLUS_OR_MINUS FACTOR .)
+
+
+state 99
+
+    (88) FACTOR -> LPAREN NUMEXPRESSION . RPAREN
+
+    RPAREN          shift and go to state 123
+
+
+state 100
+
+    (51) IFSTAT -> IF LPAREN EXPRESSION . RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+
+    RPAREN          shift and go to state 124
+
+
+state 101
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT . SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+
+    SEMICOLON       shift and go to state 125
+
+
+state 102
+
+    (10) FUNCDEF -> DEF IDENT new_scope . LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+
+    LPAREN          shift and go to state 126
+
+
+state 103
+
+    (25) STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .
+
+    $end            reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    BREAK           reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    SEMICOLON       reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    PRINT           reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    READ            reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    RETURN          reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    IF              reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    FOR             reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    INT_KEYWORD     reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    FLOAT_KEYWORD   reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    STRING_KEYWORD  reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    IDENT           reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    LBRACKETS       reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+    RBRACKETS       reduce using rule 25 (STATEMENT -> new_scope LBRACKETS STATELIST RBRACKETS .)
+
+
+state 104
+
+    (55) STATELIST -> STATEMENT OPT_STATELIST .
+
+    RBRACKETS       reduce using rule 55 (STATELIST -> STATEMENT OPT_STATELIST .)
+
+
+state 105
+
+    (56) OPT_STATELIST -> STATELIST .
+
+    RBRACKETS       reduce using rule 56 (OPT_STATELIST -> STATELIST .)
+
+
+state 106
+
+    (57) OPT_STATELIST -> empty .
+
+    RBRACKETS       reduce using rule 57 (OPT_STATELIST -> empty .)
+
+
+state 107
+
+    (29) OPT_VECTOR -> LSQBRACKETS INT_CONSTANT . RSQBRACKETS OPT_VECTOR
+
+    RSQBRACKETS     shift and go to state 127
+
+
+state 108
+
+    (59) OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS . OPT_ALLOC_NUMEXP
+    (59) OPT_ALLOC_NUMEXP -> . LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+    (60) OPT_ALLOC_NUMEXP -> . empty
+    (1) empty -> .
+
+    LSQBRACKETS     shift and go to state 41
+    ATTRIBUTION     reduce using rule 1 (empty -> .)
+    TIMES           reduce using rule 1 (empty -> .)
+    MODULE          reduce using rule 1 (empty -> .)
+    DIVIDE          reduce using rule 1 (empty -> .)
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RSQBRACKETS     reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_ALLOC_NUMEXP               shift and go to state 128
+    empty                          shift and go to state 42
+
+state 109
+
+    (34) FUNCCALL_OR_EXPRESSION -> PLUS FACTOR . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 129
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 110
+
+    (35) FUNCCALL_OR_EXPRESSION -> MINUS FACTOR . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 130
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 111
+
+    (36) FUNCCALL_OR_EXPRESSION -> INT_CONSTANT REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 131
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 112
+
+    (37) FUNCCALL_OR_EXPRESSION -> FLOAT_CONSTANT REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 132
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 113
+
+    (38) FUNCCALL_OR_EXPRESSION -> STRING_CONSTANT REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 133
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 114
+
+    (39) FUNCCALL_OR_EXPRESSION -> NULL REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 134
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 115
+
+    (40) FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION . RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+
+    RPAREN          shift and go to state 135
+
+
+state 116
+
+    (41) FUNCCALL_OR_EXPRESSION -> IDENT FOLLOW_IDENT .
+
+    SEMICOLON       reduce using rule 41 (FUNCCALL_OR_EXPRESSION -> IDENT FOLLOW_IDENT .)
+    RPAREN          reduce using rule 41 (FUNCCALL_OR_EXPRESSION -> IDENT FOLLOW_IDENT .)
+
+
+state 117
+
+    (42) FOLLOW_IDENT -> OPT_ALLOC_NUMEXP . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 136
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 118
+
+    (43) FOLLOW_IDENT -> LPAREN . PARAMLISTCALL RPAREN
+    (44) PARAMLISTCALL -> . IDENT PARAMLISTCALLAUX
+    (45) PARAMLISTCALL -> . empty
+    (1) empty -> .
+
+    IDENT           shift and go to state 138
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    PARAMLISTCALL                  shift and go to state 137
+    empty                          shift and go to state 139
+
+state 119
+
+    (58) ALLOCEXPRESSION -> NEW DATATYPE . LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+
+    LSQBRACKETS     shift and go to state 140
+
+
+state 120
+
+    (62) OPT_REL_OP_NUM_EXPR -> REL_OP NUMEXPRESSION .
+
+    SEMICOLON       reduce using rule 62 (OPT_REL_OP_NUM_EXPR -> REL_OP NUMEXPRESSION .)
+    RPAREN          reduce using rule 62 (OPT_REL_OP_NUM_EXPR -> REL_OP NUMEXPRESSION .)
+
+
+state 121
+
+    (71) REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM . REC_PLUS_MINUS_TERM
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RSQBRACKETS     reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    PLUS_OR_MINUS                  shift and go to state 90
+    REC_PLUS_MINUS_TERM            shift and go to state 141
+    empty                          shift and go to state 91
+
+state 122
+
+    (76) REC_UNARYEXPR -> UNARYEXPR_OP TERM .
+
+    PLUS            reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    MINUS           reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    LOWER_THAN      reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    GREATER_THAN    reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    LOWER_OR_EQUALS_THAN reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    GREATER_OR_EQUALS_THAN reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    EQ_COMPARISON   reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    NEQ_COMPARISON  reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    SEMICOLON       reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    RSQBRACKETS     reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+    RPAREN          reduce using rule 76 (REC_UNARYEXPR -> UNARYEXPR_OP TERM .)
+
+
+state 123
+
+    (88) FACTOR -> LPAREN NUMEXPRESSION RPAREN .
+
+    TIMES           reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    MODULE          reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    DIVIDE          reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    PLUS            reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    MINUS           reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    LOWER_THAN      reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    GREATER_THAN    reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    LOWER_OR_EQUALS_THAN reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    GREATER_OR_EQUALS_THAN reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    EQ_COMPARISON   reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    NEQ_COMPARISON  reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    SEMICOLON       reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    RSQBRACKETS     reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+    RPAREN          reduce using rule 88 (FACTOR -> LPAREN NUMEXPRESSION RPAREN .)
+
+
+state 124
+
+    (51) IFSTAT -> IF LPAREN EXPRESSION RPAREN . new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (2) new_scope -> .
+
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+
+    new_scope                      shift and go to state 142
+
+state 125
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON . EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (61) EXPRESSION -> . NUMEXPRESSION OPT_REL_OP_NUM_EXPR
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    EXPRESSION                     shift and go to state 143
+    NUMEXPRESSION                  shift and go to state 45
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 126
+
+    (10) FUNCDEF -> DEF IDENT new_scope LPAREN . PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+    (11) PARAMLIST -> . DATATYPE IDENT PARAMLISTAUX
+    (12) PARAMLIST -> . empty
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (1) empty -> .
+
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    PARAMLIST                      shift and go to state 144
+    DATATYPE                       shift and go to state 145
+    empty                          shift and go to state 146
+
+state 127
+
+    (29) OPT_VECTOR -> LSQBRACKETS INT_CONSTANT RSQBRACKETS . OPT_VECTOR
+    (29) OPT_VECTOR -> . LSQBRACKETS INT_CONSTANT RSQBRACKETS OPT_VECTOR
+    (30) OPT_VECTOR -> . empty
+    (1) empty -> .
+
+    LSQBRACKETS     shift and go to state 65
+    SEMICOLON       reduce using rule 1 (empty -> .)
+
+    OPT_VECTOR                     shift and go to state 147
+    empty                          shift and go to state 66
+
+state 128
+
+    (59) OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .
+
+    ATTRIBUTION     reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    TIMES           reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    MODULE          reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    DIVIDE          reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    PLUS            reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    MINUS           reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    LOWER_THAN      reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    GREATER_THAN    reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    LOWER_OR_EQUALS_THAN reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    GREATER_OR_EQUALS_THAN reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    EQ_COMPARISON   reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    NEQ_COMPARISON  reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    SEMICOLON       reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    RSQBRACKETS     reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    RPAREN          reduce using rule 59 (OPT_ALLOC_NUMEXP -> LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+
+
+state 129
+
+    (34) FUNCCALL_OR_EXPRESSION -> PLUS FACTOR REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 148
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 130
+
+    (35) FUNCCALL_OR_EXPRESSION -> MINUS FACTOR REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 149
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 131
+
+    (36) FUNCCALL_OR_EXPRESSION -> INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 150
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 132
+
+    (37) FUNCCALL_OR_EXPRESSION -> FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 151
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 133
+
+    (38) FUNCCALL_OR_EXPRESSION -> STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 152
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 134
+
+    (39) FUNCCALL_OR_EXPRESSION -> NULL REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 153
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 135
+
+    (40) FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION RPAREN . REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (76) REC_UNARYEXPR -> . UNARYEXPR_OP TERM
+    (77) REC_UNARYEXPR -> . empty
+    (78) UNARYEXPR_OP -> . TIMES
+    (79) UNARYEXPR_OP -> . MODULE
+    (80) UNARYEXPR_OP -> . DIVIDE
+    (1) empty -> .
+
+    TIMES           shift and go to state 95
+    MODULE          shift and go to state 96
+    DIVIDE          shift and go to state 97
+    PLUS            reduce using rule 1 (empty -> .)
+    MINUS           reduce using rule 1 (empty -> .)
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_UNARYEXPR                  shift and go to state 154
+    UNARYEXPR_OP                   shift and go to state 93
+    empty                          shift and go to state 94
+
+state 136
+
+    (42) FOLLOW_IDENT -> OPT_ALLOC_NUMEXP REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 155
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 137
+
+    (43) FOLLOW_IDENT -> LPAREN PARAMLISTCALL . RPAREN
+
+    RPAREN          shift and go to state 156
+
+
+state 138
+
+    (44) PARAMLISTCALL -> IDENT . PARAMLISTCALLAUX
+    (46) PARAMLISTCALLAUX -> . COMMA PARAMLISTCALL
+    (47) PARAMLISTCALLAUX -> . empty
+    (1) empty -> .
+
+    COMMA           shift and go to state 158
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    PARAMLISTCALLAUX               shift and go to state 157
+    empty                          shift and go to state 159
+
+state 139
+
+    (45) PARAMLISTCALL -> empty .
+
+    RPAREN          reduce using rule 45 (PARAMLISTCALL -> empty .)
+
+
+state 140
+
+    (58) ALLOCEXPRESSION -> NEW DATATYPE LSQBRACKETS . NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+    (70) NUMEXPRESSION -> . TERM REC_PLUS_MINUS_TERM
+    (75) TERM -> . UNARYEXPR REC_UNARYEXPR
+    (81) UNARYEXPR -> . PLUS_OR_MINUS FACTOR
+    (82) UNARYEXPR -> . FACTOR
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (83) FACTOR -> . INT_CONSTANT
+    (84) FACTOR -> . FLOAT_CONSTANT
+    (85) FACTOR -> . STRING_CONSTANT
+    (86) FACTOR -> . NULL
+    (87) FACTOR -> . LVALUE
+    (88) FACTOR -> . LPAREN NUMEXPRESSION RPAREN
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    INT_CONSTANT    shift and go to state 52
+    FLOAT_CONSTANT  shift and go to state 53
+    STRING_CONSTANT shift and go to state 54
+    NULL            shift and go to state 55
+    LPAREN          shift and go to state 57
+    IDENT           shift and go to state 18
+
+    NUMEXPRESSION                  shift and go to state 160
+    TERM                           shift and go to state 46
+    UNARYEXPR                      shift and go to state 47
+    PLUS_OR_MINUS                  shift and go to state 48
+    FACTOR                         shift and go to state 49
+    LVALUE                         shift and go to state 56
+
+state 141
+
+    (71) REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .
+
+    LOWER_THAN      reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    GREATER_THAN    reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    LOWER_OR_EQUALS_THAN reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    GREATER_OR_EQUALS_THAN reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    EQ_COMPARISON   reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    NEQ_COMPARISON  reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    SEMICOLON       reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    RSQBRACKETS     reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+    RPAREN          reduce using rule 71 (REC_PLUS_MINUS_TERM -> PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM .)
+
+
+state 142
+
+    (51) IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope . LBRACKETS STATELIST RBRACKETS OPT_ELSE
+
+    LBRACKETS       shift and go to state 161
+
+
+state 143
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION . SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+
+    SEMICOLON       shift and go to state 162
+
+
+state 144
+
+    (10) FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST . RPAREN LBRACKETS STATELIST RBRACKETS
+
+    RPAREN          shift and go to state 163
+
+
+state 145
+
+    (11) PARAMLIST -> DATATYPE . IDENT PARAMLISTAUX
+
+    IDENT           shift and go to state 164
+
+
+state 146
+
+    (12) PARAMLIST -> empty .
+
+    RPAREN          reduce using rule 12 (PARAMLIST -> empty .)
+
+
+state 147
+
+    (29) OPT_VECTOR -> LSQBRACKETS INT_CONSTANT RSQBRACKETS OPT_VECTOR .
+
+    SEMICOLON       reduce using rule 29 (OPT_VECTOR -> LSQBRACKETS INT_CONSTANT RSQBRACKETS OPT_VECTOR .)
+
+
+state 148
+
+    (34) FUNCCALL_OR_EXPRESSION -> PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 165
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 149
+
+    (35) FUNCCALL_OR_EXPRESSION -> MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 166
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 150
+
+    (36) FUNCCALL_OR_EXPRESSION -> INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 36 (FUNCCALL_OR_EXPRESSION -> INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 36 (FUNCCALL_OR_EXPRESSION -> INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 151
+
+    (37) FUNCCALL_OR_EXPRESSION -> FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 37 (FUNCCALL_OR_EXPRESSION -> FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 37 (FUNCCALL_OR_EXPRESSION -> FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 152
+
+    (38) FUNCCALL_OR_EXPRESSION -> STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 38 (FUNCCALL_OR_EXPRESSION -> STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 38 (FUNCCALL_OR_EXPRESSION -> STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 153
+
+    (39) FUNCCALL_OR_EXPRESSION -> NULL REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 39 (FUNCCALL_OR_EXPRESSION -> NULL REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 39 (FUNCCALL_OR_EXPRESSION -> NULL REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 154
+
+    (40) FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR . REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+    (71) REC_PLUS_MINUS_TERM -> . PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM
+    (72) REC_PLUS_MINUS_TERM -> . empty
+    (73) PLUS_OR_MINUS -> . PLUS
+    (74) PLUS_OR_MINUS -> . MINUS
+    (1) empty -> .
+
+    PLUS            shift and go to state 50
+    MINUS           shift and go to state 51
+    LOWER_THAN      reduce using rule 1 (empty -> .)
+    GREATER_THAN    reduce using rule 1 (empty -> .)
+    LOWER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    GREATER_OR_EQUALS_THAN reduce using rule 1 (empty -> .)
+    EQ_COMPARISON   reduce using rule 1 (empty -> .)
+    NEQ_COMPARISON  reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    REC_PLUS_MINUS_TERM            shift and go to state 167
+    PLUS_OR_MINUS                  shift and go to state 90
+    empty                          shift and go to state 91
+
+state 155
+
+    (42) FOLLOW_IDENT -> OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 168
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 156
+
+    (43) FOLLOW_IDENT -> LPAREN PARAMLISTCALL RPAREN .
+
+    SEMICOLON       reduce using rule 43 (FOLLOW_IDENT -> LPAREN PARAMLISTCALL RPAREN .)
+    RPAREN          reduce using rule 43 (FOLLOW_IDENT -> LPAREN PARAMLISTCALL RPAREN .)
+
+
+state 157
+
+    (44) PARAMLISTCALL -> IDENT PARAMLISTCALLAUX .
+
+    RPAREN          reduce using rule 44 (PARAMLISTCALL -> IDENT PARAMLISTCALLAUX .)
+
+
+state 158
+
+    (46) PARAMLISTCALLAUX -> COMMA . PARAMLISTCALL
+    (44) PARAMLISTCALL -> . IDENT PARAMLISTCALLAUX
+    (45) PARAMLISTCALL -> . empty
+    (1) empty -> .
+
+    IDENT           shift and go to state 138
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    PARAMLISTCALL                  shift and go to state 169
+    empty                          shift and go to state 139
+
+state 159
+
+    (47) PARAMLISTCALLAUX -> empty .
+
+    RPAREN          reduce using rule 47 (PARAMLISTCALLAUX -> empty .)
+
+
+state 160
+
+    (58) ALLOCEXPRESSION -> NEW DATATYPE LSQBRACKETS NUMEXPRESSION . RSQBRACKETS OPT_ALLOC_NUMEXP
+
+    RSQBRACKETS     shift and go to state 170
+
+
+state 161
+
+    (51) IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS . STATELIST RBRACKETS OPT_ELSE
+    (55) STATELIST -> . STATEMENT OPT_STATELIST
+    (18) STATEMENT -> . VARDECL SEMICOLON
+    (19) STATEMENT -> . ATRIBSTAT SEMICOLON
+    (20) STATEMENT -> . PRINTSTAT SEMICOLON
+    (21) STATEMENT -> . READSTAT SEMICOLON
+    (22) STATEMENT -> . RETURNSTAT SEMICOLON
+    (23) STATEMENT -> . IFSTAT
+    (24) STATEMENT -> . FORSTAT
+    (25) STATEMENT -> . new_scope LBRACKETS STATELIST RBRACKETS
+    (26) STATEMENT -> . BREAK SEMICOLON
+    (27) STATEMENT -> . SEMICOLON
+    (28) VARDECL -> . DATATYPE IDENT OPT_VECTOR
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (48) PRINTSTAT -> . PRINT EXPRESSION
+    (49) READSTAT -> . READ LVALUE
+    (50) RETURNSTAT -> . RETURN
+    (51) IFSTAT -> . IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (54) FORSTAT -> . FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    BREAK           shift and go to state 15
+    SEMICOLON       shift and go to state 8
+    PRINT           shift and go to state 20
+    READ            shift and go to state 21
+    RETURN          shift and go to state 22
+    IF              shift and go to state 23
+    FOR             shift and go to state 24
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    IDENT           shift and go to state 18
+
+    new_scope                      shift and go to state 4
+    STATELIST                      shift and go to state 171
+    STATEMENT                      shift and go to state 63
+    VARDECL                        shift and go to state 7
+    ATRIBSTAT                      shift and go to state 9
+    PRINTSTAT                      shift and go to state 10
+    READSTAT                       shift and go to state 11
+    RETURNSTAT                     shift and go to state 12
+    IFSTAT                         shift and go to state 13
+    FORSTAT                        shift and go to state 14
+    DATATYPE                       shift and go to state 17
+    LVALUE                         shift and go to state 19
+
+state 162
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON . ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    IDENT           shift and go to state 18
+
+    ATRIBSTAT                      shift and go to state 172
+    LVALUE                         shift and go to state 19
+
+state 163
+
+    (10) FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST RPAREN . LBRACKETS STATELIST RBRACKETS
+
+    LBRACKETS       shift and go to state 173
+
+
+state 164
+
+    (11) PARAMLIST -> DATATYPE IDENT . PARAMLISTAUX
+    (13) PARAMLISTAUX -> . COMMA PARAMLIST
+    (14) PARAMLISTAUX -> . empty
+    (1) empty -> .
+
+    COMMA           shift and go to state 175
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    PARAMLISTAUX                   shift and go to state 174
+    empty                          shift and go to state 176
+
+state 165
+
+    (34) FUNCCALL_OR_EXPRESSION -> PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 34 (FUNCCALL_OR_EXPRESSION -> PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 34 (FUNCCALL_OR_EXPRESSION -> PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 166
+
+    (35) FUNCCALL_OR_EXPRESSION -> MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 35 (FUNCCALL_OR_EXPRESSION -> MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 35 (FUNCCALL_OR_EXPRESSION -> MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 167
+
+    (40) FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM . OPT_REL_OP_NUM_EXPR
+    (62) OPT_REL_OP_NUM_EXPR -> . REL_OP NUMEXPRESSION
+    (63) OPT_REL_OP_NUM_EXPR -> . empty
+    (64) REL_OP -> . LOWER_THAN
+    (65) REL_OP -> . GREATER_THAN
+    (66) REL_OP -> . LOWER_OR_EQUALS_THAN
+    (67) REL_OP -> . GREATER_OR_EQUALS_THAN
+    (68) REL_OP -> . EQ_COMPARISON
+    (69) REL_OP -> . NEQ_COMPARISON
+    (1) empty -> .
+
+    LOWER_THAN      shift and go to state 83
+    GREATER_THAN    shift and go to state 84
+    LOWER_OR_EQUALS_THAN shift and go to state 85
+    GREATER_OR_EQUALS_THAN shift and go to state 86
+    EQ_COMPARISON   shift and go to state 87
+    NEQ_COMPARISON  shift and go to state 88
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_REL_OP_NUM_EXPR            shift and go to state 177
+    REL_OP                         shift and go to state 81
+    empty                          shift and go to state 82
+
+state 168
+
+    (42) FOLLOW_IDENT -> OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 42 (FOLLOW_IDENT -> OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 42 (FOLLOW_IDENT -> OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 169
+
+    (46) PARAMLISTCALLAUX -> COMMA PARAMLISTCALL .
+
+    RPAREN          reduce using rule 46 (PARAMLISTCALLAUX -> COMMA PARAMLISTCALL .)
+
+
+state 170
+
+    (58) ALLOCEXPRESSION -> NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS . OPT_ALLOC_NUMEXP
+    (59) OPT_ALLOC_NUMEXP -> . LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+    (60) OPT_ALLOC_NUMEXP -> . empty
+    (1) empty -> .
+
+    LSQBRACKETS     shift and go to state 41
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    OPT_ALLOC_NUMEXP               shift and go to state 178
+    empty                          shift and go to state 42
+
+state 171
+
+    (51) IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST . RBRACKETS OPT_ELSE
+
+    RBRACKETS       shift and go to state 179
+
+
+state 172
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT . RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+
+    RPAREN          shift and go to state 180
+
+
+state 173
+
+    (10) FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS . STATELIST RBRACKETS
+    (55) STATELIST -> . STATEMENT OPT_STATELIST
+    (18) STATEMENT -> . VARDECL SEMICOLON
+    (19) STATEMENT -> . ATRIBSTAT SEMICOLON
+    (20) STATEMENT -> . PRINTSTAT SEMICOLON
+    (21) STATEMENT -> . READSTAT SEMICOLON
+    (22) STATEMENT -> . RETURNSTAT SEMICOLON
+    (23) STATEMENT -> . IFSTAT
+    (24) STATEMENT -> . FORSTAT
+    (25) STATEMENT -> . new_scope LBRACKETS STATELIST RBRACKETS
+    (26) STATEMENT -> . BREAK SEMICOLON
+    (27) STATEMENT -> . SEMICOLON
+    (28) VARDECL -> . DATATYPE IDENT OPT_VECTOR
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (48) PRINTSTAT -> . PRINT EXPRESSION
+    (49) READSTAT -> . READ LVALUE
+    (50) RETURNSTAT -> . RETURN
+    (51) IFSTAT -> . IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (54) FORSTAT -> . FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    BREAK           shift and go to state 15
+    SEMICOLON       shift and go to state 8
+    PRINT           shift and go to state 20
+    READ            shift and go to state 21
+    RETURN          shift and go to state 22
+    IF              shift and go to state 23
+    FOR             shift and go to state 24
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    IDENT           shift and go to state 18
+
+    new_scope                      shift and go to state 4
+    STATELIST                      shift and go to state 181
+    STATEMENT                      shift and go to state 63
+    VARDECL                        shift and go to state 7
+    ATRIBSTAT                      shift and go to state 9
+    PRINTSTAT                      shift and go to state 10
+    READSTAT                       shift and go to state 11
+    RETURNSTAT                     shift and go to state 12
+    IFSTAT                         shift and go to state 13
+    FORSTAT                        shift and go to state 14
+    DATATYPE                       shift and go to state 17
+    LVALUE                         shift and go to state 19
+
+state 174
+
+    (11) PARAMLIST -> DATATYPE IDENT PARAMLISTAUX .
+
+    RPAREN          reduce using rule 11 (PARAMLIST -> DATATYPE IDENT PARAMLISTAUX .)
+
+
+state 175
+
+    (13) PARAMLISTAUX -> COMMA . PARAMLIST
+    (11) PARAMLIST -> . DATATYPE IDENT PARAMLISTAUX
+    (12) PARAMLIST -> . empty
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (1) empty -> .
+
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    RPAREN          reduce using rule 1 (empty -> .)
+
+    PARAMLIST                      shift and go to state 182
+    DATATYPE                       shift and go to state 145
+    empty                          shift and go to state 146
+
+state 176
+
+    (14) PARAMLISTAUX -> empty .
+
+    RPAREN          reduce using rule 14 (PARAMLISTAUX -> empty .)
+
+
+state 177
+
+    (40) FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .
+
+    SEMICOLON       reduce using rule 40 (FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+    RPAREN          reduce using rule 40 (FUNCCALL_OR_EXPRESSION -> LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR .)
+
+
+state 178
+
+    (58) ALLOCEXPRESSION -> NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .
+
+    SEMICOLON       reduce using rule 58 (ALLOCEXPRESSION -> NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+    RPAREN          reduce using rule 58 (ALLOCEXPRESSION -> NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP .)
+
+
+state 179
+
+    (51) IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS . OPT_ELSE
+    (52) OPT_ELSE -> . ELSE new_scope LBRACKETS STATELIST RBRACKETS
+    (53) OPT_ELSE -> . empty
+    (1) empty -> .
+
+    ELSE            shift and go to state 184
+    $end            reduce using rule 1 (empty -> .)
+    BREAK           reduce using rule 1 (empty -> .)
+    SEMICOLON       reduce using rule 1 (empty -> .)
+    PRINT           reduce using rule 1 (empty -> .)
+    READ            reduce using rule 1 (empty -> .)
+    RETURN          reduce using rule 1 (empty -> .)
+    IF              reduce using rule 1 (empty -> .)
+    FOR             reduce using rule 1 (empty -> .)
+    INT_KEYWORD     reduce using rule 1 (empty -> .)
+    FLOAT_KEYWORD   reduce using rule 1 (empty -> .)
+    STRING_KEYWORD  reduce using rule 1 (empty -> .)
+    IDENT           reduce using rule 1 (empty -> .)
+    LBRACKETS       reduce using rule 1 (empty -> .)
+    RBRACKETS       reduce using rule 1 (empty -> .)
+
+    OPT_ELSE                       shift and go to state 183
+    empty                          shift and go to state 185
+
+state 180
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN . new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (3) new_loop_scope -> .
+
+    LBRACKETS       reduce using rule 3 (new_loop_scope -> .)
+
+    new_loop_scope                 shift and go to state 186
+
+state 181
+
+    (10) FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST . RBRACKETS
+
+    RBRACKETS       shift and go to state 187
+
+
+state 182
+
+    (13) PARAMLISTAUX -> COMMA PARAMLIST .
+
+    RPAREN          reduce using rule 13 (PARAMLISTAUX -> COMMA PARAMLIST .)
+
+
+state 183
+
+    (51) IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .
+
+    $end            reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    BREAK           reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    SEMICOLON       reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    PRINT           reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    READ            reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    RETURN          reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    IF              reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    FOR             reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    INT_KEYWORD     reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    FLOAT_KEYWORD   reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    STRING_KEYWORD  reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    IDENT           reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    LBRACKETS       reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+    RBRACKETS       reduce using rule 51 (IFSTAT -> IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE .)
+
+
+state 184
+
+    (52) OPT_ELSE -> ELSE . new_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+
+    new_scope                      shift and go to state 188
+
+state 185
+
+    (53) OPT_ELSE -> empty .
+
+    $end            reduce using rule 53 (OPT_ELSE -> empty .)
+    BREAK           reduce using rule 53 (OPT_ELSE -> empty .)
+    SEMICOLON       reduce using rule 53 (OPT_ELSE -> empty .)
+    PRINT           reduce using rule 53 (OPT_ELSE -> empty .)
+    READ            reduce using rule 53 (OPT_ELSE -> empty .)
+    RETURN          reduce using rule 53 (OPT_ELSE -> empty .)
+    IF              reduce using rule 53 (OPT_ELSE -> empty .)
+    FOR             reduce using rule 53 (OPT_ELSE -> empty .)
+    INT_KEYWORD     reduce using rule 53 (OPT_ELSE -> empty .)
+    FLOAT_KEYWORD   reduce using rule 53 (OPT_ELSE -> empty .)
+    STRING_KEYWORD  reduce using rule 53 (OPT_ELSE -> empty .)
+    IDENT           reduce using rule 53 (OPT_ELSE -> empty .)
+    LBRACKETS       reduce using rule 53 (OPT_ELSE -> empty .)
+    RBRACKETS       reduce using rule 53 (OPT_ELSE -> empty .)
+
+
+state 186
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope . LBRACKETS STATELIST RBRACKETS
+
+    LBRACKETS       shift and go to state 189
+
+
+state 187
+
+    (10) FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS .
+
+    DEF             reduce using rule 10 (FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS .)
+    $end            reduce using rule 10 (FUNCDEF -> DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS .)
+
+
+state 188
+
+    (52) OPT_ELSE -> ELSE new_scope . LBRACKETS STATELIST RBRACKETS
+
+    LBRACKETS       shift and go to state 190
+
+
+state 189
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS . STATELIST RBRACKETS
+    (55) STATELIST -> . STATEMENT OPT_STATELIST
+    (18) STATEMENT -> . VARDECL SEMICOLON
+    (19) STATEMENT -> . ATRIBSTAT SEMICOLON
+    (20) STATEMENT -> . PRINTSTAT SEMICOLON
+    (21) STATEMENT -> . READSTAT SEMICOLON
+    (22) STATEMENT -> . RETURNSTAT SEMICOLON
+    (23) STATEMENT -> . IFSTAT
+    (24) STATEMENT -> . FORSTAT
+    (25) STATEMENT -> . new_scope LBRACKETS STATELIST RBRACKETS
+    (26) STATEMENT -> . BREAK SEMICOLON
+    (27) STATEMENT -> . SEMICOLON
+    (28) VARDECL -> . DATATYPE IDENT OPT_VECTOR
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (48) PRINTSTAT -> . PRINT EXPRESSION
+    (49) READSTAT -> . READ LVALUE
+    (50) RETURNSTAT -> . RETURN
+    (51) IFSTAT -> . IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (54) FORSTAT -> . FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    BREAK           shift and go to state 15
+    SEMICOLON       shift and go to state 8
+    PRINT           shift and go to state 20
+    READ            shift and go to state 21
+    RETURN          shift and go to state 22
+    IF              shift and go to state 23
+    FOR             shift and go to state 24
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    IDENT           shift and go to state 18
+
+    ATRIBSTAT                      shift and go to state 9
+    STATELIST                      shift and go to state 191
+    STATEMENT                      shift and go to state 63
+    VARDECL                        shift and go to state 7
+    PRINTSTAT                      shift and go to state 10
+    READSTAT                       shift and go to state 11
+    RETURNSTAT                     shift and go to state 12
+    IFSTAT                         shift and go to state 13
+    FORSTAT                        shift and go to state 14
+    new_scope                      shift and go to state 4
+    DATATYPE                       shift and go to state 17
+    LVALUE                         shift and go to state 19
+
+state 190
+
+    (52) OPT_ELSE -> ELSE new_scope LBRACKETS . STATELIST RBRACKETS
+    (55) STATELIST -> . STATEMENT OPT_STATELIST
+    (18) STATEMENT -> . VARDECL SEMICOLON
+    (19) STATEMENT -> . ATRIBSTAT SEMICOLON
+    (20) STATEMENT -> . PRINTSTAT SEMICOLON
+    (21) STATEMENT -> . READSTAT SEMICOLON
+    (22) STATEMENT -> . RETURNSTAT SEMICOLON
+    (23) STATEMENT -> . IFSTAT
+    (24) STATEMENT -> . FORSTAT
+    (25) STATEMENT -> . new_scope LBRACKETS STATELIST RBRACKETS
+    (26) STATEMENT -> . BREAK SEMICOLON
+    (27) STATEMENT -> . SEMICOLON
+    (28) VARDECL -> . DATATYPE IDENT OPT_VECTOR
+    (31) ATRIBSTAT -> . LVALUE ATTRIBUTION ATRIB_RIGHT
+    (48) PRINTSTAT -> . PRINT EXPRESSION
+    (49) READSTAT -> . READ LVALUE
+    (50) RETURNSTAT -> . RETURN
+    (51) IFSTAT -> . IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+    (54) FORSTAT -> . FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+    (2) new_scope -> .
+    (15) DATATYPE -> . INT_KEYWORD
+    (16) DATATYPE -> . FLOAT_KEYWORD
+    (17) DATATYPE -> . STRING_KEYWORD
+    (89) LVALUE -> . IDENT OPT_ALLOC_NUMEXP
+
+    BREAK           shift and go to state 15
+    SEMICOLON       shift and go to state 8
+    PRINT           shift and go to state 20
+    READ            shift and go to state 21
+    RETURN          shift and go to state 22
+    IF              shift and go to state 23
+    FOR             shift and go to state 24
+    LBRACKETS       reduce using rule 2 (new_scope -> .)
+    INT_KEYWORD     shift and go to state 26
+    FLOAT_KEYWORD   shift and go to state 27
+    STRING_KEYWORD  shift and go to state 28
+    IDENT           shift and go to state 18
+
+    new_scope                      shift and go to state 4
+    STATELIST                      shift and go to state 192
+    STATEMENT                      shift and go to state 63
+    VARDECL                        shift and go to state 7
+    ATRIBSTAT                      shift and go to state 9
+    PRINTSTAT                      shift and go to state 10
+    READSTAT                       shift and go to state 11
+    RETURNSTAT                     shift and go to state 12
+    IFSTAT                         shift and go to state 13
+    FORSTAT                        shift and go to state 14
+    DATATYPE                       shift and go to state 17
+    LVALUE                         shift and go to state 19
+
+state 191
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST . RBRACKETS
+
+    RBRACKETS       shift and go to state 193
+
+
+state 192
+
+    (52) OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST . RBRACKETS
+
+    RBRACKETS       shift and go to state 194
+
+
+state 193
+
+    (54) FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .
+
+    $end            reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    BREAK           reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    SEMICOLON       reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    PRINT           reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    READ            reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    RETURN          reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    IF              reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    FOR             reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    INT_KEYWORD     reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    FLOAT_KEYWORD   reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    STRING_KEYWORD  reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    IDENT           reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    LBRACKETS       reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+    RBRACKETS       reduce using rule 54 (FORSTAT -> FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS .)
+
+
+state 194
+
+    (52) OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .
+
+    $end            reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    BREAK           reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    SEMICOLON       reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    PRINT           reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    READ            reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    RETURN          reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    IF              reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    FOR             reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    INT_KEYWORD     reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    FLOAT_KEYWORD   reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    STRING_KEYWORD  reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    IDENT           reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    LBRACKETS       reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+    RBRACKETS       reduce using rule 52 (OPT_ELSE -> ELSE new_scope LBRACKETS STATELIST RBRACKETS .)
+

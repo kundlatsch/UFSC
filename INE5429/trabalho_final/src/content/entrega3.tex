@@ -1,0 +1,490 @@
+\section{Introdução}
+
+O Classic McEliece é um sistema criptográfico de criptografia assimétrica baseado em códigos lineares de correção de erros, que inclui geração de chaves, criptografia e descriptografia de mensagens. Nesse trabalho, vamos apresentar na prática como ele funciona, utilizando a ferramenta libmcleece disponível em \href{https://github.com/sz3/libmcleece}{sua página no github}.
+
+\section{\texttt{libmcleece}}
+
+A libmcleece foi desenvolvida em C++, e implementa uma interface de linha de comando para a implementação original do Classic McEliece feita para sua sumbissão no concurso de algoritmos de criptografia de chave-pública pós-quânticos do NIST, disponível no site oficial do algoritmo \cite{ClassicMcEliece}.
+
+Para instalar a libmcleece, basta cloná-la do github, instalar as dependências contidas no arquivo \texttt{README.md} e executar os comandos:
+
+\begin{minted}{shell}
+
+    cmake .
+    make -j4 install
+
+\end{minted}
+
+O resultado do build estará disponível, por padrão, na basta \texttt{dist/}, e conterá um executável \texttt{mcleececli}, que será utilizado nos experimentos que serão realizados.
+
+\section{Sistema criptográfico}
+
+Nessa seção vamos descrever como funciona cada uma das etapas de criptografia do Classic McEliece: a geração de chave, criptografia e descriptografia de mensagens. Para exemplificar, vamos utilizar os personagens tradicionais de exemplos de criptografia Alice e Bob. Primeiro, Bob vai gerar uma chave e Alice vai encriptar uma mensagem utilizando a chave pública de Bob. Dessa maneira, apenas ele será capaz de descriptografar a mensagem.
+
+Para facilitar o entendimento, primeiro serão descritos cada um dos processos e como eles foram implementados na submissão para o NIST, e depois será apresentado um exemplo prático com parâmetros pequenos, para fins didáticos.
+
+\subsection{Geração de Chave}
+
+Para Bob gerar um par de chaves, os seguintes passos são executados:
+
+\begin{enumerate}
+    \item Primeiro, ele deve gerar um polinômio irredutível mônico aleatório $g(z) \in {F}_{2^m}[z]$ de grau $t$, sendo ${F}_{2^m}$ um campo de extensão binária (um elemento da aritmética de campos finitos).
+    \item Seleciona um conjunto uniformemente aleatório $\{\alpha_1, \alpha_2, ..., \alpha_n\} \subseteq {F}_{2^m}$ com todos os seus elementos sendo distintos.
+    \item Computar uma matriz de tamanho $t \times n$ definida como $\tilde{H} = \{h_{i, j}\}$ sobre ${F}_{2^m}$, onde $ \{h_{i, j}\} = a_{j}^{i-1}g(\alpha_i)^{-1}$ para $i = 1, 2, ..., t$ e $j = 1, 2, ..., n$.
+    \item Substituir cada entrada da matriz $\tilde{H}$ (elementos de ${F}_{2^m}$) com vetores de ${F}_{2}^m$ (arranjados em colunas) usando o isomorfismo de espaço vetorial entre ${F}_{2^m}$ e ${F}_{2^m}$ para chegar a uma matriz $\hat{H}$ de tamanho $mt \times n$.
+    \item Aplicar eliminação gaussiana em  $\hat{H}$ para obter uma matriz sistemática $H = (I_{mt} | T_{mt \times (n-mt)})$ se possível, caso contrário deve retornar para a etapa 1.
+    \item Gerar uma cadeia uniforme de bits aleatórios de tamanho $n$ nomeada $s$.
+    \item \textbf{Chave Pública:} $T$.
+    \item \textbf{Chave Privada:} $\{s, g(z), \alpha_1, \alpha_2, ..., \alpha_n\}$.
+    
+\end{enumerate}
+
+Apesar de ser um pouco difícil de entender, pois utiliza notação matemática pesada e aritmética de campos finitos, a ideia da geração é criar, a partir de um código linear de correção de erros, uma matriz geradora para do código selecionado, e transformar essa matriz em um polinômio.
+
+A implementação da geração de chave privada proposta na submissão do McEliece é a seguinte:
+
+
+\iffalse
+A ideia por trás da geração de chave do McEliece é escolher um código linear $C$ e tornar sua matriz geradora pública para que qualquer um possa usá-lo para codificar mensagens, mas manter o algoritmo de decodificação secreto (chave pública e privada, respectivamente). Conhecer $C$ apenas não é suficiente para quebrar o segredo do algoritmo, pois é necessário saber os parâmtros utilizados na geração.
+
+Um exemplo disso são códigos Goppa binários, que são a versão dos códigos Goppa descritos originalmente por Valerii Denisovich Goppa \cite{berlekamp1973goppa} (códigos lineares gerados a partir de uma curva sobre um campo finito). Para decodificar um códigos Goppa binários, é necessário saber o polinômio Goppa utilizado e os localizadores de código. Assim, é possível publicar uma matriz geradora de $C$ publicamente ofuscando essas informações.
+
+O passo a passo para Alice gerar uma chave seria o seguinte:
+
+\begin{enumerate}
+    \item Alice seleciona um código binário $C$ de dimensão $n$ por $k$ capaz de corrigir (eficientemente) um número definido de erros $t$, como um código Goppa binário, descrito anteriormente. Esta escolha deve dar origem a um algoritmo de decodificação eficiente $A$. A partir dessas escolhas, uma matrix geradora $G$ deve ser escolhida (cada código linear possui diversas matrizes geradores, por isso essa escolha precisa ser feita).
+    
+    \item Alice seleciona uma matriz binária não singular $k \times k$ aleatória chamada $S$.
+    
+    \item Alice seleciona uma matriz de permutação $n \times n$ aleatória chamada $P$.
+    
+    \item Alice computa a matriz $\hat{G} = SGP$ de dimensão  $k \times n$.
+    
+    \item A chave pública de Alice será ($\hat{G}$, $t$), e sua chave privada ($S$, $P$, $A$).
+    
+\end{enumerate}
+
+
+
+\fi
+
+\begin{minted}{cpp}
+int genpoly_gen(gf *out, gf *f)
+{
+  int i, j, k, c;
+
+  gf mat[ SYS_T+1 ][ SYS_T ];
+  gf mask, inv, t;
+
+  // fill matrix
+
+  mat[0][0] = 1;
+
+  for (i = 1; i < SYS_T; i++)
+    mat[0][i] = 0;
+
+  for (i = 0; i < SYS_T; i++)
+    mat[1][i] = f[i];
+
+  for (j = 2; j <= SYS_T; j++)
+    GF_mul(mat[j], mat[j-1], f);
+
+  // gaussian
+
+  for (j = 0; j < SYS_T; j++)
+  {
+    for (k = j + 1; k < SYS_T; k++)
+    {
+      mask = gf_iszero(mat[ j ][ j ]);
+
+      for (c = j; c < SYS_T + 1; c++)
+        mat[ c ][ j ] ^= mat[ c ][ k ] & mask;
+
+    }
+
+    if ( mat[ j ][ j ] == 0 ) // return if not systematic
+    {
+      return -1;
+    }
+
+    inv = gf_inv(mat[j][j]);
+
+    for (c = j; c < SYS_T + 1; c++)
+      mat[ c ][ j ] = gf_mul(mat[ c ][ j ], inv) ;
+
+    for (k = 0; k < SYS_T; k++)
+    {
+      if (k != j)
+      {
+        t = mat[ j ][ k ];
+
+        for (c = j; c < SYS_T + 1; c++)
+          mat[ c ][ k ] ^= gf_mul(mat[ c ][ j ], t);
+      }
+    }
+  }
+
+  for (i = 0; i < SYS_T; i++)
+    out[i] = mat[ SYS_T ][ i ];
+
+  return 0;
+}
+\end{minted}
+
+Nessa implementação, é possível perceber o preenchimento da matriz e a eliminação gaussiana. Para realizar esses procedimentos, é utilizada uma estrutura de dados \texttt{gf} que implementa funções para aritmética de campo.
+
+A partir da geração da chave privada, a chave pública é gerada da seguinte maneira:
+
+\begin{minted}{cpp}
+int pk_gen(unsigned char * pk, unsigned char * sk,
+uint32_t * perm, int16_t * pi)
+{
+  int i, j, k;
+  int row, c;
+
+  uint64_t buf[ 1 << GFBITS ];
+
+  unsigned char mat[ PK_NROWS ][ SYS_N/8 ];
+  unsigned char mask;
+  unsigned char b;
+
+  gf g[ SYS_T+1 ]; // Goppa polynomial
+  gf L[ SYS_N ]; // support
+  gf inv[ SYS_N ];
+
+  //
+
+  g[ SYS_T ] = 1;
+
+  for (i = 0; i < SYS_T; i++) { g[i] = load_gf(sk); sk += 2; }
+
+  for (i = 0; i < (1 << GFBITS); i++)
+  {
+    buf[i] = perm[i];
+    buf[i] <<= 31;
+    buf[i] |= i;
+  }
+
+  uint64_sort(buf, 1 << GFBITS);
+
+  for (i = 1; i < (1 << GFBITS); i++)
+    if ((buf[i-1] >> 31) == (buf[i] >> 31))
+      return -1;
+
+  for (i = 0; i < (1 << GFBITS); i++) pi[i] = buf[i] & GFMASK;
+  for (i = 0; i < SYS_N;         i++) L[i] = bitrev(pi[i]);
+
+  // filling the matrix
+
+  root(inv, g, L);
+    
+  for (i = 0; i < SYS_N; i++)
+    inv[i] = gf_inv(inv[i]);
+
+  for (i = 0; i < PK_NROWS; i++)
+  for (j = 0; j < SYS_N/8; j++)
+    mat[i][j] = 0;
+
+  for (i = 0; i < SYS_T; i++)
+  {
+    for (j = 0; j < SYS_N; j+=8)
+    for (k = 0; k < GFBITS;  k++)
+    {
+      b  = (inv[j+7] >> k) & 1; b <<= 1;
+      b |= (inv[j+6] >> k) & 1; b <<= 1;
+      b |= (inv[j+5] >> k) & 1; b <<= 1;
+      b |= (inv[j+4] >> k) & 1; b <<= 1;
+      b |= (inv[j+3] >> k) & 1; b <<= 1;
+      b |= (inv[j+2] >> k) & 1; b <<= 1;
+      b |= (inv[j+1] >> k) & 1; b <<= 1;
+      b |= (inv[j+0] >> k) & 1;
+
+      mat[ i*GFBITS + k ][ j/8 ] = b;
+    }
+
+    for (j = 0; j < SYS_N; j++)
+      inv[j] = gf_mul(inv[j], L[j]);
+
+  }
+
+  // gaussian elimination
+
+  for (i = 0; i < (PK_NROWS + 7) / 8; i++)
+  for (j = 0; j < 8; j++)
+  {
+    row = i*8 + j;      
+
+    if (row >= PK_NROWS)
+      break;
+
+    for (k = row + 1; k < PK_NROWS; k++)
+    {
+      mask = mat[ row ][ i ] ^ mat[ k ][ i ];
+      mask >>= j;
+      mask &= 1;
+      mask = -mask;
+
+      for (c = 0; c < SYS_N/8; c++)
+        mat[ row ][ c ] ^= mat[ k ][ c ] & mask;
+    }
+
+    if ( ((mat[ row ][ i ] >> j) & 1) == 0 ) 
+    // return if not systematic
+    {
+      return -1;
+    }
+
+    for (k = 0; k < PK_NROWS; k++)
+    {
+      if (k != row)
+      {
+        mask = mat[ k ][ i ] >> j;
+        mask &= 1;
+        mask = -mask;
+
+        for (c = 0; c < SYS_N/8; c++)
+          mat[ k ][ c ] ^= mat[ row ][ c ] & mask;
+      }
+    }
+  }
+
+  for (i = 0; i < PK_NROWS; i++)
+    memcpy(pk + i*PK_ROW_BYTES, mat[i] + PK_NROWS/8, PK_ROW_BYTES);
+
+  return 0;
+}
+\end{minted}
+
+\subsection{Encriptação}
+
+Para Alice realizar o processo de encriptação, ela deve seguir as seguintes etapas:
+
+\begin{itemize}
+    \item Gera um vetor aleatório uniforme  $e \in {F}_{2}^n$ com peso de Hamming $t$.
+    
+    \item \textbf{Codificação Niederreiter:} Usando a chave pública $T$ de Bob, Alice deve primeiro computar a matriz $H$, e depois o vetor $C_0 = He = (I | T)e$ de comprimento $mt$ em ${F}_{2}^mt$.
+    
+    \item Computar $C_1 = H(2, e)$ e gerar o texto cifrado $C = (C_0, C_1)$ de comprimento $mt + 256$ bits.
+    
+    \item Computar uma sessão de chave de 256 bits $K = H(1, e, C)$.
+\end{itemize}
+
+Na implementação de referência, o vetor $e$ é gerado com o seguinte algoritmo abaixo, que gera valores aleatórios continuamente até encontrar um vetor onde não haja repetição, então realiza as operações necessárias.
+
+\begin{minted}{C++}
+static void gen_e(unsigned char *e)
+{
+  int i, j, eq;
+
+  uint16_t ind[ SYS_T ];
+  unsigned char bytes[ sizeof(ind) ];
+  unsigned char mask;  
+  unsigned char val[ SYS_T ];  
+
+  while (1)
+  {
+    randombytes(bytes, sizeof(bytes));
+
+    for (i = 0; i < SYS_T; i++)
+      ind[i] = load_gf(bytes + i*2);
+
+    // check for repetition
+
+    eq = 0;
+
+    for (i = 1; i < SYS_T; i++) 
+      for (j = 0; j < i; j++)
+        if (ind[i] == ind[j]) 
+          eq = 1;
+
+    if (eq == 0)
+      break;
+  }
+
+  for (j = 0; j < SYS_T; j++)
+    val[j] = 1 << (ind[j] & 7);
+
+  for (i = 0; i < SYS_N/8; i++) 
+  {
+    e[i] = 0;
+
+    for (j = 0; j < SYS_T; j++)
+    {
+      mask = same_mask(i, (ind[j] >> 3));
+
+      e[i] |= val[j] & mask;
+    }
+  }
+}
+\end{minted}
+
+Na implementação da codificação de Niederriter, é importante notar que esse algoritmo usa uma síndrome como texto cifrado e a mensagem é um padrão de erro. Isso pode ser visto no trecho de código abaixo:
+
+\begin{minted}{cpp}
+static void syndrome(unsigned char *s, 
+const unsigned char *pk, unsigned char *e)
+{
+  unsigned char b, row[SYS_N/8];
+  const unsigned char *pk_ptr = pk;
+
+  int i, j;
+
+  for (i = 0; i < SYND_BYTES; i++)
+    s[i] = 0;
+
+  for (i = 0; i < PK_NROWS; i++)  
+  {
+    for (j = 0; j < SYS_N/8; j++) 
+      row[j] = 0;
+
+    for (j = 0; j < PK_ROW_BYTES; j++) 
+      row[ SYS_N/8 - PK_ROW_BYTES + j ] = pk_ptr[j];
+
+    row[i/8] |= 1 << (i%8);
+    
+    b = 0;
+    for (j = 0; j < SYS_N/8; j++)
+      b ^= row[j] & e[j];
+
+    b ^= b >> 4;
+    b ^= b >> 2;
+    b ^= b >> 1;
+    b &= 1;
+
+    s[ i/8 ] |= (b << (i%8));
+
+    pk_ptr += PK_ROW_BYTES;
+  }
+}
+\end{minted}
+
+\subsection{Decriptação}
+
+Para Bob decriptar a mensagem encriptografada enviada por Alice, os seguintes passos devem ser seguidos:
+
+\begin{enumerate}
+    \item Primeiro, ele deve dividir $C$ como $(C_0, C_1)$, com $C_0 \in {F}_{2}^{mt}$ e $C_1 \in {F}_{2}^{256}$.
+    
+    \item Atribuir $b \leftarrow 1$.
+    
+    \item Decodificação:
+        \begin{enumerate}
+            \item \texttt{Entrada:} $C_0$ e a chava privada $\{s, g(z), \alpha_1, \alpha_2, ..., \alpha_n\}$.
+            \item Estender $C_0$ para $v = (C_0, 0, ..., 0 \in  {F}_{2}^{mt}$ inderindo nele $n - mt$ zeros.
+            \item Através da decodificação de Niederreiter, achar a palavra-código $c$ no código Goppa definido por $\Gamma = \{g(z), \alpha_1, \alpha_2, ..., \alpha_n\}$.
+            \item Caso a palavra-código $c$ exista, atribuir o vetor $e = v + c$. Se $wt(e) = t$ e $C_0 = He$, retorna $e$. Caso contrário, retorna $\perp$.
+        \end{enumerate}
+    
+    \item Se a decodificação retornou $\perp$, atribuir $e \leftarrow s$ e $b \leftarrow 0$.
+    
+    \item Computar $C_1' = H(2, e)$, e verificar se $C_1' = C_1$. Se não for, definir $e \leftarrow s$ e $b \leftarrow 0$.
+    
+    \item Computar a sessão de chave $K' = H(b, e, C)$.
+\end{enumerate}
+
+Se não houver falha em nenhuma das etapas durante o processo de decriptação e $C_1' = C_1$, então certamente a sessão de chave $K'$ será idêntica a $K$. De maneira equivalente, se Bob receber um texto cifrado válido $C$, ou seja, $C = (C_0, C_1)$ com $C_0 = He$ para algum $e \in {F}_{2}^{n}$ de peso $t$ e $C_1 = H(2, e)$, a decodificação sempre vai resultar no vetor $e$.
+
+Na implementação de referência, foi implementado a decriptação de Niederreiter com o decodificador de Berlekamp, um algoritmo decodificador de correção de erros. O seguinte trecho de código recebe a chave privada e o texto crifrado, e retorna o vetor de erro $e$, conforme descrito anteriormente.
+
+\begin{minted}{cpp}
+int decrypt(unsigned char *e, 
+const unsigned char *sk, const unsigned char *c)
+{
+  int i, w = 0; 
+  uint16_t check;  
+
+  unsigned char r[ SYS_N/8 ];
+
+  gf g[ SYS_T+1 ];
+  gf L[ SYS_N ];
+
+  gf s[ SYS_T*2 ];
+  gf s_cmp[ SYS_T*2 ];
+  gf locator[ SYS_T+1 ];
+  gf images[ SYS_N ];
+
+  gf t;
+
+  //
+
+  for (i = 0; i < SYND_BYTES; i++)       r[i] = c[i];
+  for (i = SYND_BYTES; i < SYS_N/8; i++) r[i] = 0;
+
+  for (i = 0; i < SYS_T; i++) 
+  { g[i] = load_gf(sk); sk += 2; } g[ SYS_T ] = 1;
+
+  support_gen(L, sk);
+
+  synd(s, g, L, r);
+
+  bm(locator, s);
+
+  root(images, locator, L);
+
+  //
+  
+  for (i = 0; i < SYS_N/8; i++) 
+    e[i] = 0;
+
+  for (i = 0; i < SYS_N; i++)
+  {
+    t = gf_iszero(images[i]) & 1;
+
+    e[ i/8 ] |= t << (i%8);
+    w += t;
+
+  }
+
+#ifdef KAT
+  {
+    int k;
+    printf("decrypt e: positions");
+    for (k = 0;k < SYS_N;++k)
+      if (e[k/8] & (1 << (k&7)))
+        printf(" %d",k);
+    printf("\n");
+  }
+#endif
+  
+  synd(s_cmp, g, L, e);
+
+  //
+
+  check = w;
+  check ^= SYS_T;
+
+  for (i = 0; i < SYS_T*2; i++)
+    check |= s[i] ^ s_cmp[i]; 
+
+  check -= 1;
+  check >>= 15;
+
+  return check ^ 1;
+}
+\end{minted}
+
+\section{Aplicação Prática}
+
+É possível utilizar essas três funções da implementação de referência através da libmcleece. Primeiro, para gerar uma chave, basta executar o binário gerado com o build com os seguintes parâmetros:
+
+\begin{minted}{bash}
+  mcleececli generate-keypair --key-path=/tmp/key
+\end{minted}
+
+Com isso, a chave será guardada em um arquivo apontado pelo \texttt{--key-path}. Com a chave gerada, podemos encriptar qualquer arquivo através da ferramenta de linha de comando:
+
+\begin{minted}{bash}
+  mcleececli encrypt /caminho/arquivo.ext 
+    --key-path=/tmp/key.pk > encriptado.bin
+\end{minted}
+
+Por fim, qualquer pessoa que possua o arquivo encriptado e a chave privada, pode decriptar o arquivo com o comando:
+
+\begin{minted}{cpp}
+  mcleececli decrypt encriptado.bin 
+    --key-path=/tmp/key.sk > decriptado
+\end{minted}
+
+\section{Conclusão}
+
+Apesar da definição formal do algoritmo Classic McEliece ser bastante complexa, utilizando aritmética de campos finitos e bastante notação matemática, os princípios empregados são relativamente simples: utilizar a complexidade computacional de decodificar códigos lineares de correção de erros para encriptar as mensagens. Isso, em conjunto com uma ferramenta que transporta a implementação de referência para uma ferramenta de interface de linha de comando como o libmcleece, torna o uso do Classic McEliece simples e palpável para aplicações práticas.

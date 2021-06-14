@@ -1,0 +1,14 @@
+def test() {
+    int a;
+    int error;
+    string error;
+}
+
+def main() {
+    int a;
+    float c;
+    int b;
+    
+    b = a + 4 * c + 2;
+    return;
+}

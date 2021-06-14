@@ -1,0 +1,107 @@
+def gcd(int a, int b) {
+    int orig_a;
+    orig_a = a;
+    int iteration;
+    for(iteration = 0; a != b; iteration = iteration + 1) {
+        if (a > b) {
+            a = a - b;
+        } else {
+            b = b - a;
+        }
+    }
+    print "O GCD de";
+    print orig_a;
+    print " e ";
+    print b;
+    print "é:";
+    print a;
+
+    return;
+}
+
+def is_prime(int n) {
+    if(n <= 3){
+        if (n > 1) {
+            print "É primo";
+        } else {
+            print "Não é primo.\n";
+        }
+        return;
+    }
+
+    if (n % 2 == 0) {
+        print "Não é primo.\n";
+        return;
+    }
+
+     if (n % 3 == 0) {
+        print "Não é primo.\n";
+        return;
+     }
+
+    int i;
+    for (i = 5; n >= (i * i); i = i + 6){
+        if ((n % i) == 0) {
+            print "Não é primo\n";
+            return;
+        }
+        int tmp;
+        tmp = i + 2;
+        if ((n % tmp) == 0) {
+            print "Não é primo\n";
+            return;
+        }
+    }
+
+    print "É primo\n";
+    return;
+}
+
+def pow(int n, int e) {
+    int output;
+    output = 1;
+    int i;
+    for (i = 0; i < e; i = i + 1) {
+        output = output * n;
+    }
+
+    print "Resultado é ";
+    print output;
+    print "\n";
+
+    return;
+}
+
+def main() {
+    int aux_a;
+    int aux_b;
+    int return_value;
+
+    print "Se 11 é primo:";
+    aux_a = 6;
+    return_value = is_prime(aux_a);
+
+    aux_a = 12;
+    print "Se 12 é primo:";
+    return_value = is_prime(aux_a);
+
+    aux_a = 5;
+    aux_b = 2; 
+    print "5 elevado a 2:";
+    return_value = pow(aux_a, aux_b);
+
+    aux_a = 5;
+    aux_b = 5; 
+    print "5 elevado a 5";
+    return_value = pow(aux_a, aux_b);
+
+    aux_a = 30;
+    aux_b = 27; 
+    print "GCD de 30 e 27";
+    return_value = gcd(aux_a, aux_b);
+
+    aux_a = 97;
+    aux_b = 32; 
+    print "GCD de 97 e 32";
+    return_value = gcd(aux_a, aux_b);
+}

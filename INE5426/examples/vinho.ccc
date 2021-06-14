@@ -1,0 +1,174 @@
+def combinar(string comida1, string comida2) {
+    
+    int seco_branco;
+    int doce_branco;
+    int rico_branco;
+    int frisante ;
+    int suave_tinto;
+    int demisec_tinto;
+    int seco_tinto;
+    int sobremesa;
+    
+    seco_branco = 0;
+    doce_branco = 0;
+    rico_branco = 0;
+    frisante = 0;
+    suave_tinto = 0;
+    demisec_tinto = 0;
+    seco_tinto = 0;
+    sobremesa = 0;
+
+
+    if (comida1 == "vegetais") {
+        seco_branco = seco_branco + 1;
+        frisante = frisante + 1;
+    }
+    if (comida2 == "vegetais") {
+        seco_branco = seco_branco + 1;
+        frisante = frisante + 1;
+    }
+
+    if (comida1 == "vegetais_assados") {
+        seco_branco = seco_branco + 1;
+        suave_tinto = suave_tinto + 1;
+        demisec_tinto = demisec_tinto + 1;
+    }
+    if (comida2 == "vegetais_assados") {
+        seco_branco = seco_branco + 1;
+        suave_tinto = suave_tinto + 1;
+        demisec_tinto = demisec_tinto + 1;
+    }
+
+    if (comida1 == "queijos_macios") {
+        doce_branco = doce_branco + 1;
+        rico_branco = rico_branco + 1;
+        frisante = frisante + 1;
+        sobremesa = sobremesa + 1;
+    }
+    if (comida2 == "queijos_macios") {
+        doce_branco = doce_branco + 1;
+        rico_branco = rico_branco + 1;
+        frisante = frisante + 1;
+        sobremesa = sobremesa + 1;
+    }
+
+    if (comida1 == "queijos_duros") {
+        doce_branco = doce_branco + 1;
+        frisante = frisante + 1;
+        suave_tinto = suave_tinto + 1;
+        seco_tinto = seco_tinto + 1;
+    }
+    if (comida2 == "queijos_duros") {
+        doce_branco = doce_branco + 1;
+        frisante = frisante + 1;
+        suave_tinto = suave_tinto + 1;
+        seco_tinto = seco_tinto + 1;
+    }
+
+    if (comida1 == "carbs") {
+        doce_branco = doce_branco - 1;
+    }
+    if (comida2 == "carbs") {
+        doce_branco = doce_branco - 1;
+    }
+
+    if (comida1 == "peixes") {
+        seco_branco = seco_branco + 1;
+        rico_branco = rico_branco + 1;
+        frisante = frisante + 1;
+    }
+    if (comida2 == "peixes") {
+        seco_branco = seco_branco + 1;
+        rico_branco = rico_branco + 1;
+        frisante = frisante + 1;
+    }
+
+    if (comida1 == "crustaceos") {
+        rico_branco = rico_branco + 1;
+        suave_tinto = suave_tinto + 1;
+    }
+    if (comida2 == "crustaceos") {
+        rico_branco = rico_branco + 1;
+        suave_tinto = suave_tinto + 1;
+    }
+
+    if (comida1 == "carnes_brancas") {
+        rico_branco = rico_branco + 1;
+        suave_tinto = suave_tinto + 1;
+        demisec_tinto = demisec_tinto + 1;
+    }
+    if (comida2 == "carnes_brancas") {
+        rico_branco = rico_branco + 1;
+        suave_tinto = suave_tinto + 1;
+        demisec_tinto = demisec_tinto + 1;
+    }
+
+    if (comida1 == "carnes_vermelhas") {
+        demisec_tinto = demisec_tinto + 1;
+        seco_tinto = seco_tinto + 1;
+    }
+    if (comida2 == "carnes_vermelhas") {
+        demisec_tinto = demisec_tinto + 1;
+        seco_tinto = seco_tinto + 1;
+    }
+
+    if (comida1 == "embutidos") {
+        frisante = frisante - 1;
+        seco_branco = seco_branco - 1;
+    }
+    if (comida2 == "embutidos") {
+        frisante = frisante - 1;
+        seco_branco = seco_branco - 1;
+    }
+
+    if (comida1 == "doces") {
+        doce_branco = doce_branco + 1;
+        sobremesa = sobremesa + 1;
+    }
+    if (comida2 == "doces") {
+        doce_branco = doce_branco + 1;
+        sobremesa = sobremesa + 1;
+    }
+
+    print "\n";
+    print "Pontuações";
+    print "\nSeco branco: ";
+    print seco_branco;
+    print "\nDoce branco: ";
+    print doce_branco;
+    print "\nRico branco: ";
+    print rico_branco;
+    print "\nFrisante: ";
+    print frisante;
+    print "\nSuave Tinto ";
+    print suave_tinto;
+    print "\nDemisec Tinto ";
+    print demisec_tinto;
+    print "\nSeco Tinto: ";
+    print seco_tinto;
+    print "\nSobremesa: ";
+    print sobremesa;
+
+    return;
+}
+
+def main() {
+    string vegetais;
+    string crustaceos;
+    string queijos_macios;
+    string carnes_vermelhas;
+    int result;
+
+    vegetais = "vegetais";
+    crustaceos = "crustaceos";
+    queijos_macios = "queijos_macios";
+    carnes_vermelhas = "carnes_vermelhas";
+
+    print "Escolhendo melhor vinho para as combinações:\n";
+    print "Vegetais e Crustaceos\n";
+    result = combinar(vegetais, crustaceos);
+    
+    print "\n";
+    print "Queijos macios e Carnes vermelhas\n";
+    result = combinar(queijos_macios, carnes_vermelhas);
+}

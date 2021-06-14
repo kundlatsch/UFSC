@@ -1,0 +1,9 @@
+mtllib pentagram.mtl
+o pentagram
+usemtl Polygon_1_mtl
+v -75.0 80.0 0.0
+v 0.0 -100.0 0.0
+v 75.0 80.0 0.0
+v -100.0 -25.0 0.0
+v 100.0 -25.0 0.0
+f -5 -4 -3 -2 -1

@@ -1,0 +1,16 @@
+\section{Parâmetros do Classic McEliece}
+
+\begin{table}[h]
+\begin{tabularx}{\textwidth}{|X|X|X|}
+\hline
+\textbf{Parâmetro} & \textbf{Definição}                                                   & \textbf{Descrição}                              \\ \hline
+m                  & Um inteiro positivo                                                  & $\log_2 q$                                      \\ \hline
+q                  & $q = 2^m$                                                            & O tamanho do campo utilizado                    \\ \hline
+n                  & Um inteiro positivo tal que $n \leq m$                               & O comprimento do código                         \\ \hline
+t                  & Um inteiro positivo tal que $t \geq 2$ e $mt < n$                    & A capacidade garantida de correção de erros     \\ \hline
+k                  & $k = n - mt$                                                         & A dimensão do código                            \\ \hline
+f(z)               & Um polinômio mônico irredutível $f(z) \in \mathds{F}_2[z]$ de grau m & -                                               \\ \hline
+l                  & Um inteiro positivo                                                  & Tamanho da saída da função hash a ser utilizada \\ \hline
+H                  & Uma função de hash de saída de $l$ bits                              & Função de hash utilizada pelo algoritmo         \\ \hline
+\end{tabularx}
+\end{table}

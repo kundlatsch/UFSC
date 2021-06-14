@@ -1,0 +1,97 @@
+Monte um exemplo, mostrando todos os passos de ciframento e deciframento usando o SDES. Como dado a cifrar, uso o dia do seu aniversário. Como chave use 0x2FA.
+
+Gerar chaves:
+
+ 
+
+A) Converter a chave para binário: 0x2FA = 0010 1111 1010
+
+B) Aplicar P10:
+
+P10 (k1, k2, k3, k4, k5, k6, k7, k8, k9, k10) = (k3, k5, k2, k7, k4, k10, k1, k9, k8, k6)
+
+P10(10 1111 1010) = 11 0110 1101
+
+C) Dividir a chave em 2 e executar um deslocamento circular de bits (LS-1):
+
+LS-1(11011) = 10111
+
+LS-1(01101) = 11010
+
+10111 11010
+
+D) Aplicar P8:
+
+P8 (k1, k2, k3, k4, k5, k6, k7, k8, k9, k10) = (k6, k3, k7, k4, k8, k5, k10, k9)
+
+K1 = 1111 0101
+
+E) Executar um LS-2 no resultado da etapa C:
+
+Resultado de C: 10111 11010
+
+LS-2(10111) = 11110
+
+LS-2(11010) = 01011
+
+11110 01011
+
+F) Aplicar P8 no resultado do passo E:
+
+K2 = 0111 0011
+
+ 
+
+Criptografia S-DES
+
+ 
+
+Input: 26 = 0001 1010
+
+A) Aplicar função IP:
+
+IP(b1, b2, b3, b4, b5, b6, b7, b8) = (b2, b6, b3, b1, b4, b8, b5, b7)
+
+IP(0001 1010) = 0000 1011
+
+ 
+
+B) Aplicar a função fk:
+
+fk(L,R) = (L+F(R, SK), R)
+
+Onde L são os 4 bits mais a esquerda e R os 4 bits mais a direita. SK é uma subchave e + é a operação OR exclusivo aplicado bit a bit.
+
+1. Aplicar F
+
+F é uma função com 4 bits de entrada, que aplica uma expansão/permutação. Sendo a entrada R = n1, n2, n3, n4
+
+vamos definir F como F(n1, n2, n3, n4) = (n4, n1, n2, n3, n2, n3, n4, n1)
+
+Aplicando ela em 0000 1011, obtemos F(1011) = 1101 0111
+
+2. Aplicar +
+
+Vamos usar a subchave K1 para aplicar o OR exclusivo
+
+1101 0111 + 1111 0101 = 1101 0101
+
+3. Vamos usar o resultado da etapa 2 para alimentar as matrizes S0 e S1:
+
+Os primeiros 4 bits alimentam a matriz S0, e os 4 últimos a matriz S1.
+
+O primeiro e o quarto bits de entrada são tratados como um número de 2 bits que especifica uma linha de S, e o segundo e o terceiro bits de entrada especificam uma coluna de S. O valor presente nessa linha e coluna, na base 2, é a saída de 2 bits
+
+S0(11 01) = 00
+
+S1(01 01) = 00
+
+4. Por fim é aplicado uma permutação P4:
+
+P4(n1, n2, n3, n4) = (n2, n4, n3, n1)
+
+P4(0000) = 0000
+
+ 
+
+C) A saída do algoritmo é o resultado da função P4 concatenado aos 4 bits mais a direita da entrada: 0000 1011

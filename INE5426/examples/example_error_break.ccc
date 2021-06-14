@@ -1,0 +1,15 @@
+def main() {
+    int e;
+    int n;
+    int output;
+    output = 1;
+    int i;
+
+    for (i = 0; i < e; i = i + 1) {
+        output = output * n;
+        break;
+    }
+
+    break;
+    return;
+}

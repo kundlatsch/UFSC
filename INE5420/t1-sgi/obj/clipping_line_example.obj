@@ -1,0 +1,26 @@
+mtllib clipping_line_example.mtl
+o Line_0
+usemtl Line_0_mtl
+v 300.0 150.0 0.0
+v -300.0 -150.0 0.0
+f -2 -1
+o Line_2
+usemtl Line_2_mtl
+v 330.0 0.0 0.0
+v 0.0 0.0 0.0
+f -2 -1
+o Line_4
+usemtl Line_4_mtl
+v 0.0 200.0 0.0
+v 330.0 0.0 0.0
+f -2 -1
+o Line_5
+usemtl Line_5_mtl
+v 0.0 0.0 0.0
+v 0.0 -200.0 0.0
+f -2 -1
+o Line_6
+usemtl Line_6_mtl
+v -330.0 100.0 0.0
+v 330.0 100.0 0.0
+f -2 -1

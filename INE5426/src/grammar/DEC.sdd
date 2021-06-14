@@ -1,0 +1,32 @@
+new_table_entry(identifier_label: str, datatype: str, dimesions: List[int], line: int)
+concat(l1: List[Any], l2: List[Any])
+
+production:
+    VARDECL : DATATYPE "ident" OPT_VECTOR
+rules:
+    VARDECL.sin = new_table_entry(ident.text, DATATYPE.type, OPT_VECTOR.sin, ident.lineno)
+
+production:
+    DATATYPE : "int"
+rules:
+    DATATYPE.type = "int"
+
+production:
+    DATATYPE : "float"
+rules:
+    DATATYPE.type = "float"
+
+production:
+    DATATYPE : "string"
+rules:
+    DATATYPE.type = "string"
+
+production:     
+    OPT_VECTOR : "[" "int_constant" "]" \
+rules:
+    OPT_VECTOR.sin = concat([int_constant.value], OPT_VECTOR1.sin)
+
+production:
+    OPT_VECTOR : &
+rules:
+    OPT_VECTOR.sin = []

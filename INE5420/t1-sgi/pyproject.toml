@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "ine5420"
+version = "0.1.0"
+description = ""
+authors = ["Francisco Vicenzi <cchenzi@users.noreply.github.com>"]
+packages = [
+    { include = "app" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+PyQt5 = "^5.15.2"
+black = "^20.8b1"
+pytest = "^6.2.2"
+numpy = "^1.20.1"
+
+[tool.poetry.dev-dependencies]
+black = {version = "^20.8b1", allow-prereleases = true}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,487 @@
+scope_stack = ScopeStack()
+num_expressions: List[Tuple[Node, int]] = []
+get_var_type(ident, lineno)
+num_expressions_as_json()
+new_scope(is_loop: bool)
+check_type(left, right, operation, lineno)
+
+
+
+production:
+    new_loop_scope : &
+rules:
+    new_scope(is_loop=True)
+
+
+productions:
+    PROGRAM : new_scope STATEMENT
+    PROGRAM : new_scope FUNCLIST
+    PROGRAM : &
+rules:
+    global_scope = scope_stack.pop()
+
+    PROGRAM.scopes = global_scope.as_json()
+    PROGRAM.num_expressions = num_expressions_as_json()
+
+production:
+    FUNCDEF : DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS
+rules:
+    scope_stack.pop()
+
+    scope = scope_stack.seek()
+    entry = TableEntry(IDENT, 'function', [], lineno(IDENT))
+    scope.add_entry(entry)
+
+productions:
+    PARAMLIST : DATATYPE IDENT PARAMLISTAUX
+rules:
+    scope = scope_stack.seek()
+    entry = TableEntry(IDENT, DATATYPE, [], lineno(IDENT))
+    scope.add_entry(entry)
+
+production:
+    DATATYPE : INT_KEYWORD
+rules:
+    DATATYPE.sin = 'int'
+
+production:
+    DATATYPE : FLOAT_KEYWORD
+rules:
+    DATATYPE.sin = 'float'
+
+production:
+    DATATYPE : STRING_KEYWORD
+rules:
+    DATATYPE.sin = 'string'
+
+
+production:
+    STATEMENT : new_scope LBRACKETS STATELIST RBRACKETS
+rules:
+    scope_stack.pop()
+
+production:
+    STATEMENT : BREAK SEMICOLON
+rules:
+    current_scope = scope_stack.seek()
+
+    while True:
+        if current_scope.is_loop:
+            break
+
+        current_scope = current_scope.upper_scope
+
+        if current_scope is None:
+            raise BreakWithoutLoopError(lineno(SEMICOLON))
+
+
+production:
+    VARDECL : DATATYPE IDENT OPT_VECTOR
+rules:
+    entry = TableEntry(IDENT, DATATYPE, OPT_VECTOR, lineno(IDENT))
+    scope = scope_stack.seek()
+    scope.add_entry(entry)
+
+
+production:
+    OPT_VECTOR : LSQBRACKETS INT_CONSTANT RSQBRACKETS OPT_VECTOR1
+rules:
+    OPT_VECTOR.sin = [INT_CONSTANT.sin, *OPT_VECTOR1.sin]
+
+
+production:
+    OPT_VECTOR : &
+rules:
+    OPT_VECTOR.sin = []
+
+production
+    FUNCCALL_OR_EXPRESSION : PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+rules:
+    right_node = FACTOR.node
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(REC_UNARYEXPR.node,
+                                 right_node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(PLUS))
+
+        right_node = Node(REC_UNARYEXPR.node,
+                          right_node,
+                          REC_UNARYEXPR.operation,
+                          result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(REC_PLUS_MINUS_TERM.node,
+                                 right_node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(PLUS))
+        right_node = Node(REC_PLUS_MINUS_TERM.node,
+                          right_node,
+                          REC_PLUS_MINUS_TERM.operation,
+                          result_type)
+
+    num_expressions.append(right_node)
+
+productions:
+    FUNCCALL_OR_EXPRESSION : MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+rules:
+    right_node = FACTOR.node
+    right_node.value *= -1
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(REC_UNARYEXPR.node,
+                                 right_node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(PLUS))
+
+        right_node = Node(REC_UNARYEXPR.node,
+                          right_node,
+                          REC_UNARYEXPR.operation,
+                          result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(REC_PLUS_MINUS_TERM.node,
+                                 right_node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(PLUS))
+        right_node = Node(REC_PLUS_MINUS_TERM.node,
+                          right_node,
+                          REC_PLUS_MINUS_TERM.operation,
+                          result_type)
+
+    num_expressions.append(right_node)
+
+
+production:
+    FUNCCALL_OR_EXPRESSION : INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+rules:
+    node = Node(None, None, INT_CONSTANT.sin, 'int')
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(REC_UNARYEXPR))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(REC_PLUS_MINUS_TERM))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node
+
+    num_expressions.append((node, lineno(REC_PLUS_MINUS_TERM)))
+
+
+production:
+    FUNCCALL_OR_EXPRESSION : FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+rules:
+    node = Node(None, None, FLOAT_CONSTANT.sin, 'float')
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(REC_UNARYEXPR))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(REC_PLUS_MINUS_TERM))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node
+
+    num_expressions.append((node, lineno(REC_PLUS_MINUS_TERM)))
+
+
+production:
+    FUNCCALL_OR_EXPRESSION : STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+rules:
+    node = Node(None, None, STRING_CONSTANT.sin, 'string')
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(REC_UNARYEXPR))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(REC_PLUS_MINUS_TERM))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node
+
+    num_expressions.append((node, lineno(REC_PLUS_MINUS_TERM)))
+
+
+production:
+    FUNCCALL_OR_EXPRESSION : LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+rules:
+    node = NUMEXPRESSION.node
+
+    if REC_UNARYEXPR:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(LPAREN))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(LPAREN))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node
+
+    num_expressions.append((node, lineno(LPAREN)))
+
+
+production:
+    FUNCCALL_OR_EXPRESSION : IDENT FOLLOW_IDENT
+rules:
+    node = Node(None, None, IDENT, get_var_type(IDENT, lineno(IDENT)))
+
+    if FOLLOW_IDENT:
+        node.value += FOLLOW_IDENT.vec_access
+        result_type = check_type(node,
+                                 FOLLOW_IDENT.node,
+                                 FOLLOW_IDENT.operation,
+                                 lineno(IDENT))
+        node = Node(node, FOLLOW_IDENT.node, FOLLOW_IDENT.operation, result_type)
+
+        num_expressions.append((node, lineno(IDENT)))
+
+
+production:
+    FOLLOW_IDENT : OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR
+rules:
+    node = None
+    operation = ''
+
+    if REC_UNARYEXPR:
+        node = REC_UNARYEXPR.node
+        operation = REC_UNARYEXPR.operation
+
+    if REC_PLUS_MINUS_TERM:
+        if node is None:
+            node = REC_PLUS_MINUS_TERM.node
+            operation = REC_PLUS_MINUS_TERM.operation
+
+        else:
+            result_type = check_type(node,
+                                     REC_PLUS_MINUS_TERM.node,
+                                     REC_PLUS_MINUS_TERM.operation,
+                                     lineno(FOLLOW_IDENT))
+            node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FOLLOW_IDENT.vec_access = OPT_ALLOC_NUMEXP.sin
+    FOLLOW_IDENT.node = node
+    FOLLOW_IDENT.operation = operation
+
+
+production:
+    IFSTAT : IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE
+rules:
+    scope_stack.pop()
+
+
+production:
+    OPT_ELSE : ELSE new_scope LBRACKETS STATELIST RBRACKETS
+rules:
+    scope_stack.pop()
+
+
+production:
+    FORSTAT : FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS
+rules:
+    scope_stack.pop()
+
+
+producttion:
+    ALLOCEXPRESSION : NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP
+rules:
+    num_expressions.append((NUMEXPRESSION.node, lineno(NEW)))
+
+
+production:
+    OPT_ALLOC_NUMEXP : &
+rules:
+    OPT_ALLOC_NUMEXP.sin = ''
+
+
+production:
+    OPT_ALLOC_NUMEXP : LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP1
+rules:
+    OPT_ALLOC_NUMEXP.sin = '[' + NUMEXPRESSION.node.id + ']' + OPT_ALLOC_NUMEXP1.sin
+
+    num_expressions.append((NUMEXPRESSION.node, lineno(NEW)))
+
+
+production:
+    EXPRESSION : NUMEXPRESSION OPT_REL_OP_NUM_EXPR
+rules:
+    num_expressions.append((NUMEXPRESSION.node, lineno(NUMEXPRESSION)))
+
+
+production:
+    OPT_REL_OP_NUM_EXPR : REL_OP NUMEXPRESSION
+rules:
+    num_expressions.append((NUMEXPRESSION.node, lineno(REL_OP)))
+
+production:
+    NUMEXPRESSION : TERM REC_PLUS_MINUS_TERM
+rules:
+    if REC_PLUS_MINUS_TERM.node:
+        NUMEXPRESSION.node = TERM.node
+
+    else:
+        result_type = check_type(TERM.node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(TERM))
+        NUMEXPRESSION.node = Node(TERM.node,
+                                  REC_PLUS_MINUS_TERM.node,
+                                  REC_PLUS_MINUS_TERM.operation,
+                                  result_type)
+
+
+production:
+    REC_PLUS_MINUS_TERM : PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM1
+rules:
+    if REC_PLUS_MINUS_TERM1.node:
+        result_type = check_type(TERM.node,
+                                 REC_PLUS_MINUS_TERM1.node,
+                                 REC_PLUS_MINUS_TERM1.operation,
+                                 lineno(PLUS_OR_MINUS))
+
+        REC_PLUS_MINUS_TERM.node = Node(TERM.node, REC_PLUS_MINUS_TERM1.node,
+                                        REC_PLUS_MINUS_TERM1.operation, result_type),
+        REC_PLUS_MINUS_TERM.operation = PLUS_OR_MINUS.operation
+
+    else:
+        REC_PLUS_MINUS_TERM.node = TERM.node,
+        REC_PLUS_MINUS_TERM.operation = PLUS_OR_MINUS.operation
+
+
+production:
+    PLUS_OR_MINUS : PLUS
+rules:
+    PLUS_OR_MINUS.operation = '+'
+
+production:
+    PLUS_OR_MINUS : MINUS
+rules:
+    PLUS_OR_MINUS.operation = '-'
+
+
+production:
+    TERM : UNARYEXPR REC_UNARYEXPR
+rules:
+    if REC_UNARYEXPR.node:
+        result_type = check_type(UNARYEXPR.node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(UNARYEXPR))
+
+        TERM.node = Node(UNARYEXPR.node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+        TERM.operation = REC_UNARYEXPR.operation
+
+    else:
+        TERM.node = UNARYEXPR.node
+
+
+production:
+    REC_UNARYEXPR : UNARYEXPR_OP TERM
+rules:
+    REC_UNARYEXPR.node = TERM.node,
+    REC_UNARYEXPR.operation = UNARYEXPR_OP.operation
+
+
+production:
+    UNARYEXPR_OP : TIMES
+rules:
+    UNARYEXPR_OP.operation = '*'
+
+
+production:
+    UNARYEXPR_OP : MODULE
+rules:
+    UNARYEXPR_OP.operation = '%'
+
+
+production:
+    UNARYEXPR_OP : DIVIDE
+rules:
+    UNARYEXPR_OP.operation = '/'
+
+
+production:
+    UNARYEXPR : PLUS_OR_MINUS FACTOR
+rules:
+    if PLUS_OR_MINUS.operation == '-':
+        FACTORnode.value *= -1
+
+    UNARYEXPR.node = FACTOR.node
+
+
+production:
+    UNARYEXPR : FACTOR
+rules:
+    UNARYEXPR.node = FACTOR.node
+
+
+production:
+    FACTOR : INT_CONSTANT
+rules:
+    FACTOR.node = Node(None, None, INT_CONSTANT.val, 'int')
+
+
+production:
+    FACTOR : FLOAT_CONSTANT
+rules:
+    FACTOR.node = Node(None, None, FLOAT_CONSTANT.val, 'float')
+
+
+production:
+    FACTOR : STRING_CONSTANT
+rules:
+    FACTOR.node = Node(None, None, STRING_CONSTANT.val, 'string')
+
+
+production:
+    FACTOR : NULL
+rules:
+    FACTOR.node = Node(None, None, NULL.val, 'null')
+
+
+production:
+    FACTOR : LVALUE
+rules:
+    FACTOR.node = LVALUE.node
+
+
+production:
+    FACTOR : LPAREN NUMEXPRESSION RPAREN
+rules:
+    FACTOR.node = NUMEXPRESSION.node
+
+    num_expressions.append((NUMEXPRESSION.node, lineno(LPAREN)))
+
+
+production:
+    LVALUE : IDENT OPT_ALLOC_NUMEXP
+rules:
+    LVALUE.node = Node(None, None, IDENT.val + OPT_ALLOC_NUMEXP.sin,
+                     result_type=get_var_type(IDENT.val, lineno(IDENT)))

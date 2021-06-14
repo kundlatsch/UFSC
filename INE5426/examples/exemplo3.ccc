@@ -1,0 +1,8 @@
+def main()
+{
+  int a;
+  int c;
+  int b;
+  b = a + 4 * c + 2;
+  return;
+}

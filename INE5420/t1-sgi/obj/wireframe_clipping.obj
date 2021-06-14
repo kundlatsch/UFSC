@@ -1,0 +1,9 @@
+mtllib wireframe_clipping.mtl
+o Polygon_0
+usemtl Polygon_0_mtl
+v 140.0 150.0 0.0
+v 333.0 150.0 0.0
+v 333.0 -150.0 0.0
+v 140.0 -150.0 0.0
+v 325.0 0.0 0.0
+f -5 -4 -3 -2 -1

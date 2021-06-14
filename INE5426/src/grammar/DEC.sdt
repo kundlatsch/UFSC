@@ -1,0 +1,18 @@
+
+production:
+    VARDECL : DATATYPE "ident" OPT_VECTOR { VARDECL.sin = new_table_entry(ident.text, DATATYPE.type, OPT_VECTOR.sin, ident.lineno) }
+
+production:
+    DATATYPE : "int" {DATATYPE.type = "int"}
+
+production:
+    DATATYPE : "float" { DATATYPE.type = "float" }
+    
+production:
+    DATATYPE : "string" { DATATYPE.type = "string" }
+
+production:     
+    OPT_VECTOR : "[" "int_constant" "]" OPT_VECTOR1 { OPT_VECTOR.sin = concat([int_constant.value], OPT_VECTOR1.sin) }
+
+production:
+    OPT_VECTOR : & { OPT_VECTOR.sin = [] }

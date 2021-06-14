@@ -1,0 +1,13 @@
+# Blender MTL File: 'cristo.blend'
+# Material Count: 1
+newmtl Asphalt_Painted_White
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.165000 0.165000 0.165000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /home/puel/Ubuntu One/Blender/Texture/Asphalt_Painted_White.jpg
+
+

@@ -1,0 +1,319 @@
+scope_stack = ScopeStack()
+num_expressions: List[Tuple[Node, int]] = []
+get_var_type(ident, lineno)
+num_expressions_as_json()
+new_scope(is_loop: bool)
+check_type(left, right, operation, lineno)
+
+
+new_loop_scope : & { new_scope(is_loop=True) }
+new_scope : & { new_scope(is_loop=False) }
+
+PROGRAM : new_scope STATEMENT { PROGRAM.scopes = global_scope.as_json(); PROGRAM.num_expressions = num_expressions_as_json() }
+PROGRAM : new_scope FUNCLIST { PROGRAM.scopes = global_scope.as_json(); PROGRAM.num_expressions = num_expressions_as_json() }
+PROGRAM : & { global_scope = scope_stack.pop() { PROGRAM.scopes = global_scope.as_json(); PROGRAM.num_expressions = num_expressions_as_json() }
+
+FUNCDEF : DEF IDENT new_scope LPAREN PARAMLIST RPAREN LBRACKETS STATELIST RBRACKETS { scope_stack.pop(); scope = scope_stack.seek(); entry = TableEntry(IDENT, 'function', [], lineno(IDENT)); scope.add_entry(entry); }
+
+PARAMLIST : DATATYPE IDENT PARAMLISTAUX { scope = scope_stack.seek(); entry = TableEntry(IDENT, DATATYPE, [], lineno(IDENT)); scope.add_entry(entry) }
+
+DATATYPE : INT_KEYWORD { DATATYPE.sin = 'int' }
+
+DATATYPE : FLOAT_KEYWORD { DATATYPE.sin = 'float' }
+
+DATATYPE : STRING_KEYWORD { DATATYPE.sin = 'string' }
+
+STATEMENT : new_scope LBRACKETS STATELIST RBRACKETS { scope_stack.pop() }
+
+STATEMENT : BREAK SEMICOLON { 
+    current_scope = scope_stack.seek();
+
+    while True:
+        if current_scope.is_loop:
+            break
+
+        current_scope = current_scope.upper_scope
+
+        if current_scope is None:
+            raise BreakWithoutLoopError(lineno(SEMICOLON)) }
+
+VARDECL : DATATYPE IDENT OPT_VECTOR { entry = TableEntry(IDENT, DATATYPE, OPT_VECTOR, lineno(IDENT))
+    scope = scope_stack.seek()
+    scope.add_entry(entry)
+
+OPT_VECTOR : LSQBRACKETS INT_CONSTANT RSQBRACKETS OPT_VECTOR1 { OPT_VECTOR.sin = [INT_CONSTANT.sin, *OPT_VECTOR1.sin] }
+
+OPT_VECTOR : & { OPT_VECTOR.sin = [] }
+
+FUNCCALL_OR_EXPRESSION : PLUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR { 
+    right_node = FACTOR.node;
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(REC_UNARYEXPR.node,
+                                 right_node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(PLUS))
+
+        right_node = Node(REC_UNARYEXPR.node,
+                          right_node,
+                          REC_UNARYEXPR.operation,
+                          result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(REC_PLUS_MINUS_TERM.node,
+                                 right_node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(PLUS))
+        right_node = Node(REC_PLUS_MINUS_TERM.node,
+                          right_node,
+                          REC_PLUS_MINUS_TERM.operation,
+                          result_type)
+
+    num_expressions.append(right_node) }
+
+FUNCCALL_OR_EXPRESSION : MINUS FACTOR REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR { 
+    right_node = FACTOR.node;
+    right_node.value *= -1
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(REC_UNARYEXPR.node,
+                                 right_node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(PLUS))
+
+        right_node = Node(REC_UNARYEXPR.node,
+                          right_node,
+                          REC_UNARYEXPR.operation,
+                          result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(REC_PLUS_MINUS_TERM.node,
+                                 right_node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(PLUS))
+        right_node = Node(REC_PLUS_MINUS_TERM.node,
+                          right_node,
+                          REC_PLUS_MINUS_TERM.operation,
+                          result_type)
+
+    num_expressions.append(right_node) }
+
+
+
+FUNCCALL_OR_EXPRESSION : INT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR { 
+    node = Node(None, None, INT_CONSTANT.sin, 'int');
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(REC_UNARYEXPR))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(REC_PLUS_MINUS_TERM))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node
+
+    num_expressions.append((node, lineno(REC_PLUS_MINUS_TERM))) }
+
+
+
+FUNCCALL_OR_EXPRESSION : FLOAT_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR { 
+    node = Node(None, None, FLOAT_CONSTANT.sin, 'float');
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(REC_UNARYEXPR))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(REC_PLUS_MINUS_TERM))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node
+
+    num_expressions.append((node, lineno(REC_PLUS_MINUS_TERM))) }
+
+
+FUNCCALL_OR_EXPRESSION : STRING_CONSTANT REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR {
+    node = Node(None, None, STRING_CONSTANT.sin, 'string');
+
+    if REC_UNARYEXPR.node:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(REC_UNARYEXPR))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM.node:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(REC_PLUS_MINUS_TERM))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node
+
+    num_expressions.append((node, lineno(REC_PLUS_MINUS_TERM))) }
+
+FUNCCALL_OR_EXPRESSION : LPAREN NUMEXPRESSION RPAREN REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR { 
+    node = NUMEXPRESSION.node;
+
+    if REC_UNARYEXPR:
+        result_type = check_type(node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(LPAREN))
+        node = Node(node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type)
+
+    if REC_PLUS_MINUS_TERM:
+        result_type = check_type(node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(LPAREN))
+        node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FUNCCALL_OR_EXPRESSION.node = node;
+    num_expressions.append((node, lineno(LPAREN))) }
+
+FUNCCALL_OR_EXPRESSION : IDENT FOLLOW_IDENT { 
+    node = Node(None, None, IDENT, get_var_type(IDENT, lineno(IDENT)));
+    if FOLLOW_IDENT:
+        node.value += FOLLOW_IDENT.vec_access
+        result_type = check_type(node,
+                                 FOLLOW_IDENT.node,
+                                 FOLLOW_IDENT.operation,
+                                 lineno(IDENT))
+        node = Node(node, FOLLOW_IDENT.node, FOLLOW_IDENT.operation, result_type)
+        num_expressions.append((node, lineno(IDENT))) }
+
+FOLLOW_IDENT : OPT_ALLOC_NUMEXP REC_UNARYEXPR REC_PLUS_MINUS_TERM OPT_REL_OP_NUM_EXPR { 
+    node = None;
+    operation = '';
+    if REC_UNARYEXPR:
+        node = REC_UNARYEXPR.node
+        operation = REC_UNARYEXPR.operation
+
+    if REC_PLUS_MINUS_TERM:
+        if node is None:
+            node = REC_PLUS_MINUS_TERM.node
+            operation = REC_PLUS_MINUS_TERM.operation
+
+        else:
+            result_type = check_type(node,
+                                     REC_PLUS_MINUS_TERM.node,
+                                     REC_PLUS_MINUS_TERM.operation,
+                                     lineno(FOLLOW_IDENT))
+            node = Node(node, REC_PLUS_MINUS_TERM.node, REC_PLUS_MINUS_TERM.operation, result_type)
+
+    FOLLOW_IDENT.vec_access = OPT_ALLOC_NUMEXP.sin
+    FOLLOW_IDENT.node = node
+    FOLLOW_IDENT.operation = operation}
+
+IFSTAT : IF LPAREN EXPRESSION RPAREN new_scope LBRACKETS STATELIST RBRACKETS OPT_ELSE { scope_stack.pop() }
+
+OPT_ELSE : ELSE new_scope LBRACKETS STATELIST RBRACKETS { scope_stack.pop() }
+
+FORSTAT : FOR LPAREN ATRIBSTAT SEMICOLON EXPRESSION SEMICOLON ATRIBSTAT RPAREN new_loop_scope LBRACKETS STATELIST RBRACKETS { scope_stack.pop() }
+
+ALLOCEXPRESSION : NEW DATATYPE LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP { num_expressions.append((NUMEXPRESSION.node, lineno(NEW))) }
+
+OPT_ALLOC_NUMEXP : & { OPT_ALLOC_NUMEXP.sin = ''
+
+OPT_ALLOC_NUMEXP : LSQBRACKETS NUMEXPRESSION RSQBRACKETS OPT_ALLOC_NUMEXP1 { OPT_ALLOC_NUMEXP.sin = '[' + NUMEXPRESSION.node.id + ']' + OPT_ALLOC_NUMEXP1.sin; num_expressions.append((NUMEXPRESSION.node, lineno(NEW))) }
+
+EXPRESSION : NUMEXPRESSION OPT_REL_OP_NUM_EXPR { num_expressions.append((NUMEXPRESSION.node, lineno(NUMEXPRESSION))) }
+
+OPT_REL_OP_NUM_EXPR : REL_OP NUMEXPRESSION { num_expressions.append((NUMEXPRESSION.node, lineno(REL_OP))) }
+
+NUMEXPRESSION : TERM REC_PLUS_MINUS_TERM {
+    if REC_PLUS_MINUS_TERM.node:
+        NUMEXPRESSION.node = TERM.node
+
+    else:
+        result_type = check_type(TERM.node,
+                                 REC_PLUS_MINUS_TERM.node,
+                                 REC_PLUS_MINUS_TERM.operation,
+                                 lineno(TERM))
+        NUMEXPRESSION.node = Node(TERM.node,
+                                  REC_PLUS_MINUS_TERM.node,
+                                  REC_PLUS_MINUS_TERM.operation,
+                                  result_type)}
+
+
+
+REC_PLUS_MINUS_TERM : PLUS_OR_MINUS TERM REC_PLUS_MINUS_TERM1 { 
+    if REC_PLUS_MINUS_TERM1.node:
+        result_type = check_type(TERM.node,
+                                 REC_PLUS_MINUS_TERM1.node,
+                                 REC_PLUS_MINUS_TERM1.operation,
+                                 lineno(PLUS_OR_MINUS))
+
+        REC_PLUS_MINUS_TERM.node = Node(TERM.node, REC_PLUS_MINUS_TERM1.node,
+                                        REC_PLUS_MINUS_TERM1.operation, result_type),
+        REC_PLUS_MINUS_TERM.operation = PLUS_OR_MINUS.operation
+
+    else:
+        REC_PLUS_MINUS_TERM.node = TERM.node,
+        REC_PLUS_MINUS_TERM.operation = PLUS_OR_MINUS.operation}
+
+
+
+PLUS_OR_MINUS : PLUS { PLUS_OR_MINUS.operation = '+' }
+
+
+PLUS_OR_MINUS : MINUS { PLUS_OR_MINUS.operation = '-' }
+
+TERM : UNARYEXPR REC_UNARYEXPR {
+    if REC_UNARYEXPR.node:
+        result_type = check_type(UNARYEXPR.node,
+                                 REC_UNARYEXPR.node,
+                                 REC_UNARYEXPR.operation,
+                                 lineno(UNARYEXPR))
+
+        TERM.node = Node(UNARYEXPR.node, REC_UNARYEXPR.node, REC_UNARYEXPR.operation, result_type),
+        TERM.operation = REC_UNARYEXPR.operation
+
+    else:
+        TERM.node = UNARYEXPR.node}
+
+
+
+REC_UNARYEXPR : UNARYEXPR_OP TERM { REC_UNARYEXPR.node = TERM.node; REC_UNARYEXPR.operation = UNARYEXPR_OP.operation }
+
+UNARYEXPR_OP : TIMES { UNARYEXPR_OP.operation = '*' }
+
+UNARYEXPR_OP : MODULE { UNARYEXPR_OP.operation = '%' }
+
+UNARYEXPR_OP : DIVIDE { UNARYEXPR_OP.operation = '/' }
+
+UNARYEXPR : PLUS_OR_MINUS FACTOR { 
+    if PLUS_OR_MINUS.operation == '-':
+        FACTORnode.value *= -1
+    UNARYEXPR.node = FACTOR.node}
+
+UNARYEXPR : FACTOR { UNARYEXPR.node = FACTOR.node }
+
+FACTOR : INT_CONSTANT { FACTOR.node = Node(None, None, INT_CONSTANT.val, 'int') }
+
+FACTOR : FLOAT_CONSTANT { FACTOR.node = Node(None, None, FLOAT_CONSTANT.val, 'float') }
+
+FACTOR : STRING_CONSTANT { FACTOR.node = Node(None, None, STRING_CONSTANT.val, 'string') }
+
+FACTOR : NULL { FACTOR.node = Node(None, None, NULL.val, 'null') }
+
+FACTOR : LVALUE { FACTOR.node = LVALUE.node }
+
+FACTOR : LPAREN NUMEXPRESSION RPAREN { FACTOR.node = NUMEXPRESSION.node; num_expressions.append((NUMEXPRESSION.node, lineno(LPAREN))) }
+
+LVALUE : IDENT OPT_ALLOC_NUMEXP { LVALUE.node = Node(None, None, IDENT.val + OPT_ALLOC_NUMEXP.sin, result_type=get_var_type(IDENT.val, lineno(IDENT))) }

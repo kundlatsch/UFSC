@@ -1,0 +1,19 @@
+VARDECL : DATATYPE "ident" OPT_VECTOR
+           
+DATATYPE : "int"
+         | "float"
+         | "string"
+            
+         
+OPT_VECTOR : "[" "int_constant" "]" OPT_VECTOR
+           | &
+
+
+FUNCDEF : "def" "ident" "(" PARAMLIST ")" "{" STATELIST "}"
+
+
+PARAMLIST : DATATYPE "ident" PARAMLISTAUX
+          | &
+       
+PARAMLISTAUX : "," PARAMLIST
+             | &
