@@ -1,0 +1,61 @@
+{
+  "id": "ed38bda0-2927-41ca-b425-26287fb49f1a",
+  "version": "2.0",
+  "name": "INE5455",
+  "url": "https://www.google.com",
+  "tests": [{
+    "id": "196bf353-eede-4ab9-994c-b1b9e2a7c156",
+    "name": "procurar-nome",
+    "commands": [{
+      "id": "85e99fbd-2bb4-4d63-b4b1-02c6faa7b293",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "6c41452d-bf7b-4fcb-8ac1-916e343b6b5f",
+      "comment": "",
+      "command": "type",
+      "target": "name=q",
+      "targets": [
+        ["name=q", "name"],
+        ["css=.gLFyf", "css:finder"],
+        ["xpath=//input[@name='q']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "gustavo emanuel kundlatsch"
+    }, {
+      "id": "39265999-dbe4-4937-8e69-2025e8a5febd",
+      "comment": "",
+      "command": "click",
+      "target": "css=form > div:nth-child(1)",
+      "targets": [
+        ["css=form > div:nth-child(1)", "css:finder"],
+        ["xpath=//form/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "330289fc-a4d3-4f64-920b-ba8caf448e89",
+      "comment": "",
+      "command": "click",
+      "target": "css=center:nth-child(1) > .gNO89b",
+      "targets": [
+        ["css=center:nth-child(1) > .gNO89b", "css:finder"],
+        ["xpath=(//input[@name='btnK'])[2]", "xpath:attributes"],
+        ["xpath=//div[3]/center/input", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "44595a12-f37c-4d5b-bc58-e81649038202",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["196bf353-eede-4ab9-994c-b1b9e2a7c156"]
+  }],
+  "urls": ["https://www.google.com/"],
+  "plugins": []
+}

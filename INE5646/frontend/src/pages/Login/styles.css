@@ -1,0 +1,30 @@
+#login-button {
+    margin-top: 30px;
+    width: 25%;
+}
+
+#login-input {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#login-page p {
+    color: var(--primary-color);
+    margin-top: 40px;
+}
+
+#login-page p:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@media (max-width: 500px) {
+    #login-page p {
+        text-align: center;
+    }
+
+    #login-button {
+        width: 50%;
+    }
+
+}

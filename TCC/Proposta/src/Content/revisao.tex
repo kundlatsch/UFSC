@@ -1,0 +1,84 @@
+% \chapter{Trabalhos Relacionados}
+\chapter{Revisão Bibliográfica}
+
+Existem diversas abordagens para otimizar as percepções recebidas por um agente. O primeiro e o segundos artigo apresentado nesse capítulo implementam modelos para tratar de percepções imprecisas. O terceiro e quarto artigo são trabalhos relacionados a outros campos de estudo de percepção, mas que precisam resolver problemas relacionados a percepções imperfeitas também.
+
+\section{Scalable Perception for BDI-Agents Embodied in Virtual Environments \cite{van2011scalable}}
+
+Ambientes virtuais como jogos, simulações e treinamentos exigem cada vez mais complexidade dos agentes com os quais os participantes interagem. A arquitetura BDI provê a complexidade necessária para que os agentes virtuais desempenhem as tarefas avançadas necessárias. Porém, agentes BDI tradicionais possuem uma interface direta com o ambiente, enquanto os agentes dos jogos normalmente possuem um conjunto de sensores limitados para realizar suas percepções. O problema é que agentes BDI não possuem um mecanismo padrão para controlar seus sensores, decidindo quais percepções receber. Dessa maneira, o agente pode facilmente ficar sobrecarregado de informação. Para resolver esse problema, os autores desse trabalho criaram um \textit{framework} que fornece habilidades sensoriais e e atenção perceptiva para agentes BDI incorporados em um ambiente virtual, funcionando como um \textit{middleware} que atua entre o modelo cognitivo do agente e o ambiente.
+
+Nesse \textit{framework} (representado na figura \ref{fig:bdiPerceptionModel}) toda informação do ambiente é representada pelo modelo de informação chamado \textit{Environment Object Model} (Modelo de Objeto de Ambiente) ou EOM. Objetos são definidos por classes e características, e existe uma hierarquia de objetos para agregar semântica. O \textit{middleware} é dividido entre a interface física e a interface cognitiva. A função da interface física é interagir com o ambiente para formar signos. Para tal, o processador sensorial primeiro recebe uma lista de possíveis percepções, que respeita filtros pré determinados implementados nos sensores. Após isso, esse processador determina se o agente está interessado nas informações recebidas, através do \textit{Interest Subscription Manager} (gerenciador de inscrição de interesse). Esses signos são passados para o agente na foma de percepções, que alteram os objetivos do agente. Os novos objetivos, por sua vez, são repassados para o sistema de atenção, que atualiza os interesses do agente no gerenciador de inscrição de interesse. A comunicação entre a interface física e a interface cognitiva é realizada através de mensagens, e há interfaces para que o \textit{middleware} possa se comunicar com o ambiente e com o agente, de maneira a mantê-lo independente de domínio. 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Images/bdiPerceptionModel.png}
+    \caption{\textit{Framework} de percepção \cite{van2011scalable}.}
+    \label{fig:bdiPerceptionModel}
+\end{figure}
+
+\section{PMK — A Knowledge Processing Framework forAutonomous Robotics Perception and Manipulation \cite{Diab_2019}}
+
+As tarefas executadas por robôs vêm se tornando cada vez mais complexas. Para realizar essas tarefas, os robôs precisam passar por uma etapa de planejamento, na qual decidem quais ações tomar baseados no estado atual do ambiente ao seu redor. Alguns dos mecanismos clássicos de planejamento utilizam a Linguagem de Definição de Domínio de Planejamento (Planning Domain Definition Language ou PDDL) para descrever o ambiente no qual o agente está inserido. O problema é que essa abordagem assume um mundo fechado, i.e., que todos os fatos sobre o mundo são conhecidos, caso contrário o planejador pode falhar. Com essa limitação, um robô não é capaz de começar uma tarefa a não ser que todos os objetos do ambiente tenham sido reconhecidos e as ações que ele deve executar tenham sido definidas. Em outras palavras, a existência de alucinações e ilusões limita o funcionamento de tais sistemas.
+
+Para resolver esse problema em situações onde o robô precisa realizar tarefas complexas de manipulação, foram criadas abordagens de planejamento baseadas no conhecimento, que utilizam reconhecimento semântico do cenário, conhecimento a respeito do comportamento físico de objetos e raciocínio sobre as possíveis ações de manipulação.
+
+O trabalho de Diab et al. propõem um \textit{framework} de representação de conhecimento baseado em ontologias (uma especificação formal de conhecimento) chamado PMK (Perception and Manipulation Knowledge), apresentado na figura \ref{fig:pmk}. Esse modelo é genérico, para que possa ser utilizado em diversos domínios, e incorporado com outras ontologias. O PMK permite associar dados de percepção de baixo nível (proveniente dos sensores, na camada física do sistema) com conhecimento de alto nível (camada de raciocínio do agente).
+Uma dos principais contribuições do artigo é criar um \textit{framework} que funcione como uma caixa preta para um planejador qualquer: o PMK é capaz raciocinar sobre os recursos do robô, suas restrições de ação, a viabilidade de ação e os comportamentos de manipulação. Para isso, o modelo utiliza análise situacional, avaliando a situação a situação dos objetos no ambiente com base em posicionamento espacial, acessibilidade do robô aos objetos, potencial área na qual o objeto será colocando entre outros. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/pmk-model.png}
+    \caption{Framework PMK}
+    \label{fig:pmk}
+\end{figure}
+
+\section{Understanding human intention by connecting perception and action learning in artificial agents \cite{kim2017understanding}}
+
+Para desenvolver agentes capazes de realizar comportamentos complexos similares aos de seres humanos, é primeiro preciso entender como os seres humanos aprendem a perceber, pensar e agir em um mundo dinâmico. Diversos campos da inteligência artificial buscam replicar esses comportamentos, além de outros como a emoção e a cooperação. Essas habilidades parecem ser intrínsecas aos seres humanos, e tornam nossas relações mútuas únicas. Em particular, a capacidade de entender a intenção dos outros tem sido considerada a base da comunicação entre humanos. Nesse artigo, Kim, Yu e Lee propõem um modelo, chamado OA-SMTRNN, para entender a intenção do usuário e responder ativamente da maneira mais adequada, através do uso de redes neurais.. Para implementar o reconhecimento de intenção, são focados dois processos cognitivos, a percepção da disponibilidade de objetos e a previsão da ação humana.
+
+Nos experimentos realizados pelos autores, diversos objetos precisaram ser percebidos pelo agente. Entretanto, alguns objetos poderiam estar sobrepostos, conforme demonstra a imagem \ref{fig:overlap}. Nesses casos, as percepções recebidas pelo agente poderiam estar incorretas. Para resolver este problema, o módulo responsável pelas ações foi implementado com a capacidade de relacionar a ação e os objetos. No artigo, é exemplificada a relação entre ``encher um copo d'água'' e ``fazer um café mocha''. Ou seja, o modelo, que foi previamente treinado, se mostrou capaz de associar a intenções como ``beber leite'' a determinadas ações (segurar um objeto, leva algo para a boca) para inferir que determinada anomalia (uma caixa de leite sobreposta por uma caneca) era uma caixa de leite.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{Images/overlap.jpg}
+    \caption{Exemplo de sobreposição \cite{kim2017understanding}.}
+    \label{fig:overlap}
+\end{figure}
+
+\section{Combining Perception and Knowledge Processing for Everyday Manipulation \cite{pangercic2010}}
+
+Robôs autônomos implementados para realizar tarefas de manipulação de objetos do dia a dia precisam tomar diversas decisões que requerem a combinação de percepção e processamento de conhecimento. Este artigo de Panger et al. apresenta um sistema de programação lógica chamado K-CoPMan (Knowledge enabled Cognitive Perception for Manipulation, ou Percepção Cognitiva Ativada pelo Conhecimento para Manipulação). Esse modelo é capaz de testar e satisfazer pré-condições de conhecimento para manipulações do dia a dia. Para isso, ele fornece ao agente o conhecimento simbólico abstrato sobre as cenas percebidas, usa conhecimento simbólico abstrato para realizar tarefas de percepção e responde a novos tipos de consultas que exigem a combinação de percepção e processamento de conhecimento.
+
+Um dos principais mecanismos do K-CoPMan é o componente de percepção passiva. Para se tornar consciente do ambiente, o agente que utiliza tal sistema pode escanear a cena em busca de áreas de interesse, como mesas ou cadeiras, utilizar os sensores para detectar objetos. Cada objeto recebe um identificador único, para então ser guardado na base de conhecimentos, juntamente com o contexto do momento em que a percepção foi realizada. O identificador é utilizado para que mais tarde seja possível examinar mais a fundo objeto, e possivelmente classificá-lo ou categorizá-lo. Portanto, o K-CoPMan permite que agentes inteligentes estejam conscientes do ambiente ao seu redor fazendo uma varredura completa do ambiente, uma vez que utiliza tanto percepção ativa quanto passiva, e guardando as anomalias detectadas para que possam ser tratadas mais tarde por um módulo próprio (o servidor de percepção).
+
+
+
+\iffalse
+\newpage
+\section{SEÇÃO DE TRABALHOS RELACIONADOS (ORGANIZAÇÃO)}
+
+Essa seção estão conteúdos ligados a pesquisa de trabalhos relacionados, mas será movida ou distribuída no artigo final.
+
+\begin{itemize}
+    \item O trabalho de John Anderson [9] propõem uma versão distribuída do simulador de agentes únicos Gensim. No artigo, Anderson discorre sobre como colocar a fonte das percepções completamente dentro do agente ou do ambiente é filosoficamente impreciso. Além disso, o autor descreve como isso também representa um problema prático, uma vez que a preparação sensorial é um elemento computacionalmente intensivo, portanto um equilíbrio deve ser encontrado.
+    
+    \item Para Włodzisław Duch [10], em seu trabalho sobre inteligência computacional, um dos grandes problemas atuais dessa área é seu foco em raciocínio como computação, e o uso da lógica como base do raciocínio, deixando de lado o caráter técnico de como símbolos precisam primeiro serem derivados de percepções reais. Segundo o autor, o cérebro humano é altamente especializado em análise de padrões naturais e outras técnicas que permitem o mapeamento de percepções a ações, mas apesar do grande avanço na área de inteligência computacional, sistemas projetados para resolver essas funções cognitivas de ordem inferior ainda estão muito distantes da capacidade do cérebro biológico.
+    
+    \item Bordeux et. al. [8] apresenta uma pipeline de percepção para agentes autônomos, propondo um processo de pré-processamento, processamento e pós-processamento utilizando filtros de percepções. filtro de agente, composto por um filtro de percepção, opcionalmente um filtro semi-reflexivo (que não será discutido por estar fora do escopo do trabalho atual) e uma lista de objetos selecionados. A ideia de guardar a lista de objetos selecionados conversa com o bloco avaliador de nosso modelo, pois guarda informações de determinadas percepções realizadas para serem mais tarde reaproveitadas para um ajuste fino.
+    
+    \item Em um artigo de revisão sobre arquiteturas cognitivas, Langley et. al [3] caracteriza a importância de tratar de percepções imperfeitas, e mostra que as arquiteturas podem conter elementos para tratar disso, uma vez que os sensores geralmente possuem interferências ou outros tipos de ruídos, que afetam a qualidade da percepção obtida. Segundo o autor, ambientes dinâmicos complicam ainda mais a situação, uma vez que o agente precisa rastrear alterações que ocorrem muitas vezes de maneira repentina no ambiente. A única solução que o autor propõem a isso é o “conhecimento perceptivo”, onde o agente decide sobre quais sensores utilizar, onde e quando focaliza-los e que interferências são plausíveis, se aproximando da percepção ativa.
+    
+    \item Mesmo em simulações virtuais, às percepções podem levar a erros por conta de sua imprecisão. Sichman [6] ilustra alguns aspectos essenciais de mecanismos de raciocínio sociais, baseado na noção de dependência social. O sistema proposto trata de um modelo de coalizões, onde agentes podem se juntar em prol de um objetivo em comum. O protocolo de formação de coalizões é formado por proposições, aceitações, recusas e mensagens de revisão. As mensagens de revisão são necessárias pois uma possível razão para um agente se recusar a participar de uma coalizão é porque o remetente tem uma crença falsa sobre suas capacidades, ou seja, acreditar que o agente pode executar uma ação, mas na realidade não pode. Isso pode acontecer pois fontes de informação, como as percepções, podem levar a erros.
+
+    \item O trabalho de Pangercic et. al. [7] trata de percepção e processamento de conhecimento, usando como estudo de caso um robô encarregado de determinar quais objetos faltam em uma mesa durante uma refeição, através de inferências lógicas. A implementação resulta em um modelo estatístico, em que cada objeto que o robô conhece recebe uma porcentagem de chance de ser necessário. Apesar dessa alta volatilidade, os autores não tratam da possibilidade da inferência incorreta.
+    
+    \item Diab et. al. apresenta um framework de processamento de conhecimento para a manipulação de percepção de robôs autônomos, através de raciocínio de percepção, isto é, raciocínio relacionado às características perceptivas dos objetos no ambiente, como outros modelos também fazem, mas além disso adiciona raciocínio relacionado aos algoritmos que o sensor pode executar para extrair os recursos, aos sensores associados ao robô e as limitações físicas dos sensores. Segundo os autores, esse processo torna o robô mais inteligente e flexível. Essa flexibilidade pode ser útil para lidar com a falhas de um sensores, fornecendo alternativas, ou seja, o framework proposto tem flexibilidade para lidar com sistemas sensoriais de vários modelos.
+    
+\end{itemize}
+
+\textbf{Problema abordado no artigo:} Conforme abordado pelo artigo [3], interferências ocorrem entre o processo físico de percepção e o processamento final dela, dentro do ciclo cognitivo do agente. Portanto, esse trabalho ataca essa lacuna que existe, com o objetivo de minimizar percepções incorretas ou falhas completas de percepção.
+
+\textbf{Contribuição do artigo:} Nesse artigo é apresentado um modelo genérico para o tratamento de percepções, com o objetivo de evitar que informação potencialmente útil seja desperdiçada, criando novos planos quando o agente não está pronto para lidar com percepções que estão fora do seu planejamento inicial. Esse modelo foi construído para que possa ser acoplado a qualquer arquitetura cognitiva, independente do grau de abstração que ela implemente.
+
+\textbf{fim da seção de organização dos trabalhos relacionados}
+\fi

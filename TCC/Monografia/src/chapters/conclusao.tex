@@ -1,0 +1,35 @@
+\chapter{Considerações finais}
+
+Agentes são entidades autônomas que, inseridas em um ambiente, são capazes de tomar decisões de maneira autônoma. Para se comunicar com o ambiente no qual estão inseridos, os agentes realizam o processo de percepção, utilizando sensores para receber diversos tipos de informações do mundo ao seu redor. Todavia, as percepções recebidas podem ser incorretas por diversos motivos.
+
+Neste trabalho, foi apresentado um modelo de revisão de percepções, capaz de detectar anomalias entre as percepções, classificá-las e transformá-las em conhecimento útil para o agente. Esse modelo foi inspirado pelos conceitos de alucinação e ilusão: percepções possíveis mais deslocadas de seu contexto ou percepções parcialmente possíveis, respectivamente. Esses dois conceitos dão nome ao modelo, HAIL (\textit{hallucination} e \textit{illusion}). A base teórica de conceitos para a construção do HAIL está presente no Capítulo 2. Uma revisão simples do estado da arte está presente no Capítulo 3, no qual outros trabalhos, que abordam o problema das percepções de diferentes maneiras, foram apresentados.
+
+O funcionamento do modelo foi descrito através de exemplos e formalizado no Capítulo 4. Ele é composto por um módulo de refinamento, responsável por reduzir as percepções iniciais recebidas através de um processo de filtragem, e um módulo de alucinação e ilusão, que classifica as anomalias através de decisores e as encaminha para blocos de avaliação. Nesses blocos, as anomalias são guardadas em listas ponderadas, e aguardam a sua vez de serem processadas. Quando o bloco libera uma anomalia, ela é enviada para um bloco de planejamento automatizado, onde será utilizada para gerar um novo plano para o agente.
+
+No Capítulo 5 apresentamos uma implementação do modelo HAIL (em um ambiente sem contexto de aplicação) e os experimentos realizados para demonstrar que o funcionamento do modelo é como esperado, ou seja, que ele é capaz de categorizar anomalias e melhorar o funcionamento do agente com elas. 
+
+% Analisando os resultados, é possível observar que o modelo funciona melhor em cenários onde há uma grande quantidade de percepções anômalas, possibilitando uma maior criação de planos novos. Além disso, o maior desafio é manter o desempenho do agente em cenários onde o tempo gasto pelo módulo de planejamento automatizado é muito elevado.
+
+A partir da comparação inicial realizada com outros trabalhos que tentam resolver problemas de percepções inválidas, da definição formal do modelo e dos experimentos realizados, é possível identificar que o HAIL possui algumas características que definem quando ele é adequado:
+
+\begin{itemize}
+    \item É um modelo genérico, que pode ser utilizado com diversos tipos de agentes e configurado de acordo com a necessidade do projeto.
+    \item Pode adicionar aprendizado a qualquer arquitetura cognitiva, mesmo aquelas que não preveem esse tipo de mecanismo.
+    \item Não necessita de uma base de conhecimentos prévia, tratando apenas das anomalias que são recebidas pelo módulo de alucinação e ilusão após o processo de refinamento.
+    \item Possui uma abordagem padrão totalmente simbólica.
+\end{itemize}
+
+% O \textit{framework} de habilidade sensorial e atenção perceptiva apresentado por Oijen e Dignum atua de maneira similar ao modelo proposto por nós, sendo um comunicador presente entre as percepções recebidas do ambiente e o agente \cite{van2011scalable}. Apesar disso, esse \textit{framework} não é genérico como o HAIL pois foi concebido para funcionar apenas com agentes BDI, e se limita a função de refinamento de percepções atuando como uma forma de percepção ativa.
+
+% O modelo PMK \cite{Diab_2019} necessita de uma base de conhecimentos previamente populada, enquanto o HAIL foi criado para poder se adequar a qualquer tipo de processo de percepção que funcione de maneira simbólica. O K-CoPMan \cite{pangercic2010} é similar ao PMK, mas utiliza uma base de conhecimentos pronta, essa base é construída através da percepção passiva.
+
+% Uma abordagem diferente é implementada pelo modelo OA-SMTRNN \cite{kim2017understanding}, que utiliza uma abordagem conexionista para resolver o problema das percepções anômalas. Apesar do trabalho possuir um escopo fechado, esse tipo de abordagem pode ser superior ao HAIL nos casos que uma solução puramente simbólica não seja suficiente (apesar do HAIL permitir uma implementação conexionista do planejamento automatizado).
+
+\section{Trabalhos futuros}
+
+Apesar dos experimentos terem resultados positivos, as simulações foram implementadas em um cenário genérico sem objetivo no mundo real. Por conta disso, quase não haviam fatores aleatórios, tornando a análise extremamente precisa (com erros da ordem de grandeza de $e^{-12}$) mas também bastante limitada.
+Portanto, é necessário validar o modelo através de duas etapas: acoplando-o a uma arquitetura cognitiva e submetendo-o a experimentos mais complexos, através de simulações ou implementação física com um problema real para ser resolvido.
+
+Esses novos experimentos podem ser feitos aos moldes de experimentos de trabalhos similares, para que possa haver uma comparação direta com o HAIL. Os trabalhos apresentados no Capítulo 3, apesar de abordarem problemas similares ao que o HAIL se propõem a resolver, possuem domínios particulares que dificultam uma análise relacionando os resultados.
+
+Além disso, o HAIL ainda pode ter cada um de seus componentes testados para validar se seu comportamento é o melhor possível, alterando os decisores do módulo de alucinação e ilusão, as equações do bloco avaliador, o método utilizado para armazenar as anomalias e o funcionamento do bloco de planejamento automatizado.

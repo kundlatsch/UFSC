@@ -1,0 +1,35 @@
+<!ELEMENT Obras (Pintura*, Escultura*)>
+<!ELEMENT Escultura (Obra+)>
+<!ATTLIST Escultura Peso CDATA>
+<!ELEMENT Pintura (Obra+, Estilo+)>
+<!ATTLIST Pintura Area CDATA>
+<!ELEMENT Estilo (ID, Descricao)>
+<!ELEMENT ID (#PCDATA)>
+<!ELEMENT Descricao (#PCDATA)>
+<!ELEMENT Obra (Titulo, Ano, Autor, Salao, Manutencao*)>
+<!ATTLIST Obra Codigo CDATA>
+<!ELEMENT Titulo (#PCDATA)>
+<!ELEMENT Ano (#PCDATA)>
+<!ELEMENT Salao (Numero, Andar)>
+<!ELEMENT Numero (#PCDATA)>
+<!ELEMENT Andar (#PCDATA)>
+<!ELEMENT Autor (Nome, Nacionalidade*)>
+<!ATTLIST Autor Codigo CDATA>
+<!ELEMENT Nome (#PCDATA)>
+<!ELEMENT Nacionalidade (Descricao)>
+<!ATTLIST Nacionalidade ID CDATA>
+<!ELEMENT Descricao (#PCDATA)>
+<!ELEMENT Manutencao (Restaurador, MateriaPrima*, Data_inicio, Data_termino, Custo, Descricao)>
+<!ELEMENT Data_inicio (#PCDATA)>
+<!ELEMENT Data_termino (#PCDATA)>
+<!ELEMENT Custo (#PCDATA)>
+<!ELEMENT Descricao (#PCDATA)>
+<!ELEMENT Restaurador (Nome, Salario, CPF)>
+<!ATTLIST Restaurador ID CDATA>
+<!ELEMENT Nome (#PCDATA)>
+<!ELEMENT Salario (#PCDATA)>
+<!ELEMENT CPF (#PCDATA)>
+<!ELEMENT MateriaPrima (Nome, Quantidade)>
+<!ATTLIST MateriaPrima Codigo CDATA>
+<!ELEMENT Nome (#PCDATA)>
+<!ELEMENT Quantidade (#PCDATA)>

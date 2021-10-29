@@ -1,0 +1,11 @@
+\chapter{Conclusão}
+
+Neste trabalho, foi apresentado um modelo de revisão de percepções. Tal modelo, inspirado pelos conceitos de alucinação e ilusão, é capaz de reduzir as percepções recebidas, detectar percepções anômalas (que fogem do escopo de trabalho do agente), classificá-las de acordo com suas características como ilusão (do tipo 1 ou 2, conforme definido) ou alucinação e tratá-las, através do mecanismo de autoplanejamento.
+
+O funcionamento do modelo foi descrito no capítulo 3, e sua formalização e implementação apresentadas no capítulo 4. Os experimentos realizados demonstram que o funcionamento do modelo é como esperado, sendo capaz de absorver as anomalias recebidas do ambiente e melhorar o comportamento do agente baseado nelas. Os resultados dos experimentos foram apresentados no capítulo 5. 
+Analisando os resultados, é possível observar que o modelo funciona melhor em cenários onde há uma grande quantidade de percepções anômalas, possibilitando uma maior criação de planos novos. Além disso, o maior desafio do modelo é manter o desempenho do agente em cenários onde o tempo gasto pelo módulo de autoplanejamento é muito elevado.
+
+Apesar dos experimentos terem resultados positivos, as simulações estavam limitadas a um cenário sem escopo, ou seja, sem objetivo no mundo real. Por conta disso, quase não haviam fatores aleatórios, tornando a análise extremamente precisa (com erros da ordem de grandeza de $e^{-12}$) mas também bastante limitada.
+Portanto, é necessário ainda validar o modelo em mais três etapas: (i) acoplando-o a uma arquitetura cognitiva implementada, para verificar como ela se comporta em uma interação mais complexa com o ambiente; (ii) implementação de experimentos mais complexos, com simulações de alguma situação real que possa ter resultados mais palpáveis; (iii) a aplicação do modelo em agentes físicos, para verificar se ele é capaz de melhorar o desempenho de agentes em ambientes reais.
+
+

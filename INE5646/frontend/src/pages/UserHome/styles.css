@@ -1,0 +1,82 @@
+.buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 50%;
+    margin-bottom: 30px;
+}
+
+.buttons-container button {
+    width: 45%;
+}
+
+.header {
+    font-weight: bold;
+    color: rgb(48, 48, 48);
+}
+
+.anime-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.anime-container-line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 70%;
+    color: rgb(88, 88, 88);
+    min-height: 30px;
+}
+
+.anime-container-line:hover {
+    background-color: rgb(200, 200, 200);
+}
+
+.anime-container-column {
+    width: 50%;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.plus-container {
+    margin-top: 2px;
+    margin-left: 4px;
+}
+
+.plus-container:hover {
+    cursor: pointer;
+}
+
+#user-home p {
+    color: var(--primary-color);
+    margin-top: 40px;
+}
+
+#user-home p:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@media (max-width: 500px) {
+    #user-home {
+        text-align: center;
+    }
+
+    .buttons-container {
+        width: 90%;
+    }
+
+    .anime-container-line {
+        width: 90%;
+    }
+}

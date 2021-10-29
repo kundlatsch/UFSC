@@ -1,0 +1,5 @@
+square(smooth) -> pick(); wrap_up(red);
+square(striped) -> pick(); wrap_up(red);
+circle(smooth) -> pick(); wrap_up(red);
+circle(striped) -> pick(); wrap_up(blue);
+triangle(smooth) -> pick(); wrap_up(blue);

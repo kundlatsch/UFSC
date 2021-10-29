@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;500&display=swap');
+
+:root {
+  --primary-color: #00907D;
+  --title-color: #049e8a;
+  --text-color: #646464;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #00907D;
+  background-image: linear-gradient(to right, #00907D, #947FF9);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+}
+
+body, input, button {
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--title-color);
+  font-weight: 500;
+  font-family: 'Fira Sans';
+}
+
+h1 {
+  font-size: 46px;
+}
+
+button {
+  width: 250px;
+  height: 56px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  border: 0;
+  align-self: center;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  font-family: Ubuntu;
+  font-size: large;
+}
+
+.green-button {
+  background: var(--primary-color);
+  color: #FFF;
+}
+
+.green-button:hover {
+  background: #00574b;
+}
+
+.white-button {
+  background: #FFF;
+  color: #424242;
+}
+
+.white-button:hover {
+  background: rgb(179, 179, 179);
+}
+
+.center-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.default-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  width: 40%;
+  border-radius: 40px;
+  background-color: antiquewhite;
+  box-shadow: 5px 5px #88888815;
+  padding-top: 30px;
+  padding-bottom: 50px;
+}
+
+.default-input {
+  height: 40px;
+  border: 2px solid rgba(116, 129, 243, 0.39);
+  border-radius: 5px;
+  padding-left: 10px;
+  font-size: 20px;
+  font-family: Arial, 'Fira Sans';
+  transition: 0.3s;
+}
+
+.default-input:focus {
+  outline: none;
+  border: 2px solid var(--primary-color);
+}
+
+.vspace20 {
+  height: 20px;
+}
+
+.vspace5 {
+  height: 5px;
+}
+
+@media (max-width: 500px) {
+  .default-container {
+    width: 80%;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 15px;
+  }
+
+  .default-container h1 {
+    font-size: 26px;
+  }
+
+  .default-input {
+    font-size: 14px;
+  }
+
+}

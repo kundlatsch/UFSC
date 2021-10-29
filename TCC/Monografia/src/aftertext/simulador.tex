@@ -1,0 +1,848 @@
+% ----------------------------------------------------------
+\chapter{Código do simulador}
+% ----------------------------------------------------------
+
+O simulador foi implementado utilizando a versão 3.7 do Python, e o gerenciamento de pacotes foi feito com o Poetry. As dependências estão disponíveis no arquivo \texttt{pyproject.toml}.
+
+\begin{section}{\_\_main\_\_.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from simulation import Simulation
+from analyzer import get_mean
+from generator.perceptions import PerceptionGenerator
+
+import strings
+from time import time
+import pandas as pd
+from shutil import copyfile
+import click
+import os
+
+from proggy import BarInfo
+from proggy.tty import TTYProgressBar
+
+
+# Click was used in testing and first simulations, but was replaced with
+# multiple function calls. This way, it is possible to run the program once
+# for all 16 factors variation, instead of passing the arguments through console
+# every time one simulation ends. Uncommenting this decorators and the first line
+# from main enable console usage again.
+
+# @click.command()
+# @click.option("--generate", "-G", default=0, nargs=2, help=strings.generate_help)
+# @click.option(
+#     "--reload-agent/--not-reload", "-R/", default=True, help=strings.reload_help
+# )
+# @click.option("--reasoning-time", default=1.0, help=strings.reasoning_time_help)
+# @click.option("--planning-time", default=32.0, help=strings.planning_time_help)
+# @click.option(
+#     "--perceptions-per-cycle", "-C", default=1, help=strings.perceptions_per_cycle_help
+# )
+# @click.option("--iterations", "-I", default=1, help=strings.iterations_help)
+def run(
+    generate,
+    reload_agent,
+    reasoning_time,
+    planning_time,
+    perceptions_per_cycle,
+    iterations,
+):
+
+    start_time = time()
+    vtimes = []
+    pps = []
+    pcs = []
+    name_string = f"valid{generate[1]}reasoning{reasoning_time}planning{planning_time}" + "perceptions{perceptions_per_cycle}reload{str(reload_agent)}"
+
+    with TTYProgressBar(BarInfo(size=30, total=iterations)) as p:
+
+        for i in range(iterations):
+            # print(f"-------------\nSIMULATION {i}\n-------------")
+
+            if generate:
+                g = PerceptionGenerator(*generate, perceptions_per_cycle)
+                g.generate()
+                if not os.path.exists(f'./data3/perceptions/{name_string}'):
+                    os.makedirs(f'./data3/perceptions/{name_string}')
+                copyfile("perceptions.txt", f"./data3/perceptions/{name_string}/iteration{i}.txt")
+
+            s = Simulation(
+                reasoning_time,
+                planning_time,
+                perceptions_per_cycle,
+                reload_agent=reload_agent,
+            )
+            vtime, perceptions_processed, plans_created = s.start()
+            vtimes.append(vtime)
+            pps.append(perceptions_processed)
+            pcs.append(plans_created)
+
+            if not os.path.exists(f'./data3/agents/{name_string}'):
+                    os.makedirs(f'./data3/agents/{name_string}')
+            copyfile("agent.txt", f"./data3/agents/{name_string}/iteration{i}.txt")
+
+            p.progress += 1
+
+    final_time = time()
+    total_time = final_time - start_time
+    total_time = "{:.2f}".format(total_time)
+    print(
+        f"------------\nFinished Simulation\nTime elapsed: {total_time}s\n------------"
+    )
+
+    d = {"vtime": vtimes, "perceptions_processed": pps, "plans_created": pcs}
+    df = pd.DataFrame(data=d)
+    
+    df.to_csv(f'./data3/results/{name_string}.csv', index=False)
+
+
+if __name__ == "__main__":
+    # uncomment run() if using click
+    # run()
+    run((5000, 50), True, 16, 32, 8, 1)
+    run((5000, 50), False, 16, 32, 8, 1)
+    run((5000, 50), False, 16, 32, 8, 1)
+    run((5000, 50), False, 16, 32, 8, 1)
+    run((5000, 50), False, 16, 32, 8, 1)
+    \end{minted}
+\end{section}
+
+\newpage
+
+\begin{section}{base-agent.txt}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+square(smooth) -> pick(); wrap_up(red);
+square(striped) -> pick(); wrap_up(red);
+circle(smooth) -> pick(); wrap_up(red);
+circle(striped) -> pick(); wrap_up(blue);
+triangle(smooth) -> pick(); wrap_up(blue);
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{generator/perceptions.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from .perceptions_options import (
+    VALID_POSSIBLE_PERCEPTIONS_BODIES,
+    VALID_POSSIBLE_PERCEPTIONS_ARGS,
+    INVALID,
+)
+
+from random_words import RandomWords
+from random import choice, shuffle
+from time import time
+
+
+class PerceptionGenerator:
+    def __init__(self, cycles, invalid_perceptions_percentage, perceptions_per_line):
+        self.cycles = cycles
+        self.invalid_p = invalid_perceptions_percentage
+        self.valid_p = 100 - invalid_perceptions_percentage
+        self.perceptions_per_line = perceptions_per_line
+
+    def create_valid_perception(self):
+        body = choice(VALID_POSSIBLE_PERCEPTIONS_BODIES)
+        arg = choice(VALID_POSSIBLE_PERCEPTIONS_ARGS)
+        return f"{body}({arg})"
+
+    def generate(self):
+        start_time = time()
+
+        valid = []
+        invalid = []
+
+        valid_cycles = int(self.valid_p * self.cycles / 100)
+        invalid_cycles = int(self.invalid_p * self.cycles / 100)
+
+        random_words = RandomWords()
+        random_bodies = []
+        random_args = []
+
+        # This module only allows requesting 5450 words at once.
+        # In some cases, we need 76000 words, so we need to do it "manually"
+        for i in range(self.perceptions_per_line):
+            bodies = random_words.random_words(count=invalid_cycles)
+            args = random_words.random_words(count=invalid_cycles)
+            random_bodies = random_bodies + bodies
+            random_args = random_args + args
+
+        for i in range(valid_cycles):
+            # Generate perceptions for line
+            perception_line = []
+            for j in range(self.perceptions_per_line):
+
+                perception = self.create_valid_perception()
+                while perception in INVALID:
+                    perception = self.create_valid_perception()
+
+                perception_line.append(perception)
+
+            # Concatenate perceptions to create line
+            final_perception = ""
+            for perception in perception_line:
+                final_perception = final_perception + perception + ","
+
+            # Add final perception string without the last char
+            valid.append(final_perception[:-1])
+
+        for i in range(invalid_cycles):
+            # Generate perceptions for line
+            perception_line = []
+            for j in range(self.perceptions_per_line):
+                body = random_bodies.pop(0).lower()
+                arg = random_args.pop(0).lower()
+
+                perception = f"{body}({arg})"
+                perception_line.append(perception)
+
+            # Concatenate perceptions to create line
+            final_perception = ""
+            for perception in perception_line:
+                final_perception = final_perception + perception + ","
+
+            # Add final perception string without the last char
+            invalid.append(final_perception[:-1])
+
+        perceptions = valid + invalid
+        shuffle(perceptions)
+
+        file = open("perceptions.txt", "w")
+
+        for line in perceptions:
+            file.write(line)
+            file.write("\n")
+
+        file.close()
+
+        final_time = time() - start_time
+        # print(f"{len(perceptions)} perceptions cycles generated in {final_time}s")
+
+    \end{minted}
+\end{section}
+
+\newpage
+
+\begin{section}{generator/perceptions\_options.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+# TODO: Get this configs directly from the agent file
+VALID_POSSIBLE_PERCEPTIONS_BODIES = ["circle", "square", "triangle", "star"]
+
+VALID_POSSIBLE_PERCEPTIONS_ARGS = ["striped", "smooth"]
+
+# Invalid perception formed by valid bodies and args
+INVALID = ["triangle(striped)"]
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{simulation.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from pr_system import PerceptionRevision
+from shutil import copyfile
+
+
+class Simulation:
+    def __init__(
+        self,
+        reasoning_at,
+        autoplanning_at,
+        perceptions_per_cycle,
+        reload_agent=True,
+        debug=False,
+    ):
+        self.perception_queue = []
+        self.perceptions_per_cycle = perceptions_per_cycle
+        
+        perceptions = open("perceptions.txt", "r")
+
+        content = perceptions.readlines()
+        for c in content:
+            splited = c.split(",")
+            for s in splited:
+                self.perception_queue.append(s.replace("\n", ""))
+
+        perceptions.close()
+
+        # A copy of the base agent is created because the autoplanner
+        # will change the file.
+        if reload_agent:
+            copyfile("base-agent.txt", "agent.txt")
+
+        self.model = PerceptionRevision("agent.txt", reasoning_at, autoplanning_at)
+        self.debug = debug
+
+    def start(self):
+        vtime = 0
+        perceptions_processed = 0
+
+        perceptions_number = self.perceptions_per_cycle
+
+        while self.perception_queue:
+            if perceptions_number > len(self.perception_queue):
+                perceptions_number = len(self.perception_queue)
+
+            perceptions = [
+                self.perception_queue.pop(0) for i in range(perceptions_number)
+            ]
+
+            (_vtime, pp) = self.model.process_perceptions(perceptions)
+            vtime = vtime + _vtime
+            perceptions_processed = perceptions_processed + pp
+
+        if self.debug:
+            print(f"vtime: {vtime}\nperceptions_processed: {perceptions_processed}")
+            print(f"{self.model.autoplanner.plans_created} new plans created")
+
+        return (vtime, perceptions_processed, self.model.autoplanner.plans_created)
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{pr\_system.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+"""Perception Revision System implementation.
+This module implements all the formal model described in the
+illusion and hallucination paper. It can be attached to any
+cognitive architecture to reason about the perceptions coming
+from the environment.
+"""
+
+from utils import (
+    parse_agent_plans,
+    get_perceptions_actions,
+    get_agent_context,
+    parse_perception,
+)
+
+from structures import AvaliationBlock, Autoplanner
+
+from typing import List, Tuple
+from random import choice
+
+
+class PerceptionRevision:
+    def __init__(self, agent, reasoning_at, autoplanning_at):
+        self.agent = agent
+        self.plans = parse_agent_plans(self.agent)
+        self.actions = get_perceptions_actions(self.plans)
+
+        # Now, the context only includes terms from the left side of the plan.
+        # Verify if the model uses this definition!
+        self.context_bodies, self.context_args = get_agent_context(self.plans)
+        self.context = self.context_bodies + self.context_args
+
+        self.illusion1_AB = AvaliationBlock(reasoning_at, autoplanning_at)
+        self.illusion2_AB = AvaliationBlock(reasoning_at, autoplanning_at)
+        self.hallucination_AB = AvaliationBlock(reasoning_at, autoplanning_at)
+        self.reasoning_at = reasoning_at
+
+        # This could be replaced with a set, but random.choice
+        # gives the error "'set' object is not subscriptable"
+        self.avaliation_blocks = []
+
+        self.MAP_PERCEPTION_TO_AB = {
+            "illusion1": self.illusion1_AB,
+            "illusion2": self.illusion2_AB,
+            "hallucination": self.hallucination_AB,
+        }
+
+        self.autoplanner = Autoplanner(self.actions, self.context, agent)
+
+    def __update_context(self):
+        self.plans = parse_agent_plans(self.agent)
+        self.context_bodies, self.context_args = get_agent_context(self.plans)
+        self.context = self.context_bodies + self.context_args
+
+    def __classify_perception(self, perception: str) -> str:
+        """Classify if a perception is an illusion or hallucination.
+        Args:
+            perception: The perception string in the format p(x).
+        Returns:
+            An int, 1 for illusion class 1, 2 for illusion class 2 and 3 for hallucination.
+        """
+        body, arg = parse_perception(perception)
+
+        if body in self.context and arg in self.context:
+            return "valid"
+
+        if body in self.context:
+            return "illusion1"
+
+        if arg in self.context:
+            return "illusion2"
+
+        return "hallucination"
+
+    def process_perceptions(self, perceptions: List[int]) -> Tuple[int, int]:
+        # Return = (vtime, perceptions_processed)
+
+        have_anomaly = False
+        anomalies = 0
+        # Add each perception to it's respective avaliation block
+        for perception in perceptions:
+            perception_type = self.__classify_perception(perception)
+
+            if perception_type in self.MAP_PERCEPTION_TO_AB:
+
+                ab = self.MAP_PERCEPTION_TO_AB[perception_type]
+                ab.list.push(perception)
+
+                if ab not in self.avaliation_blocks:
+                    self.avaliation_blocks.append(ab)
+
+                have_anomaly = True
+                anomalies = anomalies + 1
+
+        if not have_anomaly:
+            return (self.reasoning_at, len(perceptions))
+
+        vtime = 0
+        keep_planning = True
+
+        while keep_planning:
+            if self.avaliation_blocks:
+                avaliation_block = choice(self.avaliation_blocks)
+                (vtime, keep_planning) = avaliation_block.evaluate(vtime)
+
+                if keep_planning:
+                    plan_perception = avaliation_block.list.pop()
+                    self.autoplanner.plan(plan_perception)
+
+                if avaliation_block.list.is_empty():
+                    self.avaliation_blocks.remove(avaliation_block)
+            else:
+                keep_planning = False
+
+        self.__update_context()
+
+        return (vtime, len(perceptions) - anomalies)
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{structures.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from typing import Tuple, TypeVar
+from random import choice, randint
+
+T = TypeVar("T")
+
+
+class OrderedList:
+    def __init__(self):
+        self.__list = {}
+
+    def pop(self) -> T:
+        """Get the value that was inserted more times"""
+        first = True
+        top = None
+        for element in self.__list:
+            if first:
+                top = element
+                first = False
+
+            elif self.__list[element] > self.__list[element]:
+                top = element
+
+        self.__list.pop(top, None)
+        return top
+
+    def push(self, element: T):
+        """Insert an element on the ordered list.
+        If it's the first time that the element is inserted,
+        it's value is 1. If it's not, it's value will be increased
+        by 1.
+        
+        Args:
+            element: The element to be inserted in the list.
+        """
+        if element in self.__list:
+            old_value = self.__list[element]
+            self.__list[element] = old_value + 1
+        else:
+            self.__list[element] = 1
+
+    def clean(self):
+        """Clean list to free memory.
+        
+        Let S1 be the sum of 'weights' (number of times an element was inserted)
+        of the elements that the weight is bigger than 1.
+        Let S2 be the sum of 'weights' of the elements that hava weight 1.
+        If S1 is bigger than S2, remove all the elements in the list that have
+        'weight' 1.
+        """
+        S1 = 0
+        S2 = 0
+        for element in self.__list:
+            weight = self.__list[element]
+            if weight > 1:
+                S1 = S1 + weight
+            if weight == 1:
+                S2 = S2 + weight
+
+        if S1 > S2:
+            new_list = {}
+
+            for element in self.__list:
+                if self.__list[element] > 1:
+                    new_list[element] = self.__list[element]
+
+            self.__list = new_list
+
+    def is_empty(self):
+        return not bool(self.__list)
+
+
+class AvaliationBlock:
+    """Trivial implementation of the Avaliation Block.
+    In this case, the Avaliation Block is just the ordered list. In other
+    scenarios, the process of choosing which perception to treat could be
+    more complex, or the information from the Ordered List could be passed
+    to other elements in the model or in the agent architecture.
+    """
+
+    # at = average time
+    def __init__(self, reasoning_at: int, autoplanning_at: int):
+        self.list = OrderedList()
+        self.reasoning_at = reasoning_at
+        self.autoplanning_at = autoplanning_at
+
+    def evaluate(self, vtime: int) -> Tuple[int, bool]:
+        """Define if a perception in the Ordered List can be processed by the autoplanner."""
+        if vtime < self.reasoning_at:
+            vtime = vtime + self.autoplanning_at
+            return (vtime, True)
+        else:
+            return (vtime, False)
+
+
+class Autoplanner:
+    """Naïve autoplanning implementation.
+    In this implementation, we just randomly pick agent's action and
+    combine with the perceptions choosed to create a new plan.
+    """
+
+    def __init__(self, actions, context, agent):
+        self.actions = actions
+        self.context = context
+        self.agent = agent
+        self.plans_created = 0
+
+    def plan(self, perception):
+
+        actions_number = randint(1, len(self.actions))
+
+        actions = []
+
+        for i in range(actions_number):
+            action = choice(self.actions)
+            if action not in actions:
+                actions.append(action)
+
+        new_actions = []
+
+        for action in actions:
+            arg = choice(self.context)
+            new_actions.append(f"{action}({arg})")
+
+        new_plan = f"{perception} ->"
+
+        for action in new_actions:
+            new_plan = new_plan + " " + action + ";"
+
+        agent_file = open(self.agent, "a")
+
+        agent_file.write("\n" + new_plan)
+
+        agent_file.close()
+
+        self.plans_created = self.plans_created + 1
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{utils.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from typing import List, Tuple, Union
+
+
+def parse_agent_plans(agent: str) -> List[str]:
+    """Parse agent file to get it's plans.
+    Args:
+        agent: Agent file name. Must be on the root or contain the path.
+    Returns:
+        A list of the agent's plans.
+    """
+    with open(agent) as f:
+        plans = f.read().splitlines()
+
+    return plans
+
+
+def get_perceptions_actions(plans: List[str]) -> List[str]:
+    """Get all actions from given plans.
+    This implementations parse an specific kind of plans, i.e. different
+    agent oriented programming languages need different implementations of this
+    function.
+    Args:
+        plans: List of plans. Can be get from parse_agent_plans().
+    Returns:
+        A list of all actions used in the given plans.
+    """
+    actions = []
+    for plan in plans:
+
+        plan_body = plan.split("->")[1]
+        plan_actions = plan_body.split(";")
+
+        for action in plan_actions:
+            if "(" in action:
+                action = action.split("(")[0]
+
+            action = action.replace(" ", "")
+
+            if action not in actions:
+                actions.append(action)
+
+    actions.remove("")
+    return actions
+
+
+def get_agent_context(plans: List[str]) -> Tuple[List[str], List[str]]:
+    """Get the agent context (the domain of the perception function)
+    
+    Args:
+        plans: List of plans. Can be get from parse_agent_plans().
+    Returns:
+        The agent's context, a 2-tuple of bodies and args.
+    """
+    bodies = []
+    args = []
+    for plan in plans:
+        plan_head = plan.split("->")[0].replace(" ", "")
+
+        body, arg = parse_perception(plan_head)
+
+        if body not in bodies:
+            bodies.append(body)
+
+        if arg not in args:
+            args.append(arg)
+
+    return (bodies, args)
+
+
+def parse_perception(perception: str) -> Tuple[str, Union[str, None]]:
+    """Get the perception body and arg.
+    Args:
+        perception: Perception or plan head in the format p(x).
+    Returns:
+        A 2-tuple of body and arg.
+    """
+    if "(" in perception:
+        body, arg = perception.split("(")
+        arg = arg.replace(")", "")
+        return (body, arg)
+
+    return (perception, None)
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{analyzer.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from statistics import mean
+
+
+def get_mean():
+    results = open("results.txt", "r")
+
+    content = results.read().split(";")
+
+    vtimes = []
+    perceptions_processed = []
+    plans_created = []
+
+    for c in content:
+        try:
+            (vtime, perceptions, plans) = c.split(",")
+            vtimes.append(float(vtime))
+            perceptions_processed.append(float(perceptions))
+            plans_created.append(int(plans))
+        except ValueError:
+            pass
+
+    vt_mean = mean(vtimes)
+    vt_string = "{:.2f}".format(vt_mean)
+    print(f"VTIME: {vt_string}")
+
+    pp_mean = mean(perceptions_processed)
+    pp_string = "{:.2f}".format(pp_mean)
+    print(f"PERCEPTIONS PROCESSED: {pp_string}")
+
+    print(f"PLANS CREATED: {mean(plans_created)}")
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{strings.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+# Only used by Click
+generate_help = "Generate perceptions. Require 2 args: total number of perceptions and percentage of invalid perceptions, in this order. Exemple: --generate 500 80"
+reload_help = "Reload or not current agent file. If true, will overwrite agent.txt with base-agent.txt file, removing plans created by the autoplanner."
+reasoning_time_help = (
+    "Define agent's avarege reasoning time. Default is 1, but any value can be used."
+)
+planning_time_help = (
+    "Define agent's autoplanner avarege time. Default is 32, but any value can be used."
+)
+perceptions_per_cycle_help = (
+    "Define the number of perceptions received by the agent each cycle."
+)
+iterations_help = "Number of simulations that will be executed."
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{pyproject.toml}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+[tool.poetry]
+name = "perception-simulation"
+version = "0.1.0"
+description = ""
+authors = ["kundlatsch <gustavo.kundlatsch@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+RandomWords = "^0.2.1"
+click = "^7.1.1"
+proggy = "^0.4.3"
+pandas = "^1.0.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+    \end{minted}
+\end{section}
+\newpage
+
+

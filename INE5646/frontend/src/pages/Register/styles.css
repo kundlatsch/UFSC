@@ -1,0 +1,47 @@
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.form-container label {
+    color: var(--text-color)
+}
+
+.form-container span {
+    color: rgb(236, 115, 115);
+}
+
+.register-input {
+    width: 40%;
+}
+
+#register-page p {
+    color: var(--primary-color);
+    margin-top: 40px;
+}
+
+#register-page p:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#register-button {
+    margin-top: 30px;
+    width: 25%;
+}
+
+@media (max-width: 500px) {
+    #register-page {
+        text-align: center;
+    }
+
+    .register-input {
+        width: 80%;
+    }
+
+    #register-button {
+        width: 70%;
+    }
+}

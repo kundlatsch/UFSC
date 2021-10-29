@@ -1,0 +1,14 @@
+[
+    {
+        "id": 0,
+        "name": "Neon Genesis Evangelion",
+        "totalEpisodes": 26,
+        "currentEpisode": 9
+    },
+    {
+        "id": 1,
+        "name": "Hunter x Hunter",
+        "totalEpisodes": 148,
+        "currentEpisode": 125
+    }
+]

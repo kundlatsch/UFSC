@@ -1,0 +1,37 @@
+plugins {
+    // Apply the java-library plugin to add support for Java Library
+    id 'java-library'
+    id 'java'
+    id 'info.solidsoft.pitest' version '1.5.1'
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+
+}
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+    // Always run tests, even when nothing changed.
+    dependsOn 'cleanTest'
+
+    // Show test results.
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+pitest {
+    junit5PluginVersion = '0.12'
+    targetClasses = ['domain.*']
+    testSourceSets = [sourceSets.test]
+    mainSourceSets = [sourceSets.main]
+    threads = 4
+    outputFormats = ['HTML']
+}
+

@@ -1,0 +1,58 @@
+% \chapter{Implementação e Simulação}
+\chapter{Material e Métodos}
+
+A partir da construção do modelo proposto no capítulo anterior, a próxima etapa foi a sua formalização. Após termos um modelo formal, construímos um pseudocódigo que pode ser implementado em qualquer linguagem de programação. Para validar o modelo, foi feita uma implementação genéria (sem arquitetura cognitiva) em Python, apresentada no próximo capítulo).
+
+\input{Content/formalizacao.tex}
+
+\section{Pseudocódigo}
+
+O pseudocódigo apresentado nessa seção é um esqueleto na qual implementações reais do modelo proposto possam se basear. A sequência de comandos apresentada deve ser aplicada entre o momento que a percepção é recebida pelo agente e a efetiva entrada da percepção no seu ciclo de raciocínio.
+
+\begin{algorithm}[h]
+\While{True}{
+    $p \leftarrow$ sensors.percept\\
+    $\rho \leftarrow \theta(p)$\\
+    
+    $c \leftarrow$ agent.getContext\\
+    
+    \ForEach{perception $\rho(x)$ in $\rho$}{
+        decide $\rho(x)$ perception type based on $c$\\
+        \If{$\rho(x)$ is hallucination}{\\
+            $Ab_{h} \leftarrow \rho(x)$ \\
+            $A \leftarrow \rho(x)$\\ 
+        }
+        \ElseIf{$\rho(x)$ is illusion class 1}{
+            $Ab_{i1} \leftarrow \rho(x)$ \\
+            $A \leftarrow \rho(x)$\\ 
+        }
+        \ElseIf{$\rho(x)$ is illusion class 2}{
+            $Ab_{i2} \leftarrow \rho(x)$ \\
+            $A \leftarrow \rho(x)$\\ 
+        }
+        \Else{
+            $V \leftarrow \rho(x)$\\ 
+        }
+        
+    }
+    x $\leftarrow$ choose(i1, i2, h)\\
+        
+        \While{$Ab_x$ == True}{
+            $t \leftarrow$ top of $Ab_x$'s L
+            $plan \leftarrow Ap_{x}$.autoplan($t$)\\
+            add $plan$ to P\\
+            add $t$ to $A_{pr}$\\
+        }
+        \ForEach{y in (i1, i2, h)}{
+            \If{$Ab_{y}.Cf$ == True}{
+                clean $Ab_x$'s L
+            }
+        }
+    }
+    \caption{Algoritmo de avaliação de percepções}
+    \label{algorithm:model}
+\end{algorithm}
+
+Para facilitar a compreensão do algoritmo, iremos explicá-lo linha a linha.
+
+Colocamos o algoritmo dentro de um \emph{while true} para representar a continuidade do algoritmo, que executa todo ciclo de raciocínio. Nas linhas 2 e 3, o agente recebe as percepções através dos sensores, e aplica elas na função de refinamento $\theta$. Na linha 4, colocamos o contexto do agente na variável c. Isso é necessário pois sempre que esse algoritmo executa, é possível que o contexto mude, uma vez que novas percepções e planos passam pelo processo de cognição. Na linha 6, a percepção passa pelo processo de classificação, descrito em detalhes no algoritmo \ref{algorithm:decisor}. Entre a linha 7 e 21, caso a percepção seja uma anomalia, ela é adicionada ao bloco avaliador corresponde, e também ao conjunto de anomalias. Caso seja uma percepção válida, é apenas adicionada ao conjunto de percepções validas. Na linha 23, é realizado um processo de escolha de qual tipo de anomalia será tratada nesse ciclo de raciocínio. Essa escolha pode ser aleatória ou utilizar qualquer tipo de métrica escolhida pelo programador ao implementar o modelo. O tipo escolhido é avaliado na linha 24, onde o laço de repetição \emph{while} irá manter o planejamento automatizado recebendo o topo da lista ponderada enquanto a função de processamento permitir. Quando uma percepção é enviada ao planejamento automatizado, ela é adicionada ao conjunto de anomalias processadas. Nesse trecho de código foi realizado uma simplificação, pois não existe $Ap_{i1}$ e $Ap_{i2}$, apenas $Ap_{i}$, mas consideramos isso algo a ser tratado na implementação. Por fim, entre a linha 29 e a 33 é verificado se cada uma das listas ponderadas precisa ser limpa, utilizando a função de limpeza.

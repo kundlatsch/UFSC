@@ -1,0 +1,30 @@
+[
+    {
+        "id": 0,
+        "name": "Tensei shitara Slime Datta Ken",
+        "totalEpisodes": 24,
+        "currentEpisode": 24,
+        "weekDay": "Tuesday"
+    },
+    {
+        "id": 1,
+        "name": "Tokyo Revengers",
+        "totalEpisodes": 24,
+        "currentEpisode": 20,
+        "weekDay": "Sunday"
+    },
+    {
+        "id": 2,
+        "name": "Neon Genesis Evangelion",
+        "totalEpisodes": 26,
+        "currentEpisode": 9,
+        "weekDay": "Friday"
+    },
+    {
+        "id": 3,
+        "name": "Hunter x Hunter",
+        "totalEpisodes": 148,
+        "currentEpisode": 125,
+        "weekDay": "Friday"
+    }
+]

@@ -1,0 +1,74 @@
+.home-page h1 {
+    color: white;
+}
+
+.home-page {
+  display: flex;
+  flex-direction: row;
+}
+
+.left-container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  padding-left: 10%;
+  justify-content: center;
+  height: 100vh;
+}
+
+#logo {
+  width: 50%;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  margin-top: 40px;
+  width: 50%;
+  justify-content: space-between;
+}
+
+.button-container > button {
+  width: 45%;
+}
+
+.right-container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+}
+
+#nen {
+  width: 40%;
+  margin-left: 20%;
+}
+
+@media (max-width: 500px) {
+  .home-page {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .right-container {
+    display: none;
+  }
+
+  .left-container {
+    width: 100%;
+    padding-left: 0;
+    align-items: center;
+  }
+
+  .left-container h1 {
+    font-size: 30px;
+  }
+
+  .button-container {
+    width: 80%;
+  }
+}
