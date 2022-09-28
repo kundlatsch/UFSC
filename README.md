@@ -50,8 +50,8 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 
 | Pasta   | Minicurso                |
 | ------  | :-----------------------: |
-| CourseReact | [NodeJS](https://github.com/kundlatsch/UFSC/tree/master/CourseNode) |
-| CourseNode | [Python](https://github.com/kundlatsch/UFSC/tree/master/CourseReact) |
+| CourseNode | [NodeJS](https://github.com/kundlatsch/UFSC/tree/master/CourseNode) |
+| CourseReact | [React](https://github.com/kundlatsch/UFSC/tree/master/CourseReact) |
 
 ### Links Adicionais
 
