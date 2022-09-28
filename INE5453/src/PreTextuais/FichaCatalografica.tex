@@ -1,0 +1,50 @@
+% ---------------------------------------------------------------
+% ----------------  Ficha Catalográfica  -------------------------
+% ---------------------------------------------------------------
+% Modelo de ficha catalográfica. Você deverá substituir esta
+% folha na versão final da monografia por um pdf fornecido pela 
+% biblioteca. Salve o modelo oficial como ficha_catalografica.pdf
+% e use o comando abaixo para inseri-lo na versão final do texto.
+
+%\begin{fichacatalografica}
+%    \includepdf{ficha_catalografica.pdf}
+%\end{fichacatalografica}
+
+
+
+%% Modelo de Como fazer a Ficha Catalográfica:
+
+\begin{fichacatalografica}
+	\sffamily
+	\vspace*{\fill}					% Posição vertical
+	\begin{center}					% Minipage Centralizado
+	\fbox{\begin{minipage}[c][8cm]{14cm}		% Largura
+	\small
+	\imprimirautorcite.
+	%Sobrenome, Nome do autor
+	
+	\hspace{0.5cm}  \\
+	\imprimirtitulo  / \imprimirautor. --, \imprimirano-
+	
+	\hspace{0.5cm} \pageref{LastPage} p. 1 :il. (colors; grafs; tabs).\\
+	
+	\hspace{0.5cm} \imprimirorientadorRotulo~\imprimirorientador\\
+	
+	\hspace{0.5cm}
+	\parbox[t]{\textwidth}{\imprimirtipotrabalho~--~\imprimirinstituicao, ~ \\
+	\imprimirinstituto, ~\imprimirdepartamento,~\imprimirano.}\\
+	
+	\hspace{0.5cm} % Palavras-chave do trabalho
+		1. Palavra-chave 1.
+		2. Palavra-chave 2.
+		2. Palavra-chave 3.
+		3. Palavra-chave 4.
+		4. Palavra-chave 5.
+		I. \imprimirorientador.
+		II. \imprimirinstituicao.
+		III. \imprimirtitulo  			
+	\end{minipage} }
+	\end{center}
+\end{fichacatalografica}
+
+

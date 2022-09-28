@@ -1,0 +1,133 @@
+\section{Formalização}
+
+A formalização foi realizada em um modelo de cascata, onde se começa com uma única tupla, que se desdobra para conceitos mais complexos e específicos. O objetivo disso é criar camadas de abstração, sobre as quais podem ser criadas variações de acordo com a necessidade de implementações específicas ou da integração com arquiteturas cognitivas.
+
+ O bloco básico do modelo proposto, chamado de \emph{Modelo de Revisão de Percepções}, é composto por duas unidades: (i) um módulo para alucinação e ilusão $M_{ih}$; (ii) uma função de refinamento $\theta$. O módulo de ilusão e alucinação é uma quádrupla, apresentada na definição \ref{def:illuHallu}. A função de refinamento é uma função abstrata, cuja entrada é obtida através dos sensores do agentes e a saída é a entrada do módulo de alucinação e ilusão. Ela recebe um conjunto de percepções qualquer $p$ e retorna um subconjunto próprio $\rho$, ou seja, é uma função que pode ou não reduzir o número de percepções que são enviadas ao modulo de ilusão e alucinação.
+
+\begin{definition}{}
+    Um modelo de revisão de percepções é uma dupla $R = \langle M_{ih}, \theta \rangle$, onde:
+    
+    \begin{itemize}
+        \item $M_{ih}$ é o bloco de ilusão e alucinação; e
+        \item $\theta$ é a função de refinamento $\theta(p) = \rho$, onde $p$ é um conjunto de percepções e $\rho$ é um subconjunto próprio de $p$.
+    \end{itemize}{}
+    
+\end{definition}
+
+Após ter passado pela função $\theta$, as percepções $\rho$ irão passar pelo algoritmo \ref{alg::selection}, descrito por uma quádrupla, com conjuntos de decisores e blocos e uma função de transição.
+
+\begin{definition}
+\label{def:illuHallu}
+    O bloco de alucinação e ilusão é uma quádrupla $M_{ih} = \langle D, Ab, Ap, \Delta \rangle$, onde:
+    
+    \begin{itemize}
+        \item $D$ é o conjunto de decisores $D = \{d_{a}, d_{h}, d_{i}\}$, onde:
+             \begin{itemize}
+                \item $d_{a}$ é o decisor de anomalias, descrito pela função:
+                \[ d_{a} = \left\{ \begin{array}{ll}
+                0 & \mbox{se $\rho(x)$ está em $c$ \footnotemark};\\
+                1 & \mbox{se $\rho(x)$ não está em $c$}.\end{array} \right. \]
+             
+                \item $d_{h}$ é o decisor de alucinação, descrito pela função:
+                \[ d_{h} = \left\{ \begin{array}{ll}
+                0 & \mbox{se nem $\rho$ nem $(x)$ está em $c$};\\
+                1 & \mbox{se $\rho$ ou $(x)$ está em $c$}.\end{array} \right. \]
+                
+                \item $d_{i}$ é o decisor de ilusão, definido pela função:
+                \[ d_{i} = \left\{ \begin{array}{ll}
+                0 & \mbox{se $\rho$ está em $c$};\\
+                1 & \mbox{se $(x)$ está em $c$}.\end{array} \right. \]
+            \end{itemize}
+        
+        \footnotetext{ $c$ é o contexto do agente, de acordo com a definição \ref{definition::context}.}
+        
+        \item $Ab$ é o conjunto de blocos avaliadores $Ab = \{Ab_{h}, Ab_{i1}, Ab_{i2}\}$, onde $Ab_{h}$ é o bloco de avaliação de alucinações, $Ab_{i1}$ é o bloco de avaliação de ilusões classe 1 e $Ab_{i2}$ é o bloco de avaliação de ilusões classe 2.
+        
+        \item $Ap$ é o conjunto de blocos de planejamento automatizado $Ap = \{Ap_{h}, Ap_{i}\}$, onde $Ap_{h}$ é o bloco de planejamento automatizado de alucinações e $Ap_{i}$ é o bloco de planejamento automatizado de ilusões.
+        
+        \item $\Delta$ é a função de transição definido pela tabela abaixo, onde $out$ é um estado final, que leva a percepção para fora do modelo de revisão de percepções, ou seja, pode ser tanto uma transição para descartar a percepção quanto para levá-la para o ciclo de raciocínio do agente como uma percepção válida.
+        
+            \begin{table}[htb]
+                \centering
+                \begin{tabular}{c c c c} 
+                    \toprule
+                    \textbf{State} & \textbf{0} & \textbf{1} \\
+                    \midrule
+                    $d_{a}$     & $out$     & $d_{h}$       \\
+                    $d_{h}$     & $Ab_{h}$  & $d_{i}$       \\
+                    $d_{i}$     & $Ab_{i1}$ & $Ab_{i2}$     \\
+                    $Ab_{h}$    & $out$     & $Ap_{h}$      \\
+                    $Ab_{i1}$   & $out$     & $Ap_{i}$      \\
+                    $Ab_{i2}$   & $out$     & $Ap_{i}$      \\
+                    \bottomrule
+                \end{tabular}
+                \label{transition-table}
+                \caption{Tabela de transição $\Delta$ do módulo de ilusão e alucinação}
+                
+            \end{table}
+    \end{itemize}{}
+\end{definition}{}
+
+O módulo de alucinação e ilusão é o corpo principal do modelo. Ele recebe uma entrada $\rho$, que é a saída da função de refinamento apresentada na definição 1, e processa cada um dos elementos $\rho(x)$ desse conjunto, através de decisores e blocos de avaliação, percorrendo o modelo de acordo com as transições descritas pela função de transição $\Delta$. Os três decisores do conjunto $D$ fazem a triagem para detectar se a percepção $\rho(x)$ é uma anomalia, e que tipo de anomalia é. Após passar pelos três decisores, saberemos se essa percepção é valida, é uma alucinação, é uma ilusão tipo 1 ou uma ilusão tipo 2.
+
+Após ter passado pelos decisores, a percepção fica armazenada nos blocos avaliadores, que serão descritos posteriormente, onde por fim poderá ser descartada ou enviada para um módulo de planejamento automatizado.
+
+\begin{definition}
+    Um bloco avaliador é uma tripla $Ab_{x} = \langle L, Pf, Cf) \rangle$, $x \in \{h, i1, i2\}$, onde:
+
+    \begin{itemize}
+        \item $L$ é uma lista ordenada pelo número de vezes que uma mesma anomalia é dada como entrada;
+        \item $Pf$ é a função de processamento, definida abaixo:
+            
+             \[ Pf = \left\{ \begin{array}{ll}
+                        1 & \mbox{if $T_{m}(A) \leq T_{m}(V) * (|A| - |A_{pr}|)$;}\\
+                        0 & \mbox{caso contrário}.\end{array} \right. \]
+        
+            
+            Onde:
+            
+            \begin{itemize}
+                \item $T_{m}$ é a função que retorna a média do tempo gasto para processar as percepções de um conjunto;
+                \item $A$ é o conjunto de anomalias, $A(x)$ é um elemento específico $x$ e $|A|$ o número de anomalias do conjunto;
+                \item $A_{pr}$ é o conjunto de anomalias que já foram validades para serem processadas pela função de processamento neste ciclo de raciocínio ($A_{pr}$ é instanciada vazia a cada ciclo de raciocínio), e $|A_{pr}|$ o número de anomalias desse conjunto.
+                \item $V$ é o conjunto de percepções válidas.
+            \end{itemize}{}
+        
+        \item $Cf$ é a função de limpeza conforme definida abaixo, sendo $\alpha$ um coeficiente variável que precisa ser definido pela instância do modelo de revisão de percepções:
+        
+        \[ Cf = \left\{ \begin{array}{ll}
+                        1 & \mbox{se  $Ce = Verdadeiro$;}\\
+                        0 & \mbox{caso contrário}.\end{array} \right. \]
+            
+            \[ Ce = \sum_{i=1}^{|L|} P_{n}(L_{i}) > \alpha \sum_{j=1}^{|L|} P_{1}(L_{j}) \]
+            
+            Onde:
+            
+            \begin{itemize}
+                \item $L$ é a lista ordenada do bloco, sendo $|L|$ o número de anomalias únicas e $L_{i}$ a anomalia $i$ da lista.
+                \item $P$ é a função $P(L_{i}) = |L_{i}|$, sendo $|L_{i}|$ o peso da anomalia especificada (número de entradas recebidas dessa mesma anomalia na lista). A função $P$ é utilizada para especificar as seguintes funções:
+                \\
+                
+                    (i) $ P_{1}(L_{i}) = \left\{ \begin{array}{ll}
+                        1 & \mbox{se $P(L_{i}) = 1$;}\\
+                        0 & \mbox{caso contrário}.\end{array} \right. $
+                \\
+                
+                    (ii) $ P_{n}(L_{i}) = \left\{ \begin{array}{ll}
+                        P(L{i}) & \mbox{se $P(L_{i}) > 1$;}\\
+                        0 & \mbox{caso contrário}.\end{array} \right. $
+            \end{itemize}{}
+    \end{itemize}
+\end{definition}{}
+
+A terceira definição é a de bloco de avaliação ($Ab$). Um $Ab$ é um módulo do modelo que é responsável por armazenar as anomalias detectadas e decidir se elas serão processadas pelo agente ou não. É descrito por uma tripla, constituída por uma lista ordenada $L$, uma função de processamento $Pf$ e uma função de limpeza $Cf$. $L$ é uma lista organizada pela recorrência de elementos inseridos nela, onde cada elemento só aparece uma vez e contém um número de vezes que o mesmo elemento já foi inserido nela, chamado de peso. Nesse modelo, os elementos são as anomalias percebidas pelo agente, e o peso é o número de vezes que o agente percebeu a anomalia.
+
+$Pf$ é uma função que avalia se uma anomalia será processada nesse ciclo de raciocínio ou se será armazenada para ser processada no futuro. Para isso, ela precisa de uma função que retorne o tempo médio previsto para o processamento de uma percepção $T_m$, seja ela uma percepção válida ou uma anomalia. Com base nessa função, $Pf$ retorna 1 caso o tempo médio de processamento de uma anomalia seja menor que o tempo médio de processamento de uma percepção válida multiplicado pelo número de anomalias que fazem parte desse ciclo de raciocínio menos o número de anomalias que já foram aprovadas pelo bloco avaliador, e zero caso contrário.
+
+De maneira simplificada, o que essa função busca evitar que o modelo de revisão de percepção gaste mais tempo de processamento do que ele gastaria caso não estivesse sendo utilizado, processando apenas as anomalias que aparecem de maneira mais recorrente para o agente.
+
+$Cf$ é uma função que realiza a limpeza de $L$. Conforme os ciclos de raciocínio forem passando, $L$ tende a possuir diversas anomalias que foram percebidas apenas uma única vez. Dessa maneira, uma grande quantidade de memória seria necessária para armazenar as possíveis centenas de anomalias que podem nunca ser processadas. Assim, a função $Cf$ verifica se a equação $Ce$ é verdadeira ou falsa. Ela é verdadeira quando o número de anomalias que apareceram uma única vez é maior que a soma dos pesos das anomalias que apareceram mais de uma vez (o peso é o número atrelado a cada anomalia, que representa quantas vezes elas já foram inseridas na linha). Quando a função for verdadeira, o bloco avaliador remove todas as anomalias de peso 1 da lista.
+
+\begin{definition}
+    Um bloco de planejamento automatizado é uma instância do modelo conceitual de planejamento automatizado (definição \ref{definition::autoplanning}).
+\end{definition}

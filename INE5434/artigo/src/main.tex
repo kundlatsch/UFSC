@@ -1,0 +1,71 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% How to use writeLaTeX: 
+%
+% You edit the source code here on the left, and the preview on the
+% right shows you the result within a few seconds.
+%
+% Bookmark this page and share the URL with your co-authors. They can
+% edit at the same time!
+%
+% You can upload figures, bibliographies, custom classes and
+% styles using the files menu.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+
+\usepackage{graphicx,url}
+
+\usepackage[brazil]{babel}   
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[portuguese, linesnumbered]{algorithm2e}
+\usepackage{amsthm}
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+     
+\sloppy
+
+\title{HAIL: um modelo de revisão de percepções\\de agentes inteligentes baseado em alucinação e ilusão}
+
+\author{Gustavo E. Kundlatsch\inst{1}, Thiago Ângelo Gelaim\inst{1}, Elder Santos\inst{1} }
+
+
+\address{Departamento de Informática e Estatıstica\\
+Universidade Federal de Santa Catarina (UFSC)\\
+Florianópolis -- SC -- Brazil}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definição}
+\newtheorem{example}{Exemplo}[section]
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcommand{\centered}[1]{\begin{tabular}{l} #1 \end{tabular}}
+
+\begin{document} 
+
+\maketitle
+
+\begin{abstract}
+  Perceptions are the main way to an entity to receive information from the environment. Each person has a different manner of percept and interpretate the world. However, it is known that in the human perception there are anomalies, incorrect perceptions that decieve the mind. So, how can we know if our perceptions are real or just tricks from our mind? And the follow up question is: what about computers? Inteligent agents are computational entities capable of making decisions based on the environment, and use sensors to perceive the world. But sensors can fail. In the current work, we present a generic model of perception revision, capable of treating anomalies received by the agent and creating new plans from them to adapt to the environment. This model was implemented and submited to experiments to test it's behavior. The simulations demonstrate that the model is capable of detect and classify anomalies and that in environments with a high amount of anomalies the model can have more inpact creating new plans through the automatic planning process and increasing the amount of valid perceptions received by the agent's cognition.
+\end{abstract}
+     
+\begin{resumo} 
+  Percepções são a principal maneira de uma entidade receber informações do ambiente. Cada pessoa possui uma maneira diferente de perceber e interpretar o mundo. Entretanto, sabe-se que na percepção humana existem anomalias, que são percepções incorretas que enganam a mente. Dito isso, como podemos saber se nossas percepções são reais ou se são apenas fruto de nossa imaginação? E a questão derivada disso é: e computadores? Agentes inteligentes são entidades computacionais autônomas capazes de tomarem decisões baseadas no ambiente no qual estão inseridos, e utilizam sensores para reconhecerem o mundo a sua volta. Mas esses sensores podem falhar. Neste trabalho, apresentamos um modelo genérico de revisão de percepções, capaz de tratar anomalias recebidas pelo agente e criar novos planos a partir delas para se adaptar ao ambiente. Esse modelo foi implementado e submetido a experimentos para testar seu funcionamento. As simulações realizadas demonstraram que o modelo é capaz de detectar e classificar as anomalias e que em ambientes com grande quantidade de anomalias o modelo consegue ter maior impacto criando novos planos através do planejamento automatizado e aumentando a quantidade de percepções válidas recebidas pelo raciocínio do agente.
+\end{resumo}
+
+\input{content/introduction}
+\input{content/theoretical}
+\input{content/related}
+\input{content/model}
+\input{content/experiments}
+\input{content/conclusion}
+
+\bibliographystyle{sbc}
+\bibliography{sbc-template}
+
+\end{document}

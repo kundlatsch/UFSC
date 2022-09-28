@@ -28,6 +28,9 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | INE5430 | [Inteligência Artificial](https://github.com/kundlatsch/UFSC/tree/master/INE5430) |
 | INE5431 | [Sistemas Multimídia](https://github.com/kundlatsch/UFSC/tree/master/INE5431) |
 | INE5432 | [Bancos de Dados II](https://github.com/kundlatsch/UFSC/tree/master/INE5432) |
+| INE5433 | [Trabalho de Conclusão de Curso I (TCC)](https://github.com/kundlatsch/UFSC/tree/master/INE5433) |
+| INE5434 | [Trabalho de Conclusão de Curso II (TCC)](https://github.com/kundlatsch/UFSC/tree/master/INE5434) |
+| INE5453 | [Introdução ao Trabalho de Conclusão de Curso](https://github.com/kundlatsch/UFSC/tree/master/INE54543) |
 | INE5455 | [Testes de Software](https://github.com/kundlatsch/UFSC/tree/master/INE5455) |
 | INE5600 | [Bancos de Dados III](https://github.com/kundlatsch/UFSC/tree/master/INE5600) |
 | INE5646 | [Programação Web](https://github.com/kundlatsch/UFSC/tree/master/INE5646) |
@@ -43,7 +46,19 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | MiniShell | [Shell Script](https://github.com/kundlatsch/UFSC/tree/master/MiniShell) |
 | MiniPLI | [Programação Linear e Inteira](https://github.com/kundlatsch/UFSC/tree/master/MiniPLI) |
 
+### Cursos
+
+| Pasta   | Minicurso                |
+| ------  | :-----------------------: |
+| CourseReact | [NodeJS](https://github.com/kundlatsch/UFSC/tree/master/CourseNode) |
+| CourseNode | [Python](https://github.com/kundlatsch/UFSC/tree/master/CourseReact) |
+
 ### Links Adicionais
 
 + [Currículo do Curso](http://cagr.sistemas.ufsc.br/relatorios/curriculoCurso?curso=208)
 + [Árvore de Disciplinas](https://github.com/CalicoUFSC/ufsc-cco-reformulado/blob/master/grafo-curricular.svg)
++ [Vídeo da Formatura da Turma 2021.2](https://repositorio.ufsc.br/handle/123456789/236150)
+
+---
+
+Obrigado, meu pai. Adeus, minha mãe. E à todas as crianças, parabéns.

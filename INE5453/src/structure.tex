@@ -1,0 +1,177 @@
+%------------------------------------------------------------
+%------------    Estrutura do texto   -----------------------      
+
+% Pacotes Básicos:
+\usepackage[T1]{fontenc}		% Seleção de códigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificação do documento (conversão automática dos acentos)
+\usepackage{lastpage}		    % Usado pela Ficha catalográfica
+\usepackage{indentfirst}		
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{tabularx}
+\usepackage{microtype} 		  	% Melhorias da justificação
+\usepackage{pdfpages}           %inserir páginas em PDF
+% Pacotes Extras:
+\usepackage{amsmath,amsthm}     % Símbolos Matemáticos
+\usepackage[portuguese, ruled, linesnumbered,commentsnumbered, algo2e, vlined, lined, boxed, algochapter]{algorithm2e} % Algoritmos 
+\usepackage{hyperref}      % Criação de links.
+
+% Escolha da formatação das referências Bibliográficas: 
+\usepackage[alf,abnt-etal-list=0,abnt-etal-cite=3]{abntex2cite}	% Citações padrão ABNT  (AUTOR, ANO)
+\usepackage{etoolbox}
+%\usepackage[num]{abntex2cite}  % Citações numéricas (1)
+%\citebrackets[] % Usar este comando para a citação numérica aparecer com [].
+
+% Numeração das Figuras e Tabelas
+\counterwithin{figure}{chapter}
+\counterwithin{table}{chapter}
+
+% Defininção de Cores:
+\definecolor{blue}{RGB}{25,25,112}
+\makeatletter % informações do PDF
+\hypersetup{
+    %pagebackref= false,
+	pdftitle={\@title}, 
+	pdfauthor={\@author},
+    %pdfsubject={\imprimirpreambulo},
+	pdfcreator={LaTeX with abnTeX2},
+	pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+	colorlinks=true,    % false: boxed links; true: colored links
+    linkcolor=blue,     % color of internal links
+    citecolor=blue,     % color of links to bibliography
+    filecolor=magenta, 	% color of file links
+	urlcolor=blue,
+	bookmarksdepth=4
+}
+\makeatother
+
+% -------------------------------------------- 
+% Espaçamentos entre linhas e parágrafos 
+\setlength{\parindent}{1.3cm} % O tamanho do parágrafo
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% Definição de ambientes matemáticos em português 
+\newtheorem{teorema}{Teorema}[chapter]
+\newtheorem{axioma}{Axioma}[chapter]
+\newtheorem{corolario}{Corolário}[chapter]
+\newtheorem{lema}{Lema}[chapter]
+\newtheorem{proposicao}{Proposição}[chapter]
+\newtheorem{definicao}{Definição}[chapter]
+\newtheorem{exemplo}{Exemplo}[chapter]
+\newtheorem{observacao}{Observação}[chapter]
+
+% Novos Comandos
+\usepackage{tgtermes}
+\renewcommand{\ABNTEXchapterfont}{\rmfamily\bfseries}
+
+% Variáveis adicionais
+\providecommand{\imprimirautorcite}{}
+\newcommand{\autorcite}[1]{\renewcommand{\imprimirautorcite}{#1}} 
+\providecommand{\imprimirsubtitulo}{}
+\newcommand{\subtitulo}[1]{\renewcommand{\imprimirsubtitulo}{#1}} 
+\providecommand{\imprimirsigla}{}
+\newcommand{\sigla}[1]{\renewcommand{\imprimirsigla}{#1}}
+\providecommand{\imprimiruf}{}
+\newcommand{\uf}[1]{\renewcommand{\imprimiruf}{#1}}
+\providecommand{\imprimircurso}{}
+\newcommand{\curso}[1]{\renewcommand{\imprimircurso}{#1}}
+\providecommand{\imprimirinstituto}{}
+\newcommand{\instituto}[1]{\renewcommand{\imprimirinstituto}{#1}}
+\providecommand{\imprimirdepartamento}{}
+\newcommand{\departamento}[1]{\renewcommand{\imprimirdepartamento}{#1}}
+\providecommand{\imprimirano}{}
+\newcommand{\ano}[1]{\renewcommand{\imprimirano}{#1}}
+\providecommand{\imprimirgrau}{}
+\newcommand{\grau}[1]{\renewcommand{\imprimirgrau}{#1}}
+\providecommand{\imprimirexaminadorum}{}
+\newcommand{\examinadorum}[1]{
+    \renewcommand{\imprimirexaminadorum}{#1}}
+\providecommand{\imprimirexaminadordois}{}
+\newcommand{\examinadordois}[1]{
+    \renewcommand{\imprimirexaminadordois}{#1}}
+\providecommand{\imprimirexaminadortres}{}
+\newcommand{\examinadortres}[1]{
+    \renewcommand{\imprimirexaminadortres}{#1}}
+\providecommand{\imprimirexaminadorquatro}{}
+\newcommand{\examinadorquatro}[1]{
+    \renewcommand{\imprimirexaminadorquatro}{#1}}
+\providecommand{\imprimirttorientador}{}
+\newcommand{\ttorientador}[1]{
+    \renewcommand{\imprimirttorientador}{#1}} 
+\providecommand{\imprimirttcoorientador}{}
+\newcommand{\ttcoorientador}[1]{
+    \renewcommand{\imprimirttcoorientador}{#1}}
+\providecommand{\imprimirttexaminadorum}{}
+\newcommand{\ttexaminadorum}[1]{
+    \renewcommand{\imprimirttexaminadorum}{#1}}
+\providecommand{\imprimirttexaminadordois}{}
+\newcommand{\ttexaminadordois}[1]{\renewcommand{
+        \imprimirttexaminadordois}{#1}}
+\providecommand{\imprimirttexaminadortres}{}
+\newcommand{\ttexaminadortres}[1]{
+    \renewcommand{\imprimirttexaminadortres}{#1}}
+\providecommand{\imprimirttexaminadorquatro}{}
+\newcommand{\ttexaminadorquatro}[1]{
+    \renewcommand{\imprimirttexaminadorquatro}{#1}}
+		
+%----------------------------------------------------
+\renewcommand{\imprimircapa}{ % Capa 
+\begin{capa}
+        \begin{center}
+                \begin{DoubleSpace}
+                \MakeUppercase{\imprimirinstituicao } \\
+                 \MakeUppercase{\imprimirinstituto } \\
+                \MakeUppercase{\imprimirdepartamento} \\
+                \end{DoubleSpace}
+                \vspace{5cm}
+				\MakeUppercase{\imprimirautor}  \\
+                \imprimirorientadorRotulo ~\imprimirorientador \\
+                \imprimircoorientadorRotulo ~\imprimircoorientador \\
+                        				
+				\vspace{5cm}
+             \textbf{{\large\MakeUppercase{\imprimirtitulo}}} \\
+			 \textbf{{\large \MakeUppercase{\imprimirsubtitulo}}} \\
+				\vfill
+        {\large{\imprimirlocal, ~\imprimiruf \\ \imprimirano  }}
+        \end{center}
+\end{capa}   
+} % Capa
+
+
+
+%----------------------------------------------------
+\renewcommand{\imprimirfolhaderosto}{% folha de rosto
+       \begin{center}
+                \MakeUppercase{\imprimirinstituicao } \\
+                 \MakeUppercase{\imprimirinstituto } \\
+                \MakeUppercase{\imprimirdepartamento} \\
+                
+                \vspace{4cm}
+				\MakeUppercase{\imprimirautor}  \\
+				\vspace{2cm}
+			    \begin{DoubleSpace}
+                \MakeUppercase{\textbf{\imprimirtitulo} } \\
+                \MakeUppercase{\textbf{\imprimirsubtitulo}} \\
+                \end{DoubleSpace} 
+      \end{center}
+    \vfill 
+    \begin{flushright} 
+    \parbox{0.6\linewidth}{
+    Proposta de TCC submetida para a aprovação na matéria de Introdução ao TCC, requisito parcial para obtenção do grau de Bacharel em Ciências da Computação pela Universidade Federal de Santa Catarina.\\ \\
+% 		\imprimirtipotrabalho~ apresentada ao Curso de \imprimircurso~ da \imprimirinstituicao~ como parte dos
+% 		requisitos necessários para a obtenção do grau de \imprimirgrau. \\ \\
+		\textbf{\imprimirorientadorRotulo}~\imprimirorientador \\
+		
+		\textbf{\imprimircoorientadorRotulo}~\imprimircoorientador}
+   \end{flushright} 
+		\vfill
+   \begin{center}
+   {\large{\imprimirlocal, ~ \imprimiruf \\
+   \imprimirano} }
+   \end{center} }  % folha de rosto
+
+%----------------------------------------------------
+
+

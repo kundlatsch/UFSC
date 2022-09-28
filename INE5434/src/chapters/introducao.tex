@@ -1,0 +1,62 @@
+\chapter{Introdução}
+
+Dentro da Inteligência Artificial (IA), agentes inteligentes são entidades capazes de raciocinar a respeito do ambiente em que estão inseridos e tomar decisões baseadas na situação em que se encontram \cite{russell2016artificial}. Dessa maneira, podemos descrever um agente pelos seus processos de percepção, raciocínio e atuação. O agente ocupa um ambiente, do qual recebe informações e no qual atua. O ambiente é o mundo em que o agente está inserido, podendo ser virtual ou uma parte do mundo real, no caso de um agente físico. Existem diversos tipos de ambientes que podem ser classificados de acordo com o seu fechamento (que determina se agentes de fora do ambiente podem afetar o sistema), dinamismo (a maneira como o ambiente evolui), determinismo (a consistência dos efeitos no ambiente) e cardinalidade (o número de objetos a serem afetados e percebidos) \cite{moya2007towards}.
+
+Uma das maneiras de um agente atualizar seu conhecimento a respeito do ambiente é a percepção, o processo de utilizar sensores para detectar o ambiente e transformar os dados coletados em informações úteis \cite{weyns2004towards}.  O raciocínio, por sua vez, é o processamento das percepções baseado nos objetivos do agente, que resulta em um conjunto ações a serem tomadas através dos atuadores. O processo do raciocínio é comandado pela arquitetura cognitiva do agente, um modelo computacional inspirado na estrutura da mente humana \cite{DYACHENKO2018130}. As arquiteturas cognitivas podem ser divididas em três categorias: simbólicas, emergentes e híbridas \cite{yeCognitivearchitectures}. Arquiteturas simbólicas descrevem o ambiente através de símbolos armazenados em memória em uma base de conhecimentos, e utilizam lógica simbólica para realizar o ciclo de percepção, raciocínio e ação. Arquiteturas emergentes se baseiam na estrutura biológica do cérebro e normalmente utilizam redes neurais em uma estrutura hierárquica para lidar com situações de incerteza. Por fim, arquiteturas híbridas combinam o comportamento emergente e o processamento simbólico para resolver problemas de diversos domínios. 
+
+Todavia, sensores podem apresentar problemas para o processo de percepção por razões como campo de visão, distância do objeto observado, resolução dos sensores e leituras não confiáveis \cite{chrisman1991intelligent}. Tratar deste problema normalmente é responsabilidade da arquitetura cognitiva do agente, pois a arquitetura precisa ser capaz de fazer a ponte entre o ambiente e o conhecimento do agente \cite{langley2009cognitive}.
+
+O objetivo deste trabalho é apresentar um modelo genérico (independente da arquitetura do agente) que pode ser acoplado entre o processo de percepção e raciocínio, capaz de detectar e tratar percepções inválidas para transformá-las em informações úteis através de um processo de criação de novos planos. Esse modelo pressupõe um ambiente aberto (onde agentes externos podem influenciar o ambiente), dinâmico (mudanças no ambiente são causadas por eventos aleatórios) e não determinístico (ações do agente causam resultados diferentes no ambiente, mesmo em situações aparentemente idênticas, pois os resultados variam dependendo da percepção do agente daquele evento).  Com isso, buscamos responder as perguntas de pesquisa:
+
+\begin{itemize}
+    \item Como podemos diferenciar percepções válidas de percepções inválidas?
+    \item Como podemos utilizar percepções inválidas para criar novos planos?
+\end{itemize}
+
+\iffalse
+
+Agentes são baseados em arquiteturas cognitivas, \emph{frameworks} criados para simular a cognição humana \cite{newell1994unified}.
+
+Um exemplo de arquitetura cognitiva é o modelo \emph{belief-desire-intention} (BDI), originado na psicologia com a teoria do raciocínio prático de Bratman \cite{bratman1987intention}, posteriormente implementado como um modelo computacional por Rao \cite{rao1995bdi}. No BDI, os estados internos do agente são divididos em crenças, desejos e intenções. Crenças são todo o conhecimento que o agente possui a respeito do mundo, recebidos da percepção do ambiente e de comunicações com outros agentes ou outras fontes externas. Desejos são as mudanças que o agente deseja causar no mundo, e as intenções representam os estados deliberativos do agente, ou seja, coisas que o agente efetivamente se dispôs a fazer.
+
+
+
+\fi
+
+
+\section{Justificativa}
+
+Para que um agente possa interagir com o ambiente, ele precisa atualizar seus estados internos, de acordo com regras estabelecidas por sua arquitetura cognitiva. A percepção é a capacidade do agente sentir o mundo, resultando em uma expressão que por si própria pode ser entendida e interpretada \cite{wyens2004}. Em ambientes dinâmicos, há possivelmente centenas de percepções por segundo \cite{hayes1992guardian}. Mas percepções não necessariamente precisam incluir representações corretas da realidade e podem variar de agente para agente \cite{janssen2005agent}. Um agente com percepção incompleta pode ter problemas de percepções por conta de limitações de sua capacidade de perceber determinados objetos ou obstrução física dos sensores, por exemplo \cite{chrisman1991intelligent}. 
+
+Falhas na entrada de dados através de sensores pode ser perigoso, levando o agente a tomar decisões incorretas, especialmente caso o agente faça parte de um sistema crítico. Por exemplo, em um sistema controlado por um agente cujo objetivo é trocar a cor do semáforo sempre que detectar pedestres o suficiente vindo de diversas direções, o mal funcionamento de um sensor pode levar a cor do semáforo a trocar com muita frequência, trancando os carros e levando a um grande engarrafamento -- ou pior, pode causar o atropelamento de um pedestre.
+
+Para categorizar as percepções incorretas e diferenciá-las das percepções válidas, foram utilizados dois conceitos vindos do estudo de percepção da filosofia: (i) alucinações, que são percepção completamente válidas, mas que ocorrem em um momento errado e (ii) ilusões, percepções ou de objetos existentes no ambiente com características incorretas, ou de objetos inexistentes no ambiente mas com características comuns a objetos válidos \cite{perception-problem}.
+
+Com base no nome em inglês desses dois conceitos foi definido o nome do modelo proposto neste trabalho: HAIL (\textit{hallucination} e \textit{illusion}, alucinação e ilusão em inglês, respectivamente).
+
+\section{Objetivos}
+
+\subsection{Objetivo geral}
+
+Este trabalho possui como objetivo geral propor um modelo de revisão de percepções capaz de detectar percepções inválidas e transformá-las em informações úteis para o agente.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}
+    \item Analisar o estado da arte relativo a percepções de agentes inteligentes;
+    \item Criar um modelo capaz de detectar, classificar e aprender com percepções inválidas;
+    \item Formalizar e implementar o modelo proposto em um ambiente genérico (sem contexto de aplicação);
+        \item Testar o modelo proposto através de diferentes simulações, utilizando o design fatorial de experimentos. 
+\end{enumerate}
+
+\section{Organização do trabalho}
+
+Este trabalho está organizado do seguinte modo:
+
+\begin{itemize}
+    \item O capítulo 2 apresenta e define formalmente a fundamentação teórica necessária para a compreensão do trabalho, dentre eles inteligência artificial, agente inteligente, percepção e planejamento automatizado;
+    \item O capítulo 3 é um compilado de alguns trabalhos relacionados, que exploram o problema de percepções inválidas de diferentes maneiras;
+    \item O capítulo 4 apresenta e define formalmente o modelo HAIL;
+    \item O capítulo 5 descreve os experimentos realizados para testar o modelo HAIL e apresenta seus resultados;
+    \item O capítulo 6 contém as considerações finais e os trabalhos futuros.
+\end{itemize}

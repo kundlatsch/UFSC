@@ -1,0 +1,98 @@
+\chapter{Planejamento}
+
+\section{Escopo}
+
+O trabalho consiste na análise do estado da arte na área de percepção em agentes inteligentes, com ênfase em soluções para a correção de percepções incompletas ou errôneas, a proposta de um modelo formal para o tratamento destas percepções inválidas, a implementação do modelo proposto livre de um domínio específico, a realização de simulações para testar a implementação e a análise dos dados obtidos.
+
+Esse trabalho de conclusão de curso é uma lapidação do trabalho que foi desenvolvido pelo autor como bolsista PIBIC nos ciclos de 2018-2019 e 2019-2020.
+
+\section{Método de Pesquisa}
+
+A pesquisa será realizada através de uma revisão do estado da arte, a proposta de um modelo e a análise de tal modelo utilizando o \textit{factorial design} \cite{jain1990art}, mais especificamente o $2^k$ fatorial. Esse tipo de design consiste em variar $k$ fatores em 2 níveis diferentes, -1 e 1, que são extremos opostos. Por exemplo, em uma pesquisa ligada a um processador, um fator pode ser o número de núcleos, e seus níveis serem 1 núcleo e 8 núcleos. Portanto, o fator é uma variável livre, que é utilizada para analisar a variação de uma variável dependente qualquer. Para analisar os dados gerados, eles serão processados, apresentados em tabelas e dispostos em gráficos.
+
+A pesquisa da parte teórica será feita através de livros e artigos das áreas abordadas (inteligência artificial, agentes, percepção e planejamento automatizado), enquanto a parte prática utilizará a linguagem de programação Python, tanto na implementação e simulação do modelo quanto no processamento dos dados.
+
+\section{Custo}
+
+Os custos não foram estimados, pois são constituídos apenas pelas horas trabalhadas dos professores envolvidos, uma vez que aquisições adicionais não são necessárias. O autor não recebe bolsa de pesquisa, portanto o projeto também não possui orçamento.
+
+\section{Cronograma}
+
+O gráfico de Gantt do cronograma é apresentado na tabela 2.1. Devido a pandemia do novo corona vírus, o cronograma pode ser alterado. As atividades iniciais são revisões, pois o texto já foi iniciado, conforme descrito no escopo. As atividades de desenvolvimento são verificações pois a implementação já foi realizada pelo autor, mas testes podem detectar erros que ainda não foram identificados.
+
+% Please add the following required packages to your document preamble:
+% \usepackage[table,xcdraw]{xcolor}
+% If you use beamer only pass "xcolor=table" option, i.e. \documentclass[xcolor=table]{beamer}
+\begin{table}[H]
+\resizebox{\textwidth}{!}{\begin{tabular}{ccccccccccc}
+\rowcolor[HTML]{CBCEFB} 
+\cellcolor[HTML]{C0C0C0}\textbf{Atividade}                        & dez. & jan. & fev. & mar. & abr. & mai. & jun. & jul. & ago. & set. \\
+Revisão da pesquisa do estado da arte                             & X    & X    &      &      &      &      &      &      &      &      \\
+Revisão do modelo proposto                                        &      & X    & X    &      &      &      &      &      &      &      \\
+Entrega parcial para TCC 1                                        &      &      & X    &      &      &      &      &      &      &      \\
+Verificar corretude da implementação do modelo                    &      &      &      & X    & X    & X    &      &      &      &      \\
+Verificar dados obtidos e executar nova simulação caso necessário &      &      &      & X    & X    & X    &      &      &      &      \\
+Terminar rascunho do TCC                                          &      &      &      &      &      & X    & X    &      &      &      \\
+Entregar rascunho do TCC                                          &      &      &      &      &      &      &      & X    &      &      \\
+Preparação para a defesa pública                                  &      &      &      &      &      &      &      & X    &      &      \\
+Defesa pública                                                    &      &      &      &      &      &      &      &      & X    &      \\
+Ajustes no relatório final                                        &      &      &      &      &      &      &      &      & X    & X   
+\end{tabular}}
+\caption{Gráfico de Grantt.}
+\end{table}
+
+\section{Recursos Humanos}
+
+Os recursos humanos do projeto e seus papéis estão descritos na tabela 2.2.
+
+\begin{table}[H]
+\centering
+\resizebox{0.7\textwidth}{!}{\begin{tabular}{cc}
+\rowcolor[HTML]{CBCEFB} 
+\textbf{Nome}              & \textbf{Papel}              \\
+Gustavo Emanuel Kundlatsch & Autor                       \\
+Thiago Ângelo Gelaim       & Orientador                  \\
+Elder Rizzon Santos        & Co-orientador e Responsável \\
+Renato Cislaghi            & Professor das disciplinas de TCC\\
+A definir                  & Membro da Banca             \\
+A definir                  & Membro da Banca            
+\end{tabular}}
+\caption{Recursos humanos.}
+\end{table}
+
+\section{Comunicação}
+
+Devido a pandemia, o projeto precisa ser desenvolvido de maneira completamente remota até o retorno das atividades presenciais da UFSC. Dessa forma, as reuniões de orientação precisam ser feitas por alguma ferramenta online (optamos pela ferramenta \textit{hangouts}). O fluxo de comunicação está descrito na tabela 2.3
+
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|}
+\hline
+\rowcolor[HTML]{CBCEFB} 
+\textbf{O que}       & \textbf{Por quem} & \textbf{Para quem}                                                                                      & \textbf{Como}  & \textbf{Frequência} \\ \hline
+Proposta de projeto  & Autor             & \begin{tabular}[c]{@{}c@{}}Orientador, Co-orientador e \\ Professor das disciplinas de TCC\end{tabular} & Sistema de TCC & Singular            \\ \hline
+Andamento do projeto & Autor             & Orientador e Co-orientador                                                                              & Hangouts       & Quando necessário   \\ \hline
+Relatório de TCC I   & Autor             & \begin{tabular}[c]{@{}c@{}}Orientador, Co-orientador e \\ Professor das disciplinas de TCC\end{tabular} & Sistema de TCC & Singular            \\ \hline
+Relatório de TCC II  & Autor             & \begin{tabular}[c]{@{}c@{}}Orientador, Co-orientador e \\ Professor das disciplinas de TCC\end{tabular} & Sistema de TCC & Singular      \\ \hline
+\end{tabular}}
+\caption{Fluxo de comunicação.}
+\label{tab:my-table}
+\end{table}
+
+\section{Riscos}
+
+Os riscos mais prováveis e perigosos levantados foram apresentados na tabela 2.4. 
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{\begin{tabular}{|l|l|l|l|l|}
+\hline
+\rowcolor[HTML]{CBCEFB} 
+\textbf{Risco}               & \textbf{Probabilidade} & \textbf{Impacto} & \textbf{Estratégia de Resposta}         & \textbf{Ações de Prevenção}    \\ \hline
+Perda de Dados               & Baixa                  & Baixo            & Realizar simulações novamente           & Criar backups dos dados        \\ \hline
+Resultados Insatisfatórios   & Baixa                  & Alto             & Adaptar modelo para suprir necessidades & Análise do estado da arte      \\ \hline
+Dificuldade de Implementação & Médio                  & Médio            & Estudar a linguagem através de cursos   & Implementar provas de conceito \\ \hline
+\end{tabular}}
+\caption{Riscos ativos.}
+\label{tab:my-table}
+\end{table}

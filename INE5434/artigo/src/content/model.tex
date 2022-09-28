@@ -1,0 +1,67 @@
+\section{Modelo proposto}
+
+O modelo proposto foi inspirado pelos conceitos de ilusão e alucinação apresentados na Seção \ref{anomalias}, que o nomeiam -- o nome HAIL vem da junção das palavras \textit{hallucination} e \textit{illusion}, alucinação e ilusão em inglês, respectivamente. Seu objetivo é identificar anomalias nas percepções recebidas por um agente qualquer e torná-las informação úteis na forma de novos planos.
+
+O modelo HAIL foi desenvolvido para que seja possível adicioná-lo a qualquer agente, independente de arquitetura cognitiva, como um componente que conecta as percepções vindas do ambiente ao agente. O HAIL pode ser separado em dois módulos, como mostra a Figura \ref{fig:method}. De maneira geral, o funcionamento e a comunicação desses módulos se dá da seguinte maneira:
+
+\begin{enumerate}
+    \item As percepções recebidas pelo modelo são refinadas pelo módulo de refinamento;
+    \item As percepções refinadas passam pelo módulo de alucinação e ilusão onde são categorizadas entre:  percepções válidas, alucinações, ilusões classe 1 e ilusões classe 2. 
+    \item As percepções válidas são encaminhadas para o raciocínio do agente, enquanto as anomalias continuam no módulo de alucinação e ilusão armazenadas em estruturas chamadas de bloco avaliador;
+    \item Quando os requisitos estabelecidos pelo bloco avaliador são cumpridos, as anomalias são selecionadas para passarem pelo processo de planejamento automatizado, alimentando o agente com novos planos.
+\end{enumerate}
+    
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{images/modelo_geral.png}
+    \caption{Visão geral do modelo HAIL.}
+    \label{fig:method}
+\end{figure}
+
+\subsection{Módulo de refinamento}
+
+\label{refinamento}
+
+O módulo de refinamento funciona como uma primeiro filtro para que percepções indesejadas pelo agente não cheguem até seu ciclo de raciocínio. O processo de refinamento é descrito pela Definição \ref{def:refinamento}.
+
+O processo de refinamento não é obrigatório. Caso não seja de interesse de uma determina implementação do HAIL refinar suas percepções, basta que a função do módulo de refinamento seja a função identidade $f(x) = x$, possuindo assim $\rho = p$.
+
+\subsection{Módulo de alucinação e ilusão}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/diagrama-modelo.png}
+    \caption{Módulo de alucinação e ilusão.}
+    \label{fig:model}
+\end{figure}
+ 
+ A Figura \ref{fig:model} apresenta um diagrama do funcionamento do módulo de alucinação e ilusão. Sua função é receber todas as percepções que passaram pelo processo de refinamento, e detectar quais delas são anomalias. Para isso, esse módulo utiliza uma cadeia de decisores descrita pelo Algoritmo \ref{algorithm:decisor}. Depois de serem classificadas pelos decisores, as anomalias são guardadas em seus respectivos blocos avaliadores.
+
+\begin{algorithm}[H]
+\Entrada{contexto \textit{c} do agente, percepção $\rho(x)$}
+\Inicio{
+ \label{algorithm:decisor}
+  \uSe{$\rho(x)$ está em \textit{c}}{
+  $\rho(x)$ é uma percepção válida\;
+  }\uSenaoSe{nem $\rho$ nem $x$ estão em c}{
+  $\rho(x)$ é uma alucinação\;
+  }\uSenaoSe{$\rho$ está em \texttt{c}}{
+  $\rho(x)$ é uma ilusão classe 1\;
+  }\Senao{$\rho(x)$ é uma ilusão classe 2}
+}
+ \caption{Funcionamento dos decisores do módulo de alucinação e ilusão.}
+\end{algorithm}
+
+\subsubsection{Bloco avaliador}
+
+O objetivo do bloco avaliador é decidir quando alucinações e ilusões que foram recebidas devem ser processadas, evitando que o planejamento automatizado que será realizado em seguida tenha impacto no tempo de execução de um ciclo de raciocínio do agente. Para isso, utilizamos uma lista ordenada por peso como escalonador. O principio do funcionamento da lista ordenada por peso é o mesmo de uma fila, \textit{first in first out} (FIFO), mas atribui um peso a cada entrada que aumenta quando novos elementos iguais são inseridos. Quando um elemento é inserido pela primeira vez na fila, ele recebe o peso 1, e quando uma cópia do mesmo elemento é inserida o elemento tem seu peso aumentado em 1. Quando uma operação de remoção é executada, o elemento de maior peso é removido. Se dois ou mais elementos tiverem o maior peso, aquele que foi inserido primeiro é removido.
+
+O bloco avaliador seleciona quando uma percepção deve ser tratada através de uma função matemática, levando em conta o tempo médio de processamento de uma percepção válida e de uma anomalia. Além desse funcionamento básico, o bloco avaliador ainda contém um mecanismo para remover anomalias classificadas com irrelevantes para o sistema, através de uma função de limpeza. Caso essa função retorne verdadeiro, todos os elementos de peso 1 da sua respectiva lista são removidos. Essas duas funções são descritas com mais detalhes na Seção \ref{section:formalizacao}.
+
+\subsubsection{Bloco de planejamento automatizado}
+
+O bloco de planejamento automatizado é potencialmente a parte mais custosa computacionalmente, o que pode ser um gargalo do sistema, principalmente caso o agente funcione em tempo real e receba um volume muito elevado de percepções por segundo. Um planejamento automatizado implementado de maneira puramente simbólica tende a ser complexo computacionalmente, uma vez que pode considerar milhares de alternativas para o estado de mundo atual, tentando chegar mais perto de seu objetivo. Um processo de planejamento automatizado conexionista é uma alternativa, uma vez que estamos tratando de uma análise incompleta do mundo. Caso seja possível, teorias com maior custo computacional (como criatividade computacional \cite{colton2012computational}) podem ser aplicadas aqui para um resultado ainda mais preciso.
+
+Uma percepção chega ao bloco de planejamento automatizado uma vez que ela seja a primeira na fila ponderada e a função de processamento retorne verdadeiro em sua verificação. De um ciclo para outro, as percepções permanecem na fila, a não ser que sejam descartadas pelo mecanismo de limpeza. Nosso modelo não explicita qual é a ordem que os blocos avaliadores devem processar suas filas para mandar anomalias para o planejamento automatizado (isto é, se deve primeiro ser priorizada as anomalias do bloco avaliador de alucinações, ilusões classe 1 ou ilusões classe 2), ficando a cargo da implementação em questão tomar essa decisão.
+
+\input{content/formalization}

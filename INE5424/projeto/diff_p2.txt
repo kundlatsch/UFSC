@@ -1,0 +1,2998 @@
+diff --git a/app/e6b_test/e6b_test.cc b/app/e6b_test/e6b_test.cc
+new file mode 100644
+index 0000000..c657fda
+--- /dev/null
++++ b/app/e6b_test/e6b_test.cc
+@@ -0,0 +1,76 @@
++#include <utility/ostream.h>
++#include <process.h>
++
++using namespace EPOS;
++
++OStream cout;
++
++
++char * test_char = new (SHARED) char('a');
++
++int test1_b() {
++    *test_char = 'b';
++    return 0;
++}
++
++int test1_c() {
++    *test_char = 'c';
++    return 0;
++}
++
++int main() {
++
++    cout << "-----------------------" << endl;
++    cout << "Shared memory test" << endl;
++    cout << "-----------------------" << endl;
++
++    // Test 1: create a global variable in the shared memory 
++    // and manipulate it with two different threads
++    Thread * test1_b_thread = new Thread(&test1_b);
++    Thread * test1_c_thread = new Thread(&test1_c);
++
++    test1_b_thread->join();
++    test1_c_thread->join();
++
++    cout << "Asserting test char value" << endl;
++    assert(*test_char != 'a');
++    assert(*test_char != 'b');
++    assert(*test_char == 'c');
++
++    delete test_char;
++
++    // Test 2: after deleting a variable from the shared memory,
++    // create another one and change it's value
++    int * test_int = new (SHARED) int;
++    *test_int = 0;
++    *test_int += 1;
++
++    cout << "Asserting test int value" << endl;
++    assert(*test_int != 0);
++    assert(*test_int == 1);
++    assert(*test_int != 2);
++
++    delete test_int;
++
++    // Test 3: create and change the value of a variable
++    // using the default and the shared new operator
++
++    cout << "Asserting values of different operators" << endl;
++
++    int * test_shared_new = new (SHARED) int;
++    int * test_default_new = new int;
++    
++    *test_shared_new = 0;
++    *test_default_new = 1;
++
++    ++*test_shared_new;
++    ++*test_default_new;
++
++    assert(*test_shared_new == 1);
++    assert(*test_default_new == 2);
++
++    delete test_shared_new;
++    delete test_default_new;
++    
++    cout << "Finishing test..." << endl;
++}
+\ No newline at end of file
+diff --git a/app/e6b_test/e6b_test_traits.h b/app/e6b_test/e6b_test_traits.h
+new file mode 100644
+index 0000000..2d8b759
+--- /dev/null
++++ b/app/e6b_test/e6b_test_traits.h
+@@ -0,0 +1,155 @@
++#ifndef __traits_h
++#define __traits_h
++
++#include <system/config.h>
++
++__BEGIN_SYS
++
++// Build
++template<> struct Traits<Build>: public Traits_Tokens
++{
++    // Basic configuration
++    static const unsigned int MODE = LIBRARY;
++    static const unsigned int ARCHITECTURE = ARMv7;
++    static const unsigned int MACHINE = Cortex;
++    static const unsigned int MODEL = Raspberry_Pi3;
++    static const unsigned int CPUS = 1;
++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
++
++    // Default flags
++    static const bool enabled = true;
++    static const bool monitored = false;
++    static const bool debugged = true;
++    static const bool hysterically_debugged = false;
++
++    // Default aspects
++    typedef ALIST<> ASPECTS;
++};
++
++
++// Utilities
++template<> struct Traits<Debug>: public Traits<Build>
++{
++    static const bool error   = true;
++    static const bool warning = true;
++    static const bool info    = false;
++    static const bool trace   = false;
++};
++
++template<> struct Traits<Lists>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Spin>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Heaps>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Observers>: public Traits<Build>
++{
++    // Some observed objects are created before initializing the Display
++    // Enabling debug may cause trouble in some Machines
++    static const bool debugged = false;
++};
++
++
++// System Parts (mostly to fine control debugging)
++template<> struct Traits<Boot>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Setup>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Init>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Framework>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Aspect>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++
++__END_SYS
++
++// Mediators
++#include __ARCHITECTURE_TRAITS_H
++#include __MACHINE_TRAITS_H
++
++__BEGIN_SYS
++
++
++// API Components
++template<> struct Traits<Application>: public Traits<Build>
++{
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
++};
++
++template<> struct Traits<System>: public Traits<Build>
++{
++    static const unsigned int mode = Traits<Build>::MODE;
++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++    static const bool multiheap = true;
++    static const bool sharedmemory = true;
++
++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
++
++    static const bool reboot = true;
++
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
++};
++
++template<> struct Traits<Task>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multitask;
++};
++
++template<> struct Traits<Thread>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++    static const bool smp = Traits<System>::multicore;
++    static const bool trace_idle = hysterically_debugged;
++    static const bool simulate_capacity = false;
++
++    static const bool preemptive = true;
++    static const unsigned int QUANTUM = 10000; // us
++};
++
++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
++{
++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
++};
++
++template<> struct Traits<Synchronizer>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++};
++
++template<> struct Traits<Alarm>: public Traits<Build>
++{
++    static const bool visible = hysterically_debugged;
++};
++
++
++__END_SYS
++
++#endif
+\ No newline at end of file
+diff --git a/app/e6b_test/makefile b/app/e6b_test/makefile
+new file mode 100644
+index 0000000..8a6578a
+--- /dev/null
++++ b/app/e6b_test/makefile
+@@ -0,0 +1,17 @@
++# EPOS Application Makefile
++
++include ../../makedefs
++
++all: install
++
++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
++
++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
++		$(ACC) $(ACCFLAGS) -o $@ $<
++
++install: $(APPLICATION)
++		$(INSTALL) $(APPLICATION) $(IMG)
++
++clean:
++		$(CLEAN) *.o $(APPLICATION)
+diff --git a/app/e7b_test/e7b_test.cc b/app/e7b_test/e7b_test.cc
+new file mode 100644
+index 0000000..9508a9e
+--- /dev/null
++++ b/app/e7b_test/e7b_test.cc
+@@ -0,0 +1,43 @@
++#include <utility/ostream.h>
++#include <real-time.h>
++
++using namespace EPOS;
++
++OStream cout;
++
++int testing();
++
++int main()
++{
++    Periodic_Thread::Configuration conf_a{5000, 1000, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
++    Periodic_Thread::Configuration conf_b{1500, 500, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
++    Periodic_Thread::Configuration conf_c{25000, 5000, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
++
++    Periodic_Thread * a = new Periodic_Thread(conf_a, &testing);
++    Periodic_Thread * b = new Periodic_Thread(conf_b, &testing);
++    Periodic_Thread * c = new Periodic_Thread(conf_c, &testing);
++
++    a -> join();
++    b -> join();
++    c -> join();
++
++
++    delete a;
++    delete b;
++    delete c;
++
++    cout << "Finishing test..." << endl;
++
++    return 0;
++}
++
++int testing() {
++  int i = 0;
++  while ((i < 10) and Periodic_Thread::wait_next()) // iterator stops infinite runs.
++  {
++    cout << "Job finished\n" << endl;
++    i++;
++  }
++
++  return 0;
++}
+\ No newline at end of file
+diff --git a/app/e7b_test/e7b_test.h b/app/e7b_test/e7b_test.h
+new file mode 100644
+index 0000000..458ea1a
+--- /dev/null
++++ b/app/e7b_test/e7b_test.h
+@@ -0,0 +1,159 @@
++#ifndef __traits_h
++#define __traits_h
++
++#include <system/config.h>
++
++__BEGIN_SYS
++
++// Build
++template<> struct Traits<Build>: public Traits_Tokens
++{
++    // Basic configuration
++    static const unsigned int MODE = LIBRARY;
++    static const unsigned int ARCHITECTURE = ARMv7;
++    static const unsigned int MACHINE = Cortex;
++    static const unsigned int MODEL = Raspberry_Pi3;
++    static const unsigned int CPUS = 1;
++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
++
++    // Default flags
++    static const bool enabled = true;
++    static const bool monitored = false;
++    static const bool debugged = false;
++    static const bool hysterically_debugged = false;
++
++    // Default aspects
++    typedef ALIST<> ASPECTS;
++};
++
++
++// Utilities
++template<> struct Traits<Debug>: public Traits<Build>
++{
++    static const bool error   = true;
++    static const bool warning = false;
++    static const bool info    = false;
++    static const bool trace   = true;
++};
++
++template<> struct Traits<Lists>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Spin>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Heaps>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Observers>: public Traits<Build>
++{
++    // Some observed objects are created before initializing the Display
++    // Enabling debug may cause trouble in some Machines
++    static const bool debugged = false;
++};
++
++
++// System Parts (mostly to fine control debugging)
++template<> struct Traits<Boot>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Setup>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Init>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Framework>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Aspect>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++
++__END_SYS
++
++// Mediators
++#include __ARCHITECTURE_TRAITS_H
++#include __MACHINE_TRAITS_H
++
++__BEGIN_SYS
++
++
++// API Components
++template<> struct Traits<Application>: public Traits<Build>
++{
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
++};
++
++template<> struct Traits<System>: public Traits<Build>
++{
++    static const unsigned int mode = Traits<Build>::MODE;
++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++    static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
++    static const bool sharedmemory = true;
++
++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
++
++    static const bool reboot = true;
++
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
++};
++
++template<> struct Traits<Task>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multitask;
++};
++
++template<> struct Traits<Thread>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++    static const bool smp = Traits<System>::multicore;
++    static const bool trace_idle = hysterically_debugged;
++    static const bool simulate_capacity = false;
++
++    typedef DM Criterion;
++    static const unsigned int QUANTUM = 10000; // us
++};
++
++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
++{
++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
++};
++
++template<> struct Traits<Synchronizer>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++};
++
++template<> struct Traits<Alarm>: public Traits<Build>
++{
++    static const bool visible = hysterically_debugged;
++};
++
++template<> struct Traits<DM>: public Traits<Build>
++{
++    static const bool debugged = true;
++};
++
++__END_SYS
++
++#endif
+\ No newline at end of file
+diff --git a/app/e7b_test/makefile b/app/e7b_test/makefile
+new file mode 100644
+index 0000000..8a6578a
+--- /dev/null
++++ b/app/e7b_test/makefile
+@@ -0,0 +1,17 @@
++# EPOS Application Makefile
++
++include ../../makedefs
++
++all: install
++
++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
++
++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
++		$(ACC) $(ACCFLAGS) -o $@ $<
++
++install: $(APPLICATION)
++		$(INSTALL) $(APPLICATION) $(IMG)
++
++clean:
++		$(CLEAN) *.o $(APPLICATION)
+diff --git a/app/hello/hello_traits.h b/app/hello/hello_traits.h
+index 39f4b4c..68e81c6 100644
+--- a/app/hello/hello_traits.h
++++ b/app/hello/hello_traits.h
+@@ -106,7 +106,8 @@ template<> struct Traits<System>: public Traits<Build>
+     static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
+     static const bool multitask = (mode != Traits<Build>::LIBRARY);
+     static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
+-    static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
++    static const bool multiheap = true;
++    static const bool sharedmemory = true;
+ 
+     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
+     static const unsigned int DUTY_CYCLE = 1000000; // ppm
+diff --git a/app/p2_tests_addr_segment/makefile b/app/p2_tests_addr_segment/makefile
+new file mode 100644
+index 0000000..8a6578a
+--- /dev/null
++++ b/app/p2_tests_addr_segment/makefile
+@@ -0,0 +1,17 @@
++# EPOS Application Makefile
++
++include ../../makedefs
++
++all: install
++
++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
++
++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
++		$(ACC) $(ACCFLAGS) -o $@ $<
++
++install: $(APPLICATION)
++		$(INSTALL) $(APPLICATION) $(IMG)
++
++clean:
++		$(CLEAN) *.o $(APPLICATION)
+diff --git a/app/p2_tests_addr_segment/p2_tests_addr_segment.cc b/app/p2_tests_addr_segment/p2_tests_addr_segment.cc
+new file mode 100644
+index 0000000..9658edb
+--- /dev/null
++++ b/app/p2_tests_addr_segment/p2_tests_addr_segment.cc
+@@ -0,0 +1,39 @@
++#include <time.h>
++#include <process.h>
++#include <machine.h>
++#include <system.h>
++
++using namespace EPOS;
++
++int print_inf();
++int func_a();
++
++OStream cout;
++
++int main()
++{
++
++    cout << "-----------------------------" << endl;
++    cout << "Addres Space and Segment Test" << endl;
++    cout << "-----------------------------" << endl;
++    
++    System_Info * si = System::info();
++    cout << "System_Info app location" << endl;
++    cout << "App code segment = " << CPU::Phy_Addr(si->pmm.app_code) << endl;
++    cout << "App data segment = " << CPU::Phy_Addr(si->pmm.app_data) << endl;
++
++    Task * task = Task::self();
++    Address_Space * as = task->address_space();
++    cout << "Task address_space pd = " << as->pd() << endl;
++
++    CPU::Log_Addr code = task->code();
++    cout << "Testing APP_CODE..." << endl;
++    assert(code == Memory_Map::APP_CODE);
++
++    CPU::Log_Addr data = task->data();
++    cout << "Testing APP_DATA.." << endl;
++    assert(data == Memory_Map::APP_DATA);
++
++    cout << "Finishing test..." << endl;
++    
++}
+\ No newline at end of file
+diff --git a/app/p2_tests_addr_segment/p2_tests_addr_segment_traits.h b/app/p2_tests_addr_segment/p2_tests_addr_segment_traits.h
+new file mode 100644
+index 0000000..68e81c6
+--- /dev/null
++++ b/app/p2_tests_addr_segment/p2_tests_addr_segment_traits.h
+@@ -0,0 +1,155 @@
++#ifndef __traits_h
++#define __traits_h
++
++#include <system/config.h>
++
++__BEGIN_SYS
++
++// Build
++template<> struct Traits<Build>: public Traits_Tokens
++{
++    // Basic configuration
++    static const unsigned int MODE = BUILTIN;
++    static const unsigned int ARCHITECTURE = ARMv8;
++    static const unsigned int MACHINE = Cortex;
++    static const unsigned int MODEL = Raspberry_Pi3;
++    static const unsigned int CPUS = 1;
++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
++
++    // Default flags
++    static const bool enabled = true;
++    static const bool monitored = false;
++    static const bool debugged = true;
++    static const bool hysterically_debugged = false;
++
++    // Default aspects
++    typedef ALIST<> ASPECTS;
++};
++
++
++// Utilities
++template<> struct Traits<Debug>: public Traits<Build>
++{
++    static const bool error   = true;
++    static const bool warning = true;
++    static const bool info    = false;
++    static const bool trace   = false;
++};
++
++template<> struct Traits<Lists>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Spin>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Heaps>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Observers>: public Traits<Build>
++{
++    // Some observed objects are created before initializing the Display
++    // Enabling debug may cause trouble in some Machines
++    static const bool debugged = false;
++};
++
++
++// System Parts (mostly to fine control debugging)
++template<> struct Traits<Boot>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Setup>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Init>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Framework>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Aspect>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++
++__END_SYS
++
++// Mediators
++#include __ARCHITECTURE_TRAITS_H
++#include __MACHINE_TRAITS_H
++
++__BEGIN_SYS
++
++
++// API Components
++template<> struct Traits<Application>: public Traits<Build>
++{
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
++};
++
++template<> struct Traits<System>: public Traits<Build>
++{
++    static const unsigned int mode = Traits<Build>::MODE;
++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++    static const bool multiheap = true;
++    static const bool sharedmemory = true;
++
++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
++
++    static const bool reboot = true;
++
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
++};
++
++template<> struct Traits<Task>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multitask;
++};
++
++template<> struct Traits<Thread>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++    static const bool smp = Traits<System>::multicore;
++    static const bool trace_idle = hysterically_debugged;
++    static const bool simulate_capacity = false;
++
++    typedef RR Criterion;
++    static const unsigned int QUANTUM = 10000; // us
++};
++
++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
++{
++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
++};
++
++template<> struct Traits<Synchronizer>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++};
++
++template<> struct Traits<Alarm>: public Traits<Build>
++{
++    static const bool visible = hysterically_debugged;
++};
++
++
++__END_SYS
++
++#endif
+diff --git a/app/p2_tests_task/makefile b/app/p2_tests_task/makefile
+new file mode 100644
+index 0000000..8a6578a
+--- /dev/null
++++ b/app/p2_tests_task/makefile
+@@ -0,0 +1,17 @@
++# EPOS Application Makefile
++
++include ../../makedefs
++
++all: install
++
++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
++
++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
++		$(ACC) $(ACCFLAGS) -o $@ $<
++
++install: $(APPLICATION)
++		$(INSTALL) $(APPLICATION) $(IMG)
++
++clean:
++		$(CLEAN) *.o $(APPLICATION)
+diff --git a/app/p2_tests_task/p2_tests_task.cc b/app/p2_tests_task/p2_tests_task.cc
+new file mode 100644
+index 0000000..213e391
+--- /dev/null
++++ b/app/p2_tests_task/p2_tests_task.cc
+@@ -0,0 +1,42 @@
++#include <time.h>
++#include <process.h>
++#include <machine.h>
++#include <utility/fork.h>
++#include <system.h>
++
++using namespace EPOS;
++
++int print_inf();
++int func_a();
++
++OStream cout;
++
++int main()
++{
++    if (Task::self()->id() == 0) {
++        cout << "-----------------------" << endl;
++        cout << "Task Tests" << endl;
++        cout << "-----------------------" << endl;
++        fork(&main);
++    }
++    if (Task::self()->id() == 1) {
++        cout << "    -> Forked from main function " << endl;
++        int t_id = Task::self()->id();
++        assert(t_id == 1);
++        return 0;
++    }
++
++    Address_Space * as = Task::self()->address_space();
++    cout << "Address_Space pd = " << as->pd() << endl;
++
++    cout << "Task code addr = " << static_cast<void *>(Task::self()->code()) << endl;
++    cout << "Address_Space code physical addr = " << static_cast<void *>(as->physical(Task::self()->code())) << endl;
++    cout << "code_segment size = " << Task::self()->code_segment()->size() << endl;
++
++    cout << "Task data addr = " << static_cast<void *>(Task::self()->data()) << endl;
++    cout << "Address_Space data physical addr = " << static_cast<void *>(as->physical(Task::self()->data())) << endl;
++    cout << "data_segment size = " << Task::self()->data_segment()->size() << endl;
++
++    cout << "Finishing test..." << endl;
++    return 0;
++}
+diff --git a/app/p2_tests_task/p2_tests_task_traits.h b/app/p2_tests_task/p2_tests_task_traits.h
+new file mode 100644
+index 0000000..68e81c6
+--- /dev/null
++++ b/app/p2_tests_task/p2_tests_task_traits.h
+@@ -0,0 +1,155 @@
++#ifndef __traits_h
++#define __traits_h
++
++#include <system/config.h>
++
++__BEGIN_SYS
++
++// Build
++template<> struct Traits<Build>: public Traits_Tokens
++{
++    // Basic configuration
++    static const unsigned int MODE = BUILTIN;
++    static const unsigned int ARCHITECTURE = ARMv8;
++    static const unsigned int MACHINE = Cortex;
++    static const unsigned int MODEL = Raspberry_Pi3;
++    static const unsigned int CPUS = 1;
++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
++
++    // Default flags
++    static const bool enabled = true;
++    static const bool monitored = false;
++    static const bool debugged = true;
++    static const bool hysterically_debugged = false;
++
++    // Default aspects
++    typedef ALIST<> ASPECTS;
++};
++
++
++// Utilities
++template<> struct Traits<Debug>: public Traits<Build>
++{
++    static const bool error   = true;
++    static const bool warning = true;
++    static const bool info    = false;
++    static const bool trace   = false;
++};
++
++template<> struct Traits<Lists>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Spin>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Heaps>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Observers>: public Traits<Build>
++{
++    // Some observed objects are created before initializing the Display
++    // Enabling debug may cause trouble in some Machines
++    static const bool debugged = false;
++};
++
++
++// System Parts (mostly to fine control debugging)
++template<> struct Traits<Boot>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Setup>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Init>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Framework>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Aspect>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++
++__END_SYS
++
++// Mediators
++#include __ARCHITECTURE_TRAITS_H
++#include __MACHINE_TRAITS_H
++
++__BEGIN_SYS
++
++
++// API Components
++template<> struct Traits<Application>: public Traits<Build>
++{
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
++};
++
++template<> struct Traits<System>: public Traits<Build>
++{
++    static const unsigned int mode = Traits<Build>::MODE;
++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++    static const bool multiheap = true;
++    static const bool sharedmemory = true;
++
++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
++
++    static const bool reboot = true;
++
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
++};
++
++template<> struct Traits<Task>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multitask;
++};
++
++template<> struct Traits<Thread>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++    static const bool smp = Traits<System>::multicore;
++    static const bool trace_idle = hysterically_debugged;
++    static const bool simulate_capacity = false;
++
++    typedef RR Criterion;
++    static const unsigned int QUANTUM = 10000; // us
++};
++
++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
++{
++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
++};
++
++template<> struct Traits<Synchronizer>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++};
++
++template<> struct Traits<Alarm>: public Traits<Build>
++{
++    static const bool visible = hysterically_debugged;
++};
++
++
++__END_SYS
++
++#endif
+diff --git a/e6b.diff b/e6b.diff
+new file mode 100644
+index 0000000..e69de29
+diff --git a/e7b.diff b/e7b.diff
+new file mode 100644
+index 0000000..c5e96e1
+--- /dev/null
++++ b/e7b.diff
+@@ -0,0 +1,941 @@
++diff --git a/Dockerfile b/Dockerfile
++new file mode 100644
++index 0000000..33be31f
++--- /dev/null
+++++ b/Dockerfile
++@@ -0,0 +1,51 @@
+++FROM ubuntu:focal
+++
+++WORKDIR /home
+++
+++ENV TZ=America/Sao_Paulo
+++RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ
+++
+++RUN apt-get update && \
+++    apt-get install -y \
+++        bc \
+++        bin86 \
+++        build-essential \
+++        g++-multilib \
+++        gcc-multilib \
+++        gdb \
+++        gdb-multiarch \
+++        make \
+++        python3 \
+++        python3-pip \
+++        qemu \
+++        qemu-kvm \
+++        qemu-system-arm \
+++        tar \
+++        tcsh \
+++        wget \
+++        xterm && \
+++    apt-get clean && \
+++    rm -rf /var/lib/apt/lists/*
+++
+++RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb && \
+++    dpkg -i dumb-init_*.deb && \
+++    rm dumb-init_*.deb
+++
+++RUN wget -q -O ia32.tar.gz https://epos.lisha.ufsc.br/dl469 && \
+++    tar -zxvf ia32.tar.gz && \
+++    mkdir -p /usr/local/ia32/ && \
+++    mv gcc-7.2.0 /usr/local/ia32/ && \
+++    rm -r ia32.tar.gz
+++
+++RUN wget -q -O arm.tar.gz https://epos.lisha.ufsc.br/dl468 && \
+++    tar -zxvf arm.tar.gz && \
+++    mkdir -p /usr/local/arm/ && \
+++    mv gcc-7.2.0 /usr/local/arm/ && \
+++    rm -r arm.tar.gz
+++
+++ENV PATH="${PATH}:/usr/local/arm/gcc-7.2.0/bin/"
+++
+++VOLUME /code
+++WORKDIR /code
+++
+++ENTRYPOINT ["/usr/bin/dumb-init", "--"]
++diff --git a/app/hello/hello_traits.h b/app/hello/hello_traits.h
++index 77a3de8..512cac1 100644
++--- a/app/hello/hello_traits.h
+++++ b/app/hello/hello_traits.h
++@@ -107,6 +107,7 @@ template<> struct Traits<System>: public Traits<Build>
++     static const bool multitask = (mode != Traits<Build>::LIBRARY);
++     static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++     static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
+++    static const bool sharedmemory = true;
++ 
++     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++     static const unsigned int DUTY_CYCLE = 1000000; // ppm
++diff --git a/app/philosophers_dinner/philosophers_dinner_traits.h b/app/philosophers_dinner/philosophers_dinner_traits.h
++index 77a3de8..512cac1 100644
++--- a/app/philosophers_dinner/philosophers_dinner_traits.h
+++++ b/app/philosophers_dinner/philosophers_dinner_traits.h
++@@ -107,6 +107,7 @@ template<> struct Traits<System>: public Traits<Build>
++     static const bool multitask = (mode != Traits<Build>::LIBRARY);
++     static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++     static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
+++    static const bool sharedmemory = true;
++ 
++     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++     static const unsigned int DUTY_CYCLE = 1000000; // ppm
++diff --git a/app/producer_consumer/producer_consumer_traits.h b/app/producer_consumer/producer_consumer_traits.h
++index 77a3de8..512cac1 100644
++--- a/app/producer_consumer/producer_consumer_traits.h
+++++ b/app/producer_consumer/producer_consumer_traits.h
++@@ -107,6 +107,7 @@ template<> struct Traits<System>: public Traits<Build>
++     static const bool multitask = (mode != Traits<Build>::LIBRARY);
++     static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++     static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
+++    static const bool sharedmemory = true;
++ 
++     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++     static const unsigned int DUTY_CYCLE = 1000000; // ppm
++diff --git a/app/test_deadline/makefile b/app/test_deadline/makefile
++new file mode 100644
++index 0000000..8a6578a
++--- /dev/null
+++++ b/app/test_deadline/makefile
++@@ -0,0 +1,17 @@
+++# EPOS Application Makefile
+++
+++include ../../makedefs
+++
+++all: install
+++
+++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
+++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
+++
+++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
+++		$(ACC) $(ACCFLAGS) -o $@ $<
+++
+++install: $(APPLICATION)
+++		$(INSTALL) $(APPLICATION) $(IMG)
+++
+++clean:
+++		$(CLEAN) *.o $(APPLICATION)
++diff --git a/app/test_deadline/test_deadline.cc b/app/test_deadline/test_deadline.cc
++new file mode 100644
++index 0000000..9508a9e
++--- /dev/null
+++++ b/app/test_deadline/test_deadline.cc
++@@ -0,0 +1,43 @@
+++#include <utility/ostream.h>
+++#include <real-time.h>
+++
+++using namespace EPOS;
+++
+++OStream cout;
+++
+++int testing();
+++
+++int main()
+++{
+++    Periodic_Thread::Configuration conf_a{5000, 1000, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
+++    Periodic_Thread::Configuration conf_b{1500, 500, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
+++    Periodic_Thread::Configuration conf_c{25000, 5000, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
+++
+++    Periodic_Thread * a = new Periodic_Thread(conf_a, &testing);
+++    Periodic_Thread * b = new Periodic_Thread(conf_b, &testing);
+++    Periodic_Thread * c = new Periodic_Thread(conf_c, &testing);
+++
+++    a -> join();
+++    b -> join();
+++    c -> join();
+++
+++
+++    delete a;
+++    delete b;
+++    delete c;
+++
+++    cout << "Finishing test..." << endl;
+++
+++    return 0;
+++}
+++
+++int testing() {
+++  int i = 0;
+++  while ((i < 10) and Periodic_Thread::wait_next()) // iterator stops infinite runs.
+++  {
+++    cout << "Job finished\n" << endl;
+++    i++;
+++  }
+++
+++  return 0;
+++}
++\ No newline at end of file
++diff --git a/app/test_deadline/test_deadline_traits.h b/app/test_deadline/test_deadline_traits.h
++new file mode 100644
++index 0000000..2805c20
++--- /dev/null
+++++ b/app/test_deadline/test_deadline_traits.h
++@@ -0,0 +1,159 @@
+++#ifndef __traits_h
+++#define __traits_h
+++
+++#include <system/config.h>
+++
+++__BEGIN_SYS
+++
+++// Build
+++template<> struct Traits<Build>: public Traits_Tokens
+++{
+++    // Basic configuration
+++    static const unsigned int MODE = LIBRARY;
+++    static const unsigned int ARCHITECTURE = ARMv7;
+++    static const unsigned int MACHINE = Cortex;
+++    static const unsigned int MODEL = Raspberry_Pi3;
+++    static const unsigned int CPUS = 1;
+++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
+++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
+++
+++    // Default flags
+++    static const bool enabled = true;
+++    static const bool monitored = false;
+++    static const bool debugged = false;
+++    static const bool hysterically_debugged = false;
+++
+++    // Default aspects
+++    typedef ALIST<> ASPECTS;
+++};
+++
+++
+++// Utilities
+++template<> struct Traits<Debug>: public Traits<Build>
+++{
+++    static const bool error   = true;
+++    static const bool warning = false;
+++    static const bool info    = false;
+++    static const bool trace   = true;
+++};
+++
+++template<> struct Traits<Lists>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++template<> struct Traits<Spin>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++template<> struct Traits<Heaps>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++template<> struct Traits<Observers>: public Traits<Build>
+++{
+++    // Some observed objects are created before initializing the Display
+++    // Enabling debug may cause trouble in some Machines
+++    static const bool debugged = false;
+++};
+++
+++
+++// System Parts (mostly to fine control debugging)
+++template<> struct Traits<Boot>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Setup>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Init>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Framework>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Aspect>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++
+++__END_SYS
+++
+++// Mediators
+++#include __ARCHITECTURE_TRAITS_H
+++#include __MACHINE_TRAITS_H
+++
+++__BEGIN_SYS
+++
+++
+++// API Components
+++template<> struct Traits<Application>: public Traits<Build>
+++{
+++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
+++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
+++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
+++};
+++
+++template<> struct Traits<System>: public Traits<Build>
+++{
+++    static const unsigned int mode = Traits<Build>::MODE;
+++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
+++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
+++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
+++    static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
+++    static const bool sharedmemory = true;
+++
+++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
+++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
+++
+++    static const bool reboot = true;
+++
+++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
+++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
+++};
+++
+++template<> struct Traits<Task>: public Traits<Build>
+++{
+++    static const bool enabled = Traits<System>::multitask;
+++};
+++
+++template<> struct Traits<Thread>: public Traits<Build>
+++{
+++    static const bool enabled = Traits<System>::multithread;
+++    static const bool smp = Traits<System>::multicore;
+++    static const bool trace_idle = hysterically_debugged;
+++    static const bool simulate_capacity = false;
+++
+++    typedef DM Criterion;
+++    static const unsigned int QUANTUM = 10000; // us
+++};
+++
+++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
+++{
+++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
+++};
+++
+++template<> struct Traits<Synchronizer>: public Traits<Build>
+++{
+++    static const bool enabled = Traits<System>::multithread;
+++};
+++
+++template<> struct Traits<Alarm>: public Traits<Build>
+++{
+++    static const bool visible = hysterically_debugged;
+++};
+++
+++template<> struct Traits<DM>: public Traits<Build>
+++{
+++    static const bool debugged = true;
+++};
+++
+++__END_SYS
+++
+++#endif
++diff --git a/app/test_shared_memory/makefile b/app/test_shared_memory/makefile
++new file mode 100644
++index 0000000..8a6578a
++--- /dev/null
+++++ b/app/test_shared_memory/makefile
++@@ -0,0 +1,17 @@
+++# EPOS Application Makefile
+++
+++include ../../makedefs
+++
+++all: install
+++
+++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
+++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
+++
+++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
+++		$(ACC) $(ACCFLAGS) -o $@ $<
+++
+++install: $(APPLICATION)
+++		$(INSTALL) $(APPLICATION) $(IMG)
+++
+++clean:
+++		$(CLEAN) *.o $(APPLICATION)
++diff --git a/app/test_shared_memory/test_shared_memory.cc b/app/test_shared_memory/test_shared_memory.cc
++new file mode 100644
++index 0000000..5d4a190
++--- /dev/null
+++++ b/app/test_shared_memory/test_shared_memory.cc
++@@ -0,0 +1,77 @@
+++#include <utility/ostream.h>
+++#include <process.h>
+++
+++using namespace EPOS;
+++
+++OStream cout;
+++
+++
+++char * test_char = new (SHARED) char('a');
+++
+++int test1_b() {
+++    *test_char = 'b';
+++    return 0;
+++}
+++
+++int test1_c() {
+++    *test_char = 'c';
+++    return 0;
+++}
+++
+++int main() {
+++
+++    cout << "-----------------------" << endl;
+++    cout << "Shared memory test" << endl;
+++    cout << "-----------------------" << endl;
+++
+++    // Test 1: create a global variable in the shared memory 
+++    // and manipulate it with two different threads
+++    Thread * test1_b_thread = new Thread(&test1_b);
+++    Thread * test1_c_thread = new Thread(&test1_c);
+++
+++    test1_b_thread->join();
+++    test1_c_thread->join();
+++
+++    cout << "Asserting test char value" << endl;
+++    assert(*test_char != 'a');
+++    assert(*test_char != 'b');
+++    assert(*test_char == 'c');
+++
+++    delete test_char;
+++
+++    // Test 2: after deleting a variable from the shared memory,
+++    // create another one and change it's value
+++    int * test_int = new (SHARED) int;
+++    *test_int = 0;
+++    *test_int += 1;
+++
+++    cout << "Asserting test int value" << endl;
+++    assert(*test_int != 0);
+++    assert(*test_int == 1);
+++    assert(*test_int != 2);
+++
+++    delete test_int;
+++
+++    // Test 3: create and change the value of a variable in the
+++    // system, application and shared heap
+++
+++    cout << "Asserting variables in different heaps" << endl;
+++
+++    int * test_shared_var = new (SHARED) int;
+++    int * test_system_var = new (SYSTEM) int;
+++    int * test_application_var = new int;
+++    
+++    *test_shared_var = 0;
+++    *test_system_var = 1;
+++    *test_application_var = 2;
+++
+++    ++*test_shared_var;
+++    ++*test_system_var;
+++    ++*test_application_var;
+++
+++    assert(*test_shared_var == 1);
+++    assert(*test_system_var == 2);
+++    assert(*test_application_var == 3);
+++    
+++    cout << "Finishing test..." << endl;
+++}
++\ No newline at end of file
++diff --git a/app/test_shared_memory/test_shared_memory_traits.h b/app/test_shared_memory/test_shared_memory_traits.h
++new file mode 100644
++index 0000000..b5e047e
++--- /dev/null
+++++ b/app/test_shared_memory/test_shared_memory_traits.h
++@@ -0,0 +1,156 @@
+++#ifndef __traits_h
+++#define __traits_h
+++
+++#include <system/config.h>
+++
+++__BEGIN_SYS
+++
+++// Build
+++template<> struct Traits<Build>: public Traits_Tokens
+++{
+++    // Basic configuration
+++    static const unsigned int MODE = LIBRARY;
+++    static const unsigned int ARCHITECTURE = ARMv7;
+++    static const unsigned int MACHINE = Cortex;
+++    static const unsigned int MODEL = Raspberry_Pi3;
+++    static const unsigned int CPUS = 1;
+++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
+++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
+++
+++    // Default flags
+++    static const bool enabled = true;
+++    static const bool monitored = false;
+++    static const bool debugged = true;
+++    static const bool hysterically_debugged = false;
+++
+++    // Default aspects
+++    typedef ALIST<> ASPECTS;
+++};
+++
+++
+++// Utilities
+++template<> struct Traits<Debug>: public Traits<Build>
+++{
+++    static const bool error   = true;
+++    static const bool warning = true;
+++    static const bool info    = false;
+++    static const bool trace   = false;
+++};
+++
+++template<> struct Traits<Lists>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++template<> struct Traits<Spin>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++template<> struct Traits<Heaps>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++template<> struct Traits<Observers>: public Traits<Build>
+++{
+++    // Some observed objects are created before initializing the Display
+++    // Enabling debug may cause trouble in some Machines
+++    static const bool debugged = false;
+++};
+++
+++
+++// System Parts (mostly to fine control debugging)
+++template<> struct Traits<Boot>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Setup>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Init>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Framework>: public Traits<Build>
+++{
+++};
+++
+++template<> struct Traits<Aspect>: public Traits<Build>
+++{
+++    static const bool debugged = hysterically_debugged;
+++};
+++
+++
+++__END_SYS
+++
+++// Mediators
+++#include __ARCHITECTURE_TRAITS_H
+++#include __MACHINE_TRAITS_H
+++
+++__BEGIN_SYS
+++
+++
+++// API Components
+++template<> struct Traits<Application>: public Traits<Build>
+++{
+++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
+++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
+++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
+++};
+++
+++template<> struct Traits<System>: public Traits<Build>
+++{
+++    static const unsigned int mode = Traits<Build>::MODE;
+++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
+++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
+++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
+++    static const bool multiheap = true;
+++    static const bool sharedmemory = true;
+++
+++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
+++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
+++
+++    static const bool reboot = true;
+++
+++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
+++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
+++};
+++
+++template<> struct Traits<Task>: public Traits<Build>
+++{
+++    static const bool enabled = Traits<System>::multitask;
+++};
+++
+++template<> struct Traits<Thread>: public Traits<Build>
+++{
+++    static const bool enabled = Traits<System>::multithread;
+++    static const bool smp = Traits<System>::multicore;
+++    static const bool trace_idle = hysterically_debugged;
+++    static const bool simulate_capacity = false;
+++
+++    typedef DM Criterion;
+++    static const bool preemptive = true;
+++    static const unsigned int QUANTUM = 10000; // us
+++};
+++
+++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
+++{
+++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
+++};
+++
+++template<> struct Traits<Synchronizer>: public Traits<Build>
+++{
+++    static const bool enabled = Traits<System>::multithread;
+++};
+++
+++template<> struct Traits<Alarm>: public Traits<Build>
+++{
+++    static const bool visible = hysterically_debugged;
+++};
+++
+++
+++__END_SYS
+++
+++#endif
++diff --git a/dockepos b/dockepos
++new file mode 100644
++index 0000000..7f801ce
++--- /dev/null
+++++ b/dockepos
++@@ -0,0 +1,10 @@
+++#! /bin/bash
+++
+++docker run -it --rm \
+++-v $(pwd):/code \
+++-v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+++-e "DISPLAY" \
+++-e 'QEMU_AUDIO_DRV=none' \
+++-u $(id -u):$(id -g) \
+++pico/dockepos \
+++$@
++diff --git a/include/architecture/mmu.h b/include/architecture/mmu.h
++index 17ea7d9..c3c4511 100644
++--- a/include/architecture/mmu.h
+++++ b/include/architecture/mmu.h
++@@ -50,6 +50,7 @@ public:
++             IO   = 1 << 8, // Memory Mapped I/O (0=memory, 1=I/O)
++             SYS  = (PRE | RD | RW | EX),
++             APP  = (PRE | RD | RW | EX | USR),
+++            SHR  = (PRE | RD | RW | EX | USR),
++             APPC = (PRE | RD | EX | USR),
++             APPD = (PRE | RD | RW | USR)
++         };
++diff --git a/include/real-time.h b/include/real-time.h
++index 4f53875..e5559fd 100644
++--- a/include/real-time.h
+++++ b/include/real-time.h
++@@ -25,13 +25,14 @@ typedef Thread Aperiodic_Thread;
++ class Periodic_Thread: public Thread
++ {
++ public:
++-    enum {
++-        SAME    = Real_Time_Scheduler_Common::SAME,
++-        NOW     = Real_Time_Scheduler_Common::NOW,
++-        UNKNOWN = Real_Time_Scheduler_Common::UNKNOWN,
++-        ANY     = Real_Time_Scheduler_Common::ANY
+++    enum : unsigned int {
+++        SAME    = 0,
+++        NOW     = 0,
+++        UNKNOWN = 0,
+++        ANY     = -1U
++     };
++ 
+++
++ protected:
++     // Alarm Handler for periodic threads under static scheduling policies
++     class Static_Handler: public Semaphore_Handler
++@@ -75,7 +76,12 @@ public:
++ public:
++     template<typename ... Tn>
++     Periodic_Thread(const Microsecond & p, int (* entry)(Tn ...), Tn ... an)
++-    : Thread(Thread::Configuration(SUSPENDED, Criterion(p)), entry, an ...),
+++    : Thread(Thread::Configuration(SUSPENDED, Criterion(p, p)), entry, an ...),
+++      _semaphore(0), _handler(&_semaphore, this), _alarm(p, &_handler, INFINITE) { resume(); }
+++
+++    template<typename ... Tn>
+++    Periodic_Thread(const Microsecond & p, const Microsecond d, int (* entry)(Tn ...), Tn ... an)
+++    : Thread(Thread::Configuration(SUSPENDED, Criterion(d, p)), entry, an ...),
++       _semaphore(0), _handler(&_semaphore, this), _alarm(p, &_handler, INFINITE) { resume(); }
++ 
++     template<typename ... Tn>
++@@ -96,6 +102,7 @@ public:
++         Periodic_Thread * t = reinterpret_cast<Periodic_Thread *>(running());
++ 
++         db<Thread>(TRC) << "Thread::wait_next(this=" << t << ",times=" << t->_alarm.times() << ")" << endl;
+++        db<DM> (TRC) << "Thread " << t << " started working. Period: " << t->criterion() << endl;
++ 
++         if(t->_alarm.times())
++             t->_semaphore.p();
++diff --git a/include/scheduler.h b/include/scheduler.h
++index 99bfd36..e86be96 100644
++--- a/include/scheduler.h
+++++ b/include/scheduler.h
++@@ -145,6 +145,38 @@ public:
++     FCFS(int p = NORMAL, Tn & ... an);
++ };
++ 
+++class Real_Time_Scheduler: public Priority
+++{
+++protected:
+++    Real_Time_Scheduler(int p): Priority(p), _deadline(0), _period(0), _capacity(0) {}
+++    Real_Time_Scheduler(int i, const Microsecond & d, const Microsecond & p, const Microsecond & c)
+++    : Priority(i), _deadline(d), _period(p), _capacity(c) {}
+++
+++public:
+++    const Microsecond period() { return _period; }
+++    void period(const Microsecond & p) { _period = p; }
+++
+++public:
+++    Microsecond _deadline;
+++    Microsecond _period;
+++    Microsecond _capacity;
+++};
+++
+++// Deadline Monotonic
+++class DM: public Real_Time_Scheduler
+++{
+++
+++public:
+++    static const bool timed = false;
+++    static const bool dynamic = false;
+++    static const bool preemptive = true;
+++
+++public:
+++    DM(int p = APERIODIC): Real_Time_Scheduler(p) {}
+++    DM(const Microsecond & d, const Microsecond & p = SAME, const Microsecond & c = UNKNOWN, unsigned int cpu = ANY)
+++    : Real_Time_Scheduler(d, d, p, c) {}
+++};
+++
++ __END_SYS
++ 
++-#endif
+++#endif
++\ No newline at end of file
++diff --git a/include/system.h b/include/system.h
++index 5215ef1..63b03e8 100644
++--- a/include/system.h
+++++ b/include/system.h
++@@ -47,13 +47,29 @@ private:
++     static char _preheap[(Traits<System>::multiheap ? sizeof(Segment) : 0) + sizeof(Heap)];
++     static Segment * _heap_segment;
++     static Heap * _heap;
+++    static Segment * _shared_segment;
+++};
+++
+++// Class used to store and handle the shared memory heap with the "new (SHARED)" operator
+++class Shared_Memory {
+++    friend class Init_System;
+++    friend void * ::malloc(size_t);
+++    friend void ::free(void*);
+++    friend void * ::operator new(size_t, const EPOS::Shared_Allocator&);
+++    friend void * ::operator new[](size_t, const EPOS::Shared_Allocator&);
+++    friend void ::operator delete(void*);
+++    friend void ::operator delete[](void*);
+++
+++    private:
+++    static char _preheap[sizeof(Segment) + sizeof(Heap)];
+++    static Segment * _shared_heap_segment;
+++    static Heap * _shared_heap;
++ };
++ 
++ __END_SYS
++ 
++ extern "C"
++ {
++-    // Standard C Library allocators
++     inline void * malloc(size_t bytes) {
++         __USING_SYS;
++         if(Traits<System>::multiheap)
++@@ -94,6 +110,14 @@ inline void * operator new[](size_t bytes, const EPOS::System_Allocator & alloca
++     return _SYS::System::_heap->alloc(bytes);
++ }
++ 
+++inline void * operator new(size_t bytes, const EPOS::Shared_Allocator & allocator) {
+++    return _SYS::Shared_Memory::_shared_heap->alloc(bytes);
+++}
+++
+++inline void * operator new[](size_t bytes, const EPOS::Shared_Allocator & allocator) {
+++    return _SYS::Shared_Memory::_shared_heap->alloc(bytes);
+++}
+++
++ // Delete cannot be declared inline due to virtual destructors
++ void operator delete(void * ptr);
++ void operator delete[](void * ptr);
++diff --git a/include/system/traits.h b/include/system/traits.h
++index 5e505ed..7aeb447 100644
++--- a/include/system/traits.h
+++++ b/include/system/traits.h
++@@ -93,6 +93,7 @@ class Keypad;
++ // API Components
++ class System;
++ class Application;
+++class Shared_Memory;
++ 
++ class Thread;
++ class Active;
++diff --git a/include/system/types.h b/include/system/types.h
++index 645c2df..d0259ba 100644
++--- a/include/system/types.h
+++++ b/include/system/types.h
++@@ -9,6 +9,7 @@ __BEGIN_API
++ 
++ // Memory allocators
++ enum System_Allocator { SYSTEM };
+++enum Shared_Allocator { SHARED };
++ enum Scratchpad_Allocator { SCRATCHPAD };
++ enum Color {
++     COLOR_0,  COLOR_1,  COLOR_2,  COLOR_3,  COLOR_4,  COLOR_5,  COLOR_6,  COLOR_7,
++@@ -44,6 +45,9 @@ inline void * operator new[](size_t s, void * a) { return a; }
++ void * operator new(size_t, const EPOS::System_Allocator &);
++ void * operator new[](size_t, const EPOS::System_Allocator &);
++ 
+++void * operator new(size_t, const EPOS::Shared_Allocator &);
+++void * operator new[](size_t, const EPOS::Shared_Allocator &);
+++
++ void * operator new(size_t, const EPOS::Scratchpad_Allocator &);
++ void * operator new[](size_t, const EPOS::Scratchpad_Allocator &);
++ 
++diff --git a/include/time.h b/include/time.h
++index 8608ce0..7b7d168 100644
++--- a/include/time.h
+++++ b/include/time.h
++@@ -34,6 +34,7 @@ class Alarm
++     friend class Alarm_Chronometer;             // for elapsed()
++     friend class Periodic_Thread;               // for ticks(), times(), and elapsed()
++     friend class FCFS;                          // for ticks() and elapsed()
+++    friend class DM;
++ 
++ private:
++     typedef Timer_Common::Tick Tick;
++
++diff --git a/makedefs b/makedefs
++index 09760e0..9dd2176 100644
++--- a/makedefs
+++++ b/makedefs
++@@ -93,8 +93,8 @@ UUID                    = $(shell cat /proc/sys/kernel/random/uuid | sed 's/-//g
++ 
++ # Compiler prefixes
++ ia32_COMP_PREFIX	:= /usr/bin/x86_64-linux-gnu-
++-armv7_COMP_PREFIX	:= /usr/bin/arm-none-eabi-
++-armv8_COMP_PREFIX	:= /usr/bin/arm-none-eabi-
+++armv7_COMP_PREFIX       := /usr/local/arm/gcc-7.2.0/bin/arm-
+++armv8_COMP_PREFIX       := /usr/local/arm/gcc-7.2.0/bin/arm-
++ rv32_COMP_PREFIX	:= /usr/local/rv32/bin/riscv32-unknown-linux-gnu-
++ rv64_COMP_PREFIX	:= /usr/bin/riscv64-linux-gnu-
++ COMP_PREFIX		= $($(ARCH)_COMP_PREFIX)
++@@ -116,11 +116,11 @@ cortex_CC_FLAGS		:= -mcpu=cortex-a9
++ cortex_AS_FLAGS		:= -mcpu=cortex-a9
++ cortex_LD_FLAGS		:=
++ cortex_EMULATOR		= qemu-system-arm -machine realview-pbx-a9 -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
++-cortex_DEBUGGER		:= arm-none-eabi-gdb
+++cortex_DEBUGGER		:= gdb-multiarch
++ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
++ cortex_MAGIC		:= --omagic
++ cortex_CODE_NAME	:= .init
++-cortex_DATA_NAME	:= .data
+++cortex_DATA_NAME	:=
++ cortex_IMG_SUFFIX	:= .bin
++ endif
++ 
++@@ -128,11 +128,11 @@ ifeq ($(MMOD),zynq)
++ cortex_CC_FLAGS		:= -mcpu=cortex-a9
++ cortex_AS_FLAGS		:= -mcpu=cortex-a9
++ cortex_EMULATOR		= qemu-system-arm -machine xilinx-zynq-a9  -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
++-cortex_DEBUGGER		:= arm-none-eabi-gdb
+++cortex_DEBUGGER		:= gdb-multiarch
++ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
++ cortex_MAGIC		:= --omagic
++ cortex_CODE_NAME	:= .init
++-cortex_DATA_NAME	:= .data
+++cortex_DATA_NAME	:=
++ cortex_IMG_SUFFIX	:= .bin
++ endif
++ 
++@@ -140,12 +140,12 @@ ifeq ($(MMOD),raspberry_pi3)
++ cortex_CC_FLAGS		:= -mcpu=cortex-a53 -mfloat-abi=hard -mfpu=vfp
++ cortex_AS_FLAGS		:= -mcpu=cortex-a53
++ cortex_LD_FLAGS		:=
++-cortex_EMULATOR		= qemu-system-aarch64 -M raspi2 -cpu cortex-a53 -smp 4 -m 1G -serial null -serial mon:stdio -nographic -no-reboot -device loader,file=$(APPLICATION).img,addr=$(IMAGE_ADDR),force-raw=on -kernel 
++-cortex_DEBUGGER		:= gdb
+++cortex_EMULATOR		= qemu-system-aarch64 -M raspi2 -cpu cortex-a53 -smp 4 -m 1G -serial null -serial mon:stdio -nographic -no-reboot -kernel 
+++cortex_DEBUGGER		:= gdb-multiarch
++ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
++-cortex_MAGIC		:= --nmagic
+++cortex_MAGIC		:= --omagic
++ cortex_CODE_NAME	:= .init
++-cortex_DATA_NAME	:= .data
+++cortex_DATA_NAME	:=
++ cortex_IMG_SUFFIX	:= .bin
++ endif
++ 
++@@ -154,7 +154,7 @@ cortex_EMULATOR		= qemu-system-arm -machine lm3s811evb -m $(MEM_SIZE)k -serial m
++ cortex_CC_FLAGS		:= -mcpu=cortex-m3 -mthumb -mabi=atpcs
++ cortex_AS_FLAGS		:= -mcpu=cortex-m3 -mthumb -meabi=gnu
++ cortex_LD_FLAGS		:=
++-cortex_DEBUGGER		:= arm-none-eabi-gdb
+++cortex_DEBUGGER		:= gdb-multiarch
++ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
++ cortex_MAGIC		:= --omagic
++ cortex_CODE_NAME	:= .init
++@@ -167,7 +167,7 @@ cortex_EMULATOR		=
++ cortex_CC_FLAGS		:= -mcpu=cortex-m3 -mthumb -mabi=atpcs
++ cortex_AS_FLAGS		:= -mcpu=cortex-m3 -mthumb -meabi=gnu
++ cortex_LD_FLAGS		:=
++-cortex_DEBUGGER		:= arm-none-eabi-gdb
+++cortex_DEBUGGER		:= gdb-multiarch
++ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
++ cortex_MAGIC		:= --omagic
++ cortex_CODE_NAME	:= .init
++@@ -315,7 +315,7 @@ TEE		:= tee
++ ifndef DISPLAY
++ TERM        := sh -c
++ else
++-TERM        := konsole -e
+++TERM        := xterm -e
++ endif
++ 
++ TOUCH		:= touch
++diff --git a/src/init/init_system.cc b/src/init/init_system.cc
++index fefda22..194f864 100644
++--- a/src/init/init_system.cc
+++++ b/src/init/init_system.cc
++@@ -32,6 +32,19 @@ public:
++             System::_heap = new (&System::_preheap[0]) Heap(MMU::alloc(MMU::pages(HEAP_SIZE)), HEAP_SIZE);
++         db<Init>(INF) << "done!" << endl;
++ 
+++        ///////////////////////////////
+++
+++        // If the trait sharedmemory is true, a segment with the same size of
+++        // the system's heap will be allocated to be shared
+++        db<Init>(INF) << "Initializing shared memory:" << endl;
+++        if(Traits<System>::sharedmemory) {
+++            Shared_Memory::_shared_heap_segment = new(&Shared_Memory::_preheap[0]) Segment(HEAP_SIZE, Segment::Flags::SHR);
+++            Shared_Memory::_shared_heap = new(&Shared_Memory::_preheap[sizeof(Segment)]) Heap(Address_Space(MMU::current()).attach(Shared_Memory::_shared_heap_segment), Shared_Memory::_shared_heap_segment->size());
+++        }
+++        db<Init>(INF)<<"done!"<<endl;
+++
+++        ///////////////////////////////
+++
++         db<Init>(INF) << "Initializing the machine: " << endl;
++         Machine::init();
++         db<Init>(INF) << "done!" << endl;
++diff --git a/src/system/system_scaffold.cc b/src/system/system_scaffold.cc
++index 93089ce..0599311 100644
++--- a/src/system/system_scaffold.cc
+++++ b/src/system/system_scaffold.cc
++@@ -19,6 +19,9 @@ System_Info * System::_si = reinterpret_cast<System_Info *>(Memory_Map::SYS_INFO
++ char System::_preheap[];
++ Segment * System::_heap_segment;
++ Heap * System::_heap;
+++char Shared_Memory::_preheap[];
+++Segment * Shared_Memory:: _shared_heap_segment;
+++Heap * Shared_Memory:: _shared_heap;
++ 
++ __END_SYS
++ 
+\ No newline at end of file
+diff --git a/include/architecture/armv8/armv8_cpu.h b/include/architecture/armv8/armv8_cpu.h
+index e063d5e..d25cefc 100644
+--- a/include/architecture/armv8/armv8_cpu.h
++++ b/include/architecture/armv8/armv8_cpu.h
+@@ -349,7 +349,10 @@ public:
+     static Reg  pd() { return ttbr0(); }
+     static void pd(Reg r) {  ttbr0(r); }
+ 
+-    static void flush_tlb();
++   static void flush_tlb() {
++       db<MMU>(TRC) << "CPU::flush_tlb() " << endl;
++       ASM("hvc #0                                   \t\n");
++   }
+     static void flush_tlb(Reg r);
+ 
+     static void flush_branch_predictors();
+diff --git a/include/architecture/armv8/armv8_mmu.h b/include/architecture/armv8/armv8_mmu.h
+index d33def1..b879819 100644
+--- a/include/architecture/armv8/armv8_mmu.h
++++ b/include/architecture/armv8/armv8_mmu.h
+@@ -270,6 +270,7 @@ template<unsigned int ENTRIES>
+         void activate() const { ARMv8_MMU::pd(_pd); }
+ 
+         Log_Addr attach(const Chunk & chunk, unsigned int from = directory(APP_LOW)) {
++            flush_tlb();
+             for(unsigned int i = from; i < directory(SYS); i++)
+                 if(attach(i, chunk.pt(), chunk.pts(), chunk.flags()))
+                     return i << DIRECTORY_SHIFT;
+@@ -277,6 +278,7 @@ template<unsigned int ENTRIES>
+         }
+ 
+         Log_Addr attach(const Chunk & chunk, Log_Addr addr) {
++            flush_tlb();
+             unsigned int from = directory(addr);
+             if(attach(from, chunk.pt(), chunk.pts(), chunk.flags()))
+                 return from << DIRECTORY_SHIFT;
+@@ -284,6 +286,7 @@ template<unsigned int ENTRIES>
+         }
+ 
+         void detach(const Chunk & chunk) {
++            flush_tlb();
+             for(unsigned int i = 0; i < PD_ENTRIES; i++) {
+                 if(indexes(pte2phy((*_pd)[i])) == indexes(chunk.pt())) {
+                     detach(i, chunk.pt(), chunk.pts());
+@@ -294,6 +297,7 @@ template<unsigned int ENTRIES>
+         }
+ 
+         void detach(const Chunk & chunk, Log_Addr addr) {
++            flush_tlb();
+             unsigned int from = directory(addr);
+             if(indexes(pte2phy((*_pd)[from])) != indexes(chunk.pt())) {
+                 db<MMU>(WRN) << "MMU::Directory::detach(pt=" << chunk.pt() << ",addr=" << addr << ") failed!" << endl;
+@@ -311,6 +315,7 @@ template<unsigned int ENTRIES>
+ 
+     private:
+         bool attach(unsigned int from, const Page_Table * pt, unsigned int n, Page_Flags flags) {
++            flush_tlb();
+             for(unsigned int i = from; i < from + n; i++)
+                 if(_pd->log()[i])
+                     return false;
+@@ -320,7 +325,9 @@ template<unsigned int ENTRIES>
+         }
+ 
+         void detach(unsigned int from, const Page_Table * pt, unsigned int n) {
++            flush_tlb();
+             for(unsigned int i = from; i < from + n; i++) {
++                flush_tlb();
+                 _pd->log()[i] = 0;
+                 // flush_tlb(i << DIRECTORY_SHIFT);
+             }
+@@ -471,10 +478,10 @@ public:
+     }
+ 
+     static Phy_Addr pd() { return CPU::pd(); }
+-    static void pd(Phy_Addr pd) { CPU::pd(pd); /*CPU::flush_tlb();*/ CPU::isb(); CPU::dsb(); }
++    static void pd(Phy_Addr pd) { CPU::pd(pd); CPU::flush_tlb(); CPU::isb(); CPU::dsb(); }
+ 
+-    static void flush_tlb() { /*CPU::flush_tlb();*/ }
+-    static void flush_tlb(Log_Addr addr) { /*CPU::flush_tlb(directory_bits(addr));*/ } // only bits from 31 to 12, all ASIDs
++    static void flush_tlb() { CPU::flush_tlb(); }
++    static void flush_tlb(Log_Addr addr) { CPU::flush_tlb(directory_bits(addr)); } // only bits from 31 to 12, all ASIDs
+ 
+     static void init();
+ 
+diff --git a/include/architecture/mmu.h b/include/architecture/mmu.h
+index 4ebfbfe..a0fdb03 100644
+--- a/include/architecture/mmu.h
++++ b/include/architecture/mmu.h
+@@ -50,6 +50,7 @@ public:
+             IO   = 1 << 8, // Memory Mapped I/O (0=memory, 1=I/O)
+             SYS  = (PRE | RD | RW | EX),
+             APP  = (PRE | RD | RW | EX | USR),
++            SHR  = (PRE | RD | RW | EX | USR),
+             APPC = (PRE | RD | EX | USR),
+             APPD = (PRE | RD | RW | USR)
+         };
+diff --git a/include/memory.h b/include/memory.h
+index 63899b1..de38907 100644
+--- a/include/memory.h
++++ b/include/memory.h
+@@ -12,6 +12,7 @@ class Address_Space: private MMU::Directory
+     friend class Init_System;   // for Address_Space(pd)
+     friend class Thread;        // for Address_Space(pd)
+     friend class Scratchpad;    // for Address_Space(pd)
++    friend class Task;
+ 
+ private:
+     using MMU::Directory::activate;
+diff --git a/include/process.h b/include/process.h
+index e7beb71..cc50605 100644
+--- a/include/process.h
++++ b/include/process.h
+@@ -26,6 +26,7 @@ class Thread
+ protected:
+     static const bool preemptive = Traits<Thread>::Criterion::preemptive;
+     static const bool reboot = Traits<System>::reboot;
++    static const bool multitask = Traits<System>::multitask;
+ 
+     static const unsigned int QUANTUM = Traits<Thread>::QUANTUM;
+     static const unsigned int STACK_SIZE = Traits<Application>::STACK_SIZE;
+@@ -58,12 +59,13 @@ public:
+ 
+     // Thread Configuration
+     struct Configuration {
+-        Configuration(const State & s = READY, const Criterion & c = NORMAL, unsigned int ss = STACK_SIZE)
+-        : state(s), criterion(c), stack_size(ss) {}
++        Configuration(const State & s = READY, const Criterion & c = NORMAL, unsigned int ss = STACK_SIZE, Task * t = 0)
++        : state(s), criterion(c), stack_size(ss), task(t) {}
+ 
+         State state;
+         Criterion criterion;
+         unsigned int stack_size;
++        Task * task;
+     };
+ 
+ 
+@@ -86,6 +88,7 @@ public:
+     void resume();
+ 
+     static Thread * volatile self() { return running(); }
++    Task * task() const { return _task; }
+     static void yield();
+     static void exit(int status = 0);
+ 
+@@ -118,6 +121,7 @@ private:
+ 
+ protected:
+     char * _stack;
++    Task * _task;
+     Context * volatile _context;
+     volatile State _state;
+     Queue * _waiting;
+@@ -129,24 +133,92 @@ protected:
+     static Scheduler<Thread> _scheduler;
+ };
+ 
+-
+-template<typename ... Tn>
+-inline Thread::Thread(int (* entry)(Tn ...), Tn ... an)
+-: _state(READY), _waiting(0), _joining(0), _link(this, NORMAL)
++ // Task (only used in multitasking configurations)
++class Task
+ {
+-    constructor_prologue(STACK_SIZE);
+-    _context = CPU::init_stack(0, _stack + STACK_SIZE, &__exit, entry, an ...);
+-    constructor_epilogue(entry, STACK_SIZE);
+-}
++    friend class Thread;
+ 
+-template<typename ... Tn>
+-inline Thread::Thread(const Configuration & conf, int (* entry)(Tn ...), Tn ... an)
+-: _state(conf.state), _waiting(0), _joining(0), _link(this, conf.criterion)
+-{
+-    constructor_prologue(conf.stack_size);
+-    _context = CPU::init_stack(0, _stack + conf.stack_size, &__exit, entry, an ...);
+-    constructor_epilogue(entry, conf.stack_size);
+-}
++private:
++    typedef CPU::Log_Addr Log_Addr;
++    typedef CPU::Phy_Addr Phy_Addr;
++    typedef CPU::Context Context;
++
++protected:
++    template<typename ... Tn>
++    Task(Address_Space * as, Segment * cs, Segment * ds, int (* entry)(Tn ...), const Log_Addr & code, const Log_Addr & data, Tn ... an)
++    : _as(as), _cs(cs), _ds(ds), _entry(entry), _code(code), _data(data) {
++        db<Task, Init>(TRC) << "Task(as=" << _as << ",cs=" << _cs << ",ds=" << _ds << ",entry=" << _entry << ",code=" << _code << ",data=" << _data << ") => " << this << endl;
++        lock();
++        _id = _task_count++;
++        unlock();
++        _current = this;
++        activate();
++        _main = new (SYSTEM) Thread(Thread::Configuration(Thread::RUNNING, Thread::MAIN, Traits<Application>::STACK_SIZE, this), entry, an ...);
++    }
++
++public:
++    template<typename ... Tn>
++    Task(Segment * cs, Segment * ds, int (* entry)(Tn ...), const Log_Addr & code, const Log_Addr & data, Tn ... an)
++    : _as (new (SYSTEM) Address_Space), _cs(cs), _ds(ds), _entry(entry), _code(_as->attach(_cs, code)), _data(_as->attach(_ds, data)) {
++        db<Task>(TRC) << "Task(as=" << _as << ",cs=" << _cs << ",ds=" << _ds << ",entry=" << _entry << ",code=" << _code << ",data=" << _data << ") => " << this << endl;
++        lock();
++        _id = _task_count++;
++        unlock();
++        _main = new (SYSTEM) Thread(Thread::Configuration(Thread::READY, Thread::MAIN, Traits<Application>::STACK_SIZE, this), entry, an ...);
++    }
++    ~Task();
++
++    Address_Space * address_space() const { return _as; }
++
++    Segment * code_segment() const { return _cs; }
++    Segment * data_segment() const { return _ds; }
++
++    Log_Addr code() const { return _code; }
++    Log_Addr data() const { return _data; }
++
++    Thread * main() const { return _main; }
++
++    static Task * volatile self() { return current(); }
++    Log_Addr entry() { return _entry; }
++
++    unsigned int id() {return _id;}
++
++    void activate_context() {
++        activate();
++        MMU::flush_tlb();
++        lock();
++        _current = this;
++        unlock();
++    }
++
++private:
++    void activate() const { _as->activate(); }
++
++    void insert(Thread * t) { _threads.insert(new (SYSTEM) Thread::Queue::Element(t)); }
++    void remove(Thread * t) { Thread::Queue::Element * el = _threads.remove(t); if(el) delete el; }
++
++    static Task * volatile current() { return _current; }
++    static void current(Task * t) { _current = t; }
++
++    static void lock() { CPU::int_disable(); }
++    static void unlock() { CPU::int_enable(); }
++
++private:
++    unsigned int _id;
++    Address_Space * _as;
++    Segment * _cs;
++    Segment * _ds;
++    Log_Addr _entry;
++    Log_Addr _code;
++    Log_Addr _data;
++    Thread * _main;
++    Thread::Queue _threads;
++
++    static Task * volatile _current;
++
++protected:
++    static volatile unsigned int _task_count;
++};
+ 
+ 
+ // A Java-like Active Object
+@@ -178,6 +250,31 @@ private:
+     Thread * _handler;
+ };
+ 
++template<typename ... Tn>
++inline Thread::Thread(int (* entry)(Tn ...), Tn ... an)
++:_task(Task::self()), _state(READY), _waiting(0), _joining(0), _link(this, NORMAL)
++{
++    constructor_prologue(STACK_SIZE);
++    _context = CPU::init_stack(0, _stack + STACK_SIZE, &__exit, entry, an ...);
++    constructor_epilogue(entry, STACK_SIZE);
++
++    _task->insert(this);
++}
++
++template<typename ... Tn>
++inline Thread::Thread(const Configuration & conf, int (* entry)(Tn ...), Tn ... an)
++:_task(conf.task ? conf.task : Task::self()), _state(conf.state), _waiting(0), _joining(0), _link(this, conf.criterion)
++{
++    constructor_prologue(conf.stack_size);
++    _context = CPU::init_stack(0, _stack + conf.stack_size, &__exit, entry, an ...);
++    constructor_epilogue(entry, conf.stack_size);
++
++    // Not add Idle in task's threads list
++   if (conf.criterion != Thread::IDLE) {
++       _task->insert(this);
++   }
++}
++
+ __END_SYS
+ 
+ #endif
+diff --git a/include/real-time.h b/include/real-time.h
+new file mode 100644
+index 0000000..aef254e
+--- /dev/null
++++ b/include/real-time.h
+@@ -0,0 +1,116 @@
++// EPOS Real-time Declarations
++
++#ifndef __real_time_h
++#define __real_time_h
++
++#include <utility/handler.h>
++#include <utility/math.h>
++#include <utility/convert.h>
++#include <time.h>
++#include <process.h>
++#include <synchronizer.h>
++
++__BEGIN_SYS
++
++// Aperiodic Thread
++typedef Thread Aperiodic_Thread;
++
++// Periodic threads are achieved by programming an alarm handler to invoke
++// p() on a control semaphore after each job (i.e. task activation). Base
++// threads are created in BEGINNING state, so the scheduler won't dispatch
++// them before the associate alarm and semaphore are created. The first job
++// is dispatched by resume() (thus the _state = SUSPENDED statement)
++
++// Periodic Thread
++class Periodic_Thread: public Thread
++{
++public:
++    enum {
++        SAME    = Real_Time_Scheduler_Common::SAME,
++        NOW     = Real_Time_Scheduler_Common::NOW,
++        UNKNOWN = Real_Time_Scheduler_Common::UNKNOWN,
++        ANY     = Real_Time_Scheduler_Common::ANY
++    };
++
++protected:
++    // Alarm Handler for periodic threads under static scheduling policies
++    class Static_Handler: public Semaphore_Handler
++    {
++    public:
++        Static_Handler(Semaphore * s, Periodic_Thread * t): Semaphore_Handler(s) {}
++        ~Static_Handler() {}
++    };
++
++    // Alarm Handler for periodic threads under dynamic scheduling policies
++    class Dynamic_Handler: public Semaphore_Handler
++    {
++    public:
++        Dynamic_Handler(Semaphore * s, Periodic_Thread * t): Semaphore_Handler(s), _thread(t) {}
++        ~Dynamic_Handler() {}
++
++        void operator()() {
++            _thread->criterion().update();
++
++            Semaphore_Handler::operator()();
++        }
++
++    private:
++        Periodic_Thread * _thread;
++    };
++
++    typedef IF<Criterion::dynamic, Dynamic_Handler, Static_Handler>::Result Handler;
++
++public:
++    struct Configuration: public Thread::Configuration {
++        Configuration(const Microsecond & p, const Microsecond & d = SAME, const Microsecond & cap = UNKNOWN, const Microsecond & act = NOW, const unsigned int n = INFINITE, const State & s = READY, const Criterion & c = NORMAL, unsigned int ss = STACK_SIZE)
++        : Thread::Configuration(s, c, ss), period(p), deadline(d == SAME ? p : d), capacity(cap), activation(act), times(n) {}
++
++        Microsecond period;
++        Microsecond deadline;
++        Microsecond capacity;
++        Microsecond activation;
++        unsigned int times;
++    };
++
++public:
++    template<typename ... Tn>
++    Periodic_Thread(const Microsecond & p, int (* entry)(Tn ...), Tn ... an)
++    : Thread(Thread::Configuration(SUSPENDED, Criterion(p)), entry, an ...),
++      _semaphore(0), _handler(&_semaphore, this), _alarm(p, &_handler, INFINITE) { resume(); }
++
++    template<typename ... Tn>
++    Periodic_Thread(const Configuration & conf, int (* entry)(Tn ...), Tn ... an)
++    : Thread(Thread::Configuration(SUSPENDED, (conf.criterion != NORMAL) ? conf.criterion : Criterion(conf.period), conf.stack_size), entry, an ...),
++      _semaphore(0), _handler(&_semaphore, this), _alarm(conf.period, &_handler, conf.times) {
++        if((conf.state == READY) || (conf.state == RUNNING)) {
++            _state = SUSPENDED;
++            resume();
++        } else
++            _state = conf.state;
++    }
++
++    const Microsecond & period() const { return _alarm.period(); }
++    void period(const Microsecond & p) { _alarm.period(p); }
++
++    static volatile bool wait_next() {
++        Periodic_Thread * t = reinterpret_cast<Periodic_Thread *>(running());
++
++        db<Thread>(TRC) << "Thread::wait_next(this=" << t << ",times=" << t->_alarm.times() << ")" << endl;
++
++        if(t->_alarm.times())
++            t->_semaphore.p();
++
++        return t->_alarm.times();
++    }
++
++protected:
++    Semaphore _semaphore;
++    Handler _handler;
++    Alarm _alarm;
++};
++
++typedef Periodic_Thread::Configuration RTConf;
++
++__END_SYS
++
++#endif
+\ No newline at end of file
+diff --git a/include/scheduler.h b/include/scheduler.h
+index 99bfd36..7e50828 100644
+--- a/include/scheduler.h
++++ b/include/scheduler.h
+@@ -145,6 +145,39 @@ public:
+     FCFS(int p = NORMAL, Tn & ... an);
+ };
+ 
++
++class Real_Time_Scheduler: public Priority
++{
++protected:
++    Real_Time_Scheduler(int p): Priority(p), _deadline(0), _period(0), _capacity(0) {}
++    Real_Time_Scheduler(int i, const Microsecond & d, const Microsecond & p, const Microsecond & c)
++    : Priority(i), _deadline(d), _period(p), _capacity(c) {}
++
++public:
++    const Microsecond period() { return _period; }
++    void period(const Microsecond & p) { _period = p; }
++
++public:
++    Microsecond _deadline;
++    Microsecond _period;
++    Microsecond _capacity;
++};
++
++// Deadline Monotonic
++class DM: public Real_Time_Scheduler
++{
++
++public:
++    static const bool timed = false;
++    static const bool dynamic = false;
++    static const bool preemptive = true;
++
++public:
++    DM(int p = APERIODIC): Real_Time_Scheduler(p) {}
++    DM(const Microsecond & d, const Microsecond & p = SAME, const Microsecond & c = UNKNOWN, unsigned int cpu = ANY)
++    : Real_Time_Scheduler(d, d, p, c) {}
++};
++
+ __END_SYS
+ 
+ #endif
+diff --git a/include/system.h b/include/system.h
+index 5215ef1..cc98de1 100644
+--- a/include/system.h
++++ b/include/system.h
+@@ -47,6 +47,23 @@ private:
+     static char _preheap[(Traits<System>::multiheap ? sizeof(Segment) : 0) + sizeof(Heap)];
+     static Segment * _heap_segment;
+     static Heap * _heap;
++    static Segment * _shared_segment;
++};
++
++// Class used to store and handle the shared memory heap with the "new (SHARED)" operator
++class Shared_Memory {
++    friend class Init_System;
++    friend void * ::malloc(size_t);
++    friend void ::free(void*);
++    friend void * ::operator new(size_t, const EPOS::Shared_Allocator&);
++    friend void * ::operator new[](size_t, const EPOS::Shared_Allocator&);
++    friend void ::operator delete(void*);
++    friend void ::operator delete[](void*);
++
++    private:
++    static char _preheap[sizeof(Segment) + sizeof(Heap)];
++    static Segment * _shared_heap_segment;
++    static Heap * _shared_heap;
+ };
+ 
+ __END_SYS
+@@ -94,6 +111,14 @@ inline void * operator new[](size_t bytes, const EPOS::System_Allocator & alloca
+     return _SYS::System::_heap->alloc(bytes);
+ }
+ 
++inline void * operator new(size_t bytes, const EPOS::Shared_Allocator & allocator) {
++    return _SYS::Shared_Memory::_shared_heap->alloc(bytes);
++}
++
++inline void * operator new[](size_t bytes, const EPOS::Shared_Allocator & allocator) {
++    return _SYS::Shared_Memory::_shared_heap->alloc(bytes);
++}
++
+ // Delete cannot be declared inline due to virtual destructors
+ void operator delete(void * ptr);
+ void operator delete[](void * ptr);
+diff --git a/include/system/traits.h b/include/system/traits.h
+index 5e505ed..7aeb447 100644
+--- a/include/system/traits.h
++++ b/include/system/traits.h
+@@ -93,6 +93,7 @@ class Keypad;
+ // API Components
+ class System;
+ class Application;
++class Shared_Memory;
+ 
+ class Thread;
+ class Active;
+diff --git a/include/system/types.h b/include/system/types.h
+index 645c2df..d0259ba 100644
+--- a/include/system/types.h
++++ b/include/system/types.h
+@@ -9,6 +9,7 @@ __BEGIN_API
+ 
+ // Memory allocators
+ enum System_Allocator { SYSTEM };
++enum Shared_Allocator { SHARED };
+ enum Scratchpad_Allocator { SCRATCHPAD };
+ enum Color {
+     COLOR_0,  COLOR_1,  COLOR_2,  COLOR_3,  COLOR_4,  COLOR_5,  COLOR_6,  COLOR_7,
+@@ -44,6 +45,9 @@ inline void * operator new[](size_t s, void * a) { return a; }
+ void * operator new(size_t, const EPOS::System_Allocator &);
+ void * operator new[](size_t, const EPOS::System_Allocator &);
+ 
++void * operator new(size_t, const EPOS::Shared_Allocator &);
++void * operator new[](size_t, const EPOS::Shared_Allocator &);
++
+ void * operator new(size_t, const EPOS::Scratchpad_Allocator &);
+ void * operator new[](size_t, const EPOS::Scratchpad_Allocator &);
+ 
+diff --git a/include/utility/fork.h b/include/utility/fork.h
+new file mode 100644
+index 0000000..c125dda
+--- /dev/null
++++ b/include/utility/fork.h
+@@ -0,0 +1,44 @@
++#ifndef __fork_h
++#define __fork_h
++
++#include <process.h>
++#include <architecture.h>
++
++__BEGIN_UTIL
++
++static unsigned int fork(int(* main)()) {
++    //unsigned long lr = CPU::lr();
++    Task * c_task = Task::self();
++
++    // Code
++    Segment* cs;
++    unsigned int cs_size = c_task->code_segment()->size();
++    cs = new (SYSTEM) Segment(cs_size, Segment::Flags::SYS);
++
++    CPU::int_disable();
++    CPU::Log_Addr tmp = c_task->address_space()->attach(cs);
++    memcpy(tmp, c_task->code(), cs_size);
++    c_task->address_space()->detach(cs);
++    CPU::int_enable();
++
++    // Data
++    Segment* ds;
++    unsigned int ds_size = c_task->data_segment()->size();
++    ds = new (SYSTEM) Segment(ds_size, Segment::Flags::SYS);
++
++    CPU::int_disable();
++    CPU::Log_Addr tmp_ds = c_task->address_space()->attach(ds);
++    memcpy(tmp_ds, c_task->data(), ds_size);
++    c_task->address_space()->detach(ds);
++    CPU::int_enable();
++
++    typedef int (Main)();
++    main = reinterpret_cast<Main *>(main);
++    new (SYSTEM) Task(cs, ds, main, c_task->code(), c_task->data());
++
++    return Task::self()->id();
++}
++
++__END_UTIL
++
++#endif
+\ No newline at end of file
+diff --git a/makedefs b/makedefs
+index 8ed5c1d..8f8877f 100644
+--- a/makedefs
++++ b/makedefs
+@@ -147,7 +147,7 @@ ifeq ($(ARCH),armv7)
+ cortex_CC_FLAGS		:= -mcpu=cortex-a53 -mfloat-abi=hard -mfpu=vfp
+ cortex_EMULATOR		= qemu-system-aarch64 -M raspi2 -cpu cortex-a53 -smp 4 -m 1G -serial null -serial mon:stdio -nographic -no-reboot -kernel 
+ else
+-cortex_CC_FLAGS		:= -mcpu=cortex-a53 -mabi=lp64 -Wno-attributes
++cortex_CC_FLAGS		:= -mcpu=cortex-a53 -mabi=lp64 -Wno-attributes -Wno-error=stringop-overflow -mgeneral-regs-only
+ ifeq ($(SMOD), library)
+ cortex_EMULATOR		= qemu-system-aarch64 -M raspi3 -cpu cortex-a53 -smp 4 -m 1G -serial null -serial mon:stdio -nographic -no-reboot -kernel 
+ else
+@@ -156,7 +156,7 @@ endif
+ endif
+ cortex_AS_FLAGS		:= -mcpu=cortex-a53
+ cortex_LD_FLAGS		:=
+-cortex_DEBUGGER		:= gdb
++cortex_DEBUGGER		:= aarch64-linux-gnu-gdb
+ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
+ cortex_MAGIC		:= --nmagic
+ cortex_CODE_NAME	:= .init
+diff --git a/src/api/task.cc b/src/api/task.cc
+new file mode 100644
+index 0000000..1a188d9
+--- /dev/null
++++ b/src/api/task.cc
+@@ -0,0 +1,27 @@
++// EPOS Task Implementation
++
++#include <process.h>
++
++__BEGIN_SYS
++
++// Class attributes
++volatile unsigned int Task::_task_count;
++Task* volatile Task::_current;
++
++// Methods
++Task::~Task()
++{
++    db<Task>(TRC) << "~Task(this=" << this << ")" << endl;
++
++    while (!_threads.empty()){
++        delete _threads.remove()->object();
++    }
++
++    lock();
++    _task_count--;
++    unlock();
++
++    delete _as;
++}
++
++__END_SYS
+\ No newline at end of file
+diff --git a/src/api/thread.cc b/src/api/thread.cc
+index bf94c29..d82095f 100644
+--- a/src/api/thread.cc
++++ b/src/api/thread.cc
+@@ -88,6 +88,8 @@ Thread::~Thread()
+ 
+     if(_joining)
+         _joining->resume();
++    
++    _task->remove(this);
+ 
+     unlock();
+ 
+@@ -344,6 +346,10 @@ void Thread::dispatch(Thread * prev, Thread * next, bool charge)
+         }
+         db<Thread>(INF) << "Thread::dispatch:next={" << next << ",ctx=" << *next->_context << "}" << endl;
+ 
++        if (prev->_task != next->_task) {
++            next->_task->activate_context();
++        }
++
+         // The non-volatile pointer to volatile pointer to a non-volatile context is correct
+         // and necessary because of context switches, but here, we are locked() and
+         // passing the volatile to switch_constext forces it to push prev onto the stack,
+diff --git a/src/api/thread_init.cc b/src/api/thread_init.cc
+index e25ab96..8923f22 100644
+--- a/src/api/thread_init.cc
++++ b/src/api/thread_init.cc
+@@ -13,8 +13,6 @@ void Thread::init()
+ {
+     db<Init, Thread>(TRC) << "Thread::init()" << endl;
+ 
+-    Criterion::init();
+-
+     typedef int (Main)();
+ 
+     System_Info * si = System::info();
+@@ -27,7 +25,19 @@ void Thread::init()
+         // In this case, _init will have already been called, before Init_Application to construct MAIN's global objects.
+         main = reinterpret_cast<Main *>(__epos_app_entry);
+ 
+-    new (SYSTEM) Thread(Thread::Configuration(Thread::RUNNING, Thread::MAIN), main);
++    Criterion::init();
++
++    if (Traits<System>::multitask) {
++        Address_Space* as = new (SYSTEM) Address_Space(MMU::current());
++        Segment* cs = new (SYSTEM) Segment(Log_Addr(si->lm.app_code), si->lm.app_code_size, Segment::Flags::APPC);
++        Segment* ds = new (SYSTEM) Segment(Log_Addr(si->lm.app_data), si->lm.app_data_size, Segment::Flags::APPD);
++        Log_Addr code = si->lm.app_code;
++        Log_Addr data = si->lm.app_data;
++        new (SYSTEM) Task(as, cs, ds, main, code, data);
++    }
++    else {
++        new (SYSTEM) Thread(Thread::Configuration(Thread::RUNNING, Thread::MAIN), reinterpret_cast<int (*)()>(main));
++    }
+ 
+     // Idle thread creation does not cause rescheduling (see Thread::constructor_epilogue)
+     new (SYSTEM) Thread(Thread::Configuration(Thread::READY, Thread::IDLE), &Thread::idle);
+@@ -48,4 +58,4 @@ void Thread::init()
+     This_Thread::not_booting();
+ }
+ 
+-__END_SYS
++__END_SYS
+\ No newline at end of file
+diff --git a/src/init/init_system.cc b/src/init/init_system.cc
+index fefda22..b12fcf3 100644
+--- a/src/init/init_system.cc
++++ b/src/init/init_system.cc
+@@ -32,6 +32,20 @@ public:
+             System::_heap = new (&System::_preheap[0]) Heap(MMU::alloc(MMU::pages(HEAP_SIZE)), HEAP_SIZE);
+         db<Init>(INF) << "done!" << endl;
+ 
++        ///////////////////////////////
++
++        // If the trait sharedmemory is true, a segment with the same size of
++        // the system's heap will be allocated to be shared
++        db<Init>(INF) << "Initializing shared memory:" << endl;
++        if(Traits<System>::sharedmemory) {
++            Shared_Memory::_shared_heap_segment = new(&Shared_Memory::_preheap[0]) Segment(HEAP_SIZE, Segment::Flags::SHR);
++            Shared_Memory::_shared_heap = new(&Shared_Memory::_preheap[sizeof(Segment)]) Heap(Address_Space(MMU::current()).attach(Shared_Memory::_shared_heap_segment), Shared_Memory::_shared_heap_segment->size());
++        }
++        db<Init>(INF)<<"done!"<<endl;
++
++        ///////////////////////////////
++
++
+         db<Init>(INF) << "Initializing the machine: " << endl;
+         Machine::init();
+         db<Init>(INF) << "done!" << endl;
+diff --git a/src/machine/cortex/cortex_ic.cc b/src/machine/cortex/cortex_ic.cc
+index 3c72071..7f6e987 100644
+--- a/src/machine/cortex/cortex_ic.cc
++++ b/src/machine/cortex/cortex_ic.cc
+@@ -129,6 +129,54 @@ extern "C" { void _dispatch(unsigned int) __attribute__ ((alias("_ZN4EPOS1S2IC8d
+ 
+ void IC::entry()
+ {
++    // str: store register
++    // stp: store pair
++    // mrs: move the contents of a PSR to a general-purpose register
++    // ldr: load register
++    // ldp: load pair
++    ASM("str        x30, [sp, # -8]!                                     \t\n\
++         stp   x28, x29, [sp, #-16]!                                     \t\n\
++         stp   x26, x27, [sp, #-16]!                                     \t\n\
++         stp   x24, x25, [sp, #-16]!                                     \t\n\
++         stp   x22, x23, [sp, #-16]!                                     \t\n\
++         stp   x20, x21, [sp, #-16]!                                     \t\n\
++         stp   x18, x19, [sp, #-16]!                                     \t\n\
++         stp   x16, x17, [sp, #-16]!                                     \t\n\
++         stp   x14, x15, [sp, #-16]!                                     \t\n\
++         stp   x12, x13, [sp, #-16]!                                     \t\n\
++         stp   x10, x11, [sp, #-16]!                                     \t\n\
++         stp    x8,  x9, [sp, #-16]!                                     \t\n\
++         stp    x6,  x7, [sp, #-16]!                                     \t\n\
++         stp    x4,  x5, [sp, #-16]!                                     \t\n\
++         stp    x2,  x3, [sp, #-16]!                                     \t\n\
++         stp    x0,  x1, [sp, #-16]!                                     \t\n\
++         mrs x30, elr_el1                                                \t\n\
++         str        x30, [sp, # -8]!                                     \t\n\
++         mrs x30, spsr_el1                                               \t\n\
++         str        x30, [sp, # -8]!                                     \t" : : : "cc");
++
++    dispatch(int_id());
++
++    ASM("ldr         x30, [sp], #8                                       \t\n\
++         msr  spsr_el1, x30                                              \t\n\
++         ldr         x30, [sp], #8                                       \t\n\
++         msr  elr_el1, x30                                               \t\n\
++         ldp    x0,  x1, [sp], #16                                       \t\n\
++         ldp    x2,  x3, [sp], #16                                       \t\n\
++         ldp    x4,  x5, [sp], #16                                       \t\n\
++         ldp    x6,  x7, [sp], #16                                       \t\n\
++         ldp    x8,  x9, [sp], #16                                       \t\n\
++         ldp   x10, x11, [sp], #16                                       \t\n\
++         ldp   x12, x13, [sp], #16                                       \t\n\
++         ldp   x14, x15, [sp], #16                                       \t\n\
++         ldp   x16, x17, [sp], #16                                       \t\n\
++         ldp   x18, x19, [sp], #16                                       \t\n\
++         ldp   x20, x21, [sp], #16                                       \t\n\
++         ldp   x22, x23, [sp], #16                                       \t\n\
++         ldp   x24, x25, [sp], #16                                       \t\n\
++         ldp   x26, x27, [sp], #16                                       \t\n\
++         ldp   x28, x29, [sp], #16                                       \t\n\
++         ldr        x30, [sp], #8                                        \t" : : : "cc");
+ }
+ 
+ #endif    
+diff --git a/src/setup/setup_raspberry_pi3.cc b/src/setup/setup_raspberry_pi3.cc
+index e929cba..1cd581a 100644
+--- a/src/setup/setup_raspberry_pi3.cc
++++ b/src/setup/setup_raspberry_pi3.cc
+@@ -1050,140 +1050,216 @@ void _vector_table()
+     // Therefore, each exception level maps the four exception type handlers aligned by 128 bytes (enough room to write simple handlers).
+ 
+     // Our strategy is to forward all interrupts to _int_entry via
+-    ASM("// Current EL with SP0                                                 \t\n\
++    ASM("                                                                       \t\n\
+                         .balign 128                                             \t\n\
+         .sync_curr_sp0: str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_sync_curr_sp0                               \t\n\
++                        mov x0, #0                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0,  [sp], #8                                       \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .irq_curr_sp0:  str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_irq_curr_sp0                                \t\n\
++                        mov x0, #0                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0,  [sp], #8                                       \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .fiq_curr_sp0:  str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_fiq_curr_sp0                                \t\n\
++                        mov x0, #0                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0,  [sp], #8                                       \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .error_curr_sp0:str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_error_curr_sp0                              \t\n\
++                        mov x0, #0                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                         ldr x0,  [sp], #8                                      \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+-        // Current EL with SPx                                                  \t\n\
+                         .balign 128                                             \t\n\
+         .sync_curr_spx: str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_sync_curr_spx                               \t\n\
++                        mov x0, #4                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .irq_curr_spx:  str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_irq_curr_spx                                \t\n\
++                        mov x0, #4                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .fiq_curr_spx:  str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_fiq_curr_spx                                \t\n\
++                        mov x0, #4                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .error_curr_spx:str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0,  [sp,#-8]!                                      \t\n\
++                        ldr x29, vj_error_curr_spx                              \t\n\
++                        mov x0, #4                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+         // Lower EL using AArch64                                               \t\n\
+                         .balign 128                                             \t\n\
+         .sync_lower64:  str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
+-                        blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        str x28, [sp,#-8]!                                      \t\n\
++                        mrs x28, CurrentEL                                      \t\n\
++                        and x28, x28, #12                                       \t\n\
++                        lsr x28, x28, #2                                        \t\n\
++                                                                                \t\n\
++                        cmp x28, #2                                             \t\n\
++                        beq .1                                                  \t\n\
++                        ldr x29, vj_sync_lower64                                \t\n\
++                        b .2                                                    \t\n\
++                    .1:                                                         \t\n\
++                        dsb   ishst                                             \t\n\
++                        tlbi  alle1                                             \t\n\
++                        dsb   ish                                               \t\n\
++                        isb                                                     \t\n\
++                    .2:                                                         \t\n\
++                        ldr x28, [sp], #8                                       \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .irq_lower64:   str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0, [sp, #-8]!                                      \t\n\
++                        ldr x29, vj_irq_lower64                                 \t\n\
++                        mov x0, #9                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .fiq_lower64:   str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0, [sp, #-8]!                                      \t\n\
++                        ldr x29, vj_fiq_lower64                                 \t\n\
++                        mov x0, #9                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .error_lower64: str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0, [sp, #-8]!                                      \t\n\
++                        ldr x29, vj_serr_lower64                                \t\n\
++                        mov x0, #9                                              \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         // Lower EL using AArch32                               \t\n\
+                         .balign 128                                             \t\n\
+         .sync_lower32:  str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0, [sp, #-8]!                                      \t\n\
++                        ldr x29, vj_sync_lower32                                \t\n\
++                        mov x0, #12                                             \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .irq_lower32:   str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0, [sp, #-8]!                                      \t\n\
++                        ldr x29, vj_irq_lower32                                 \t\n\
++                        mov x0, #12                                             \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+         .fiq_lower32:   str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0, [sp, #-8]!                                      \t\n\
++                        ldr x29, vj_fiq_lower32                                 \t\n\
++                        mov x0, #12                                             \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
++                                                                                \t\n\
+         .error_lower32: str x30, [sp,#-8]!                                      \t\n\
+                         str x29, [sp,#-8]!                                      \t\n\
+-                        ldr x29, .ic_entry                                      \t\n\
++                        str x0, [sp, #-8]!                                      \t\n\
++                        ldr x29, vj_serr_lower32                                \t\n\
++                        mov x0, #12                                             \t\n\
+                         blr x29                                                 \t\n\
+-                        ldr x30, [sp], #8                                       \t\n\
++                        ldr x0, [sp], #8                                        \t\n\
++                        ldp  x29, x30, [sp], #16                                \t\n\
+                         eret                                                    \t\n\
+                                                                                 \t\n\
+                         .balign 128                                             \t\n\
+-        .ic_entry: .dword 0x0                                                   \t");
++        .global _vector_jat                                                     \t\n\
++        _vector_jat:                                                            \t\n\
++        vj_sync_curr_sp0:       .dword 0x0                                      \t\n\
++        vj_irq_curr_sp0:        .dword 0x0                                      \t\n\
++        vj_fiq_curr_sp0:        .dword 0x0                                      \t\n\
++        vj_error_curr_sp0:      .dword 0x0                                      \t\n\
++        vj_sync_curr_spx:       .dword 0x0                                      \t\n\
++        vj_irq_curr_spx:        .dword 0x0                                      \t\n\
++        vj_fiq_curr_spx:        .dword 0x0                                      \t\n\
++        vj_error_curr_spx:      .dword 0x0                                      \t\n\
++        vj_sync_lower64:        .dword 0x0                                      \t\n\
++        vj_irq_lower64:         .dword 0x0                                      \t\n\
++        vj_fiq_lower64:         .dword 0x0                                      \t\n\
++        vj_serr_lower64:        .dword 0x0                                      \t\n\
++        vj_sync_lower32:        .dword 0x0                                      \t\n\
++        vj_irq_lower32:         .dword 0x0                                      \t\n\
++        vj_fiq_lower32:         .dword 0x0                                      \t\n\
++        vj_serr_lower32:        .dword 0x0                                      \t");
+ }
+ 
+ void _reset()
+diff --git a/src/system/system_scaffold.cc b/src/system/system_scaffold.cc
+index 941d0d0..147cca2 100644
+--- a/src/system/system_scaffold.cc
++++ b/src/system/system_scaffold.cc
+@@ -21,6 +21,9 @@ System_Info * System::_si = (Memory_Map::SYS_INFO != Memory_Map::NOT_USED) ? rei
+ char System::_preheap[];
+ Segment * System::_heap_segment;
+ Heap * System::_heap;
++char Shared_Memory::_preheap[];
++Segment * Shared_Memory:: _shared_heap_segment;
++Heap * Shared_Memory:: _shared_heap;
+ 
+ __END_SYS
+ 

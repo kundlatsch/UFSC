@@ -1,0 +1,416 @@
+#!/bin/sh
+#=========================================================================
+# Script to compile and link EPOS applications
+#=========================================================================
+
+#=========================================================================
+# PATHS
+#=========================================================================
+EPOS=
+TMP=/tmp
+INC=$EPOS/include
+SRC=$EPOS/src
+APP=$EPOS/app
+BIN=$EPOS/bin
+LIB=$EPOS/lib
+IMG=$EPOS/img
+ETC=$EPOS/etc
+DOC=$EPOS/doc
+
+#=========================================================================
+# CONFIGURATION
+#=========================================================================
+. $ETC/eposcc.conf
+
+#=========================================================================
+# CUSTOMIZABLE DEFINITIONS
+#=========================================================================
+ANALYZER=eposanl
+ANL_FLGS="-u"
+ANL_COMP_FLGS="-DANALYZE"
+
+CONFIGURATOR=eposcfg
+
+COMP_FLGS="-include $INC/system.h"
+COMP_HDRS="$INC"
+# if [ "$SMOD" = "kernel" ] ; then
+# COMP_FLGS="$COMP_FLGS -include $INC/framework/main.h"
+# fi
+
+C_COMPILER="$TOOLS_PREFIX""gcc"
+C_COMP_FLGS="$MACH_CC_FLAGS"
+C_COMP_HDRS=
+C_LINK_FLGS="$MACH_LD_FLAGS"
+C_LINK_OBJS=
+C_LINK_LIBS=
+if [ "$BOOT_STACK" != "" ] ; then
+    C_LINK_FLGS="$C_LINK_FLGS --defsym=__boot_stack__=$BOOT_STACK"
+fi
+
+CPP_COMPILER="$TOOLS_PREFIX""g++"
+CPP_COMP_FLGS="--no-exceptions --no-rtti --no-use-cxa-atexit -std=c++14"
+CPP_COMP_HDRS=
+CPP_LINK_FLGS="$MACH_LD_FLAGS"
+CPP_LINK_OBJS=
+CPP_LINK_LIBS=
+
+F77_COMPILER="$TOOLS_PREFIX""g77"
+F77_COMP_FLGS=
+F77_COMP_HDRS=
+F77_LINK_FLGS="$MACH_LD_FLAGS"
+F77_LINK_OBJS=
+F77_LINK_LIBS="f2c"
+
+LINKER="$TOOLS_PREFIX""ld"
+
+LINKER_LIBRARY=$LINKER
+LINK_FLGS_LIBRARY="-L$LIB -L`$C_COMPILER $C_COMP_FLGS -print-file-name=` -static --section-start $MACH_CODE_NAME=$APP_CODE"
+if [ "$SETUP" != "" -o "$APP_CODE" != "$APP_DATA" -a "$MACH_DATA_NAME" != "" ] ; then
+    LINK_FLGS_LIBRARY="$LINK_FLGS_LIBRARY --section-start $MACH_DATA_NAME=$APP_DATA"
+fi
+LINK_OBJI_LIBRARY="$LIB/crt0_$MMOD.o $LIB/crtbegin_$MMOD.o $LIB/init_end_$MMOD.o"
+LINK_OBJN_LIBRARY="$LIB/application_$MMOD.o $LIB/init_application_$MMOD.o $LIB/init_system_$MMOD.o $LIB/system_$MMOD.o $LIB/init_begin_$MMOD.o"
+LINK_OBJL_LIBRARY="$LIB/crtend_$MMOD.o"
+LINK_LIBS_LIBRARY="util_$MMOD sys_$MMOD init_$MMOD sys_$MMOD mach_$MMOD arch_$MMOD util_$MMOD gcc"
+if [ "$SETUP" = "" ] ; then
+    LINK_OBJI_LIBRARY="$LIB/setup_$MMOD.o $LINK_OBJI_LIBRARY"
+fi
+
+LINKER_BUILTIN=$LINKER
+LINK_FLGS_BUILTIN="-L$LIB -L`$C_COMPILER $C_COMP_FLGS -print-file-name=` -static --section-start $MACH_CODE_NAME=$APP_CODE --section-start $MACH_DATA_NAME=$APP_DATA"
+LINK_OBJI_BUILTIN="$LIB/crt0_$MMOD.o $LIB/crtbegin_$MMOD.o"
+LINK_OBJN_BUILTIN="$LIB/application_$MMOD.o $LIB/init_application_$MMOD.o"
+LINK_OBJL_BUILTIN="$LIB/crtend_$MMOD.o -R$SRC/system/system_$MMOD"
+LINK_LIBS_BUILTIN="util_$MMOD gcc"
+
+LINKER_KERNEL=$LINKER
+LINK_FLGS_KERNEL="-L$LIB -L`$C_COMPILER $C_COMP_FLGS -print-file-name=` -static --section-start $MACH_CODE_NAME=$APP_CODE --section-start $MACH_DATA_NAME=$APP_DATA"
+LINK_OBJI_KERNEL="$LIB/crt0_$MMOD.o $LIB/crtbegin_$MMOD.o"
+LINK_OBJN_KERNEL="$LIB/application_$MMOD.o $LIB/init_application_$MMOD.o"
+LINK_OBJL_KERNEL="$LIB/crtend_$MMOD.o"
+LINK_LIBS_KERNEL="util_$MMOD arch_$MMOD util_$MMOD gcc"
+
+#=========================================================================
+# VARIABLES
+#=========================================================================
+do_exec=eval
+do_echo=:
+need_link=1
+need_compile=0
+need_trace=0
+need_analyze=0
+only_analyze=0
+os_is_library=0
+os_is_builtin=0
+os_is_kernel=0
+os_is_linux=0
+language=C
+getting_output_file=0
+has_dash_c=0
+my_name=`basename $0`
+status=0
+
+#=========================================================================
+# ARGUMENT PARSING
+#=========================================================================
+for arg in "$@" ; do
+    if [ $getting_output_file = 1 ] ; then
+        getting_output_file=0
+        output_file="$arg"
+        continue
+    fi
+    case "$arg" in
+    -c)
+        all_args="$all_args $arg"
+        compile_flgs="$compile_flgs $arg"
+        need_link=0
+        need_compile=1
+        has_dash_c=1
+        ;;
+    -E)
+        all_args="$all_args $arg"
+        compile_flgs="$compile_flgs $arg"
+        need_link=0
+        has_dash_c=1
+        need_compile=1
+        ;;
+    -S)
+        all_args="$all_args $arg"
+        compile_flgs="$compile_flgs $arg"
+        need_link=0
+        has_dash_c=1
+        need_compile=1
+        ;;
+    -o)
+        all_args="$all_args $arg"
+        getting_output_file=1
+        ;;
+    -l*)
+        all_args="$all_args $arg"
+        libs="$libs $arg"
+        link_args="$link_args $arg"
+        ;;
+    --analyze)
+        need_analyze=1
+        only_analyze=1
+        need_link=0
+        need_compile=0
+        ;;
+    --linux)
+        if [ $os_is_kernel = 1 -o $os_is_library = 1 -o $os_is_builtin = 1 ] ; then
+           echo "--builtin, --kernel, --library and --linux cannot be used together!"
+           exit -1
+        else
+           os_is_linux=1
+        fi
+        ;;
+    --builtin)
+        if [ $os_is_kernel = 1 -o $os_is_library = 1 -o $os_is_linux = 1 ] ; then
+            echo "--builtin, --kernel, --library and --linux cannot be used together!"
+            exit -1
+        else
+               os_is_builtin=1
+        fi
+        ;;
+    --library)
+        if [ $os_is_kernel = 1 -o $os_is_builtin = 1 -o $os_is_linux = 1 ] ; then
+            echo "--builtin, --kernel, --library and --linux cannot be used together!"
+            exit -1
+        else
+               os_is_library=1
+        fi
+        ;;
+    --kernel)
+        if [ $os_is_library = 1 -o $os_is_builtin = 1 -o $os_is_linux = 1 ] ; then
+            echo "--builtin, --kernel, --library and --linux cannot be used together!"
+            exit -1
+        else
+            os_is_kernel=1
+        fi
+        ;;
+    --trace)
+        need_trace=1
+        ;;
+    --echo)
+        do_echo=echo
+        ;;
+    --show)
+        do_echo=echo
+        do_exec=:
+        ;;
+    --help)
+        echo "This is a script to compile and/or link EPOS programs"
+        echo "written in C, C++ or Fortran."
+        echo
+        echo "In addition to your compiler options, the following is supported"
+        echo "  --analyze analyze application requirements"
+        echo "  --library EPOS is a library to be linked with the application"
+        echo "  --builtin EPOS is built-in the application"
+        echo "  --kernel  EPOS is a microkernel"
+        echo "  --linux   EPOS is guest at Linux"
+        echo "  --trace   instruct EPOS to generate traces"
+        echo "  --show    show commands without issuing them"
+        echo "  --help    print this help"
+        echo "  --echo    show what this script is doing"
+        echo
+        echo "This script should be used just like your usual compiler, e.g.:"
+        echo "   $my_name -c foo.cc"
+        echo "   $my_name -o foo foo.o"
+        echo "   $my_name -c -O -Llibrary_path -Iheader_path -o foo foo.c"
+        exit 1
+        ;;
+    *\"*)
+        all_args="$all_args `echo $arg | sed 's/\"/\\\"/g'`"
+        compile_flgs="$compile_flgs `echo $arg | sed 's/\"/\\\"/g'`"
+        link_flgs="$link_flgs `echo $arg | sed 's/\"/\\\"/g'`"
+        ;;
+    *)
+        all_args="$all_args $arg"
+        if [ -s "$arg" ] ; then
+            ext=`expr "$arg" : '.*\(\..*\)'`
+            if [ "$ext" = ".c" ] ; then
+                language="C"
+                need_compile=1
+                input_file="$arg"
+                key_file="`basename $arg $ext`.key"
+                link_objs="$link_objs `basename $arg $ext`.o"
+            elif [ "$ext" = ".f" ] ; then
+                language="F77"
+                need_compile=1
+                input_file="$arg"
+                key_file="`basename $arg $ext`.key"
+                link_objs="$link_objs `basename $arg $ext`.o"
+            elif [ "$ext" = ".C" -o "$ext" = ".cpp" -o "$ext" = ".cc" ] ; then
+                language="CPP"
+                need_compile=1
+                input_file="$arg"
+                key_file="`basename $arg $ext`.key"
+                link_objs="$link_objs `basename $arg $ext`.o"
+            elif [ "$ext" = ".o" ] ; then
+                if [ $need_compile = 1 ] ; then
+                    compile_args="$compile_args $arg"
+                else
+                    need_link=1
+                    link_objs="$link_objs $arg"
+                fi
+            else
+                compile_args="$compile_args $arg"
+                link_args="$link_args $arg"
+            fi
+        else
+            compile_flgs="$compile_flgs $arg"
+            link_flgs="$link_flgs $arg"
+        fi
+        ;;
+    esac
+done
+
+#=========================================================================
+# COMMAND ISSUING
+#=========================================================================
+if [ "$language" = "F77" ] ; then
+    compiler=$F77_COMPILER
+    compile_flgs="$compile_flgs $F77_COMP_FLGS"
+    for hdr in $F77_COMP_HDRS ; do
+        compile_flgs="$compile_flgs -I$hdr"
+    done
+    link_flgs="$link_flgs $F77_LINK_FLGS"
+    link_objs="$F77_LINK_OBJS $link_objs"
+    for lib in $F77_LINK_LIBS ; do
+        link_libs="$link_libs -l$lib"
+    done
+elif [ "$language" = "CPP" ] ; then
+    compiler=$CPP_COMPILER
+    compile_flgs="$compile_flgs $CPP_COMP_FLGS"
+    for hdr in $CPP_COMP_HDRS ; do
+        compile_flgs="$compile_flgs -I$hdr"
+    done
+    link_flgs="$link_flgs $CPP_LINK_FLGS"
+    link_objs="$CPP_LINK_OBJS $link_objs"
+    for lib in $CPP_LINK_LIBS ; do
+        link_libs="$link_libs -l$lib"
+    done
+else
+    compiler=$C_COMPILER
+    compile_flgs="$compile_flgs $C_COMP_FLGS"
+    for hdr in $C_COMP_HDRS ; do
+        compile_flgs="$compile_flgs -I$hdr"
+    done
+    link_flgs="$link_flgs $C_LINK_FLGS"
+    link_objs="$C_LINK_OBJS $link_objs"
+    for lib in $C_LINK_LIBS ; do
+        link_libs="$link_libs -l$lib"
+    done
+fi
+
+compile_flgs="$compile_flgs $COMP_FLGS"
+for hdr in $COMP_HDRS ; do
+    compile_flgs="$compile_flgs -I$hdr"
+done
+
+if [ $os_is_library = 1 ] ; then
+    LINKER=$LINKER_LIBRARY
+    LINK_FLGS=$LINK_FLGS_LIBRARY
+    LINK_OBJI=$LINK_OBJI_LIBRARY
+    LINK_OBJN=$LINK_OBJN_LIBRARY
+    LINK_OBJL=$LINK_OBJL_LIBRARY
+    LINK_LIBS=$LINK_LIBS_LIBRARY
+elif [ $os_is_builtin = 1 ] ; then
+    LINKER=$LINKER_BUILTIN
+    LINK_FLGS=$LINK_FLGS_BUILTIN
+    LINK_OBJI=$LINK_OBJI_BUILTIN
+    LINK_OBJN=$LINK_OBJN_BUILTIN
+    LINK_OBJL=$LINK_OBJL_BUILTIN
+    LINK_LIBS=$LINK_LIBS_BUILTIN
+elif [ $os_is_kernel = 1 ] ; then
+    LINKER=$LINKER_KERNEL
+    LINK_FLGS=$LINK_FLGS_KERNEL
+    LINK_OBJI=$LINK_OBJI_KERNEL
+    LINK_OBJN=$LINK_OBJN_KERNEL
+    LINK_OBJL=$LINK_OBJL_KERNEL
+    LINK_LIBS=$LINK_LIBS_KERNEL
+fi
+
+linker=$LINKER
+link_flgs="$link_flgs $LINK_FLGS"
+link_objs="$LINK_OBJI $link_objs $LINK_OBJN"
+for lib in $LINK_LIBS ; do
+  link_libs="$link_libs -l$lib"
+done
+link_libs="$link_libs $LINK_OBJL"
+
+if [ $need_compile = 1 -a ! -f "$key_file" ] ; then
+    need_analyze=1
+fi
+
+# disabled for EPOS
+if [ $need_analyze = 5 ] ; then
+    analyze_flgs=$compile_flgs
+
+    if [ $has_dash_c = 0 ] ; then
+        analyze_flgs="-c $analyze_flgs"
+    fi
+    tmp_file="$TMP/epos`date +%Y%m%d%H%M%S`"
+    analyze_flgs="$analyze_flgs $ANL_COMP_FLGS"
+    analyze_flgs="$analyze_flgs -o $tmp_file.o"
+    $do_echo $compiler $analyze_flgs $analyze_args $input_file
+    $do_exec $compiler $analyze_flgs $analyze_args $input_file
+    status=$?
+    if [ $status != 0 ] ; then
+        $do_echo rm -f "$tmp_file.*"
+        $do_exec rm -f "$tmp_file.*"
+        exit $status
+    fi
+
+    $do_echo $ANALYZER $ANL_FLAGS "$tmp_file.o" -o "$tmp_file.anl"
+    $do_exec $ANALYZER $ANL_FLAGS "$tmp_file.o" -o "$tmp_file.anl"
+    status=$?
+    if [ $status != 0 ] ; then
+        $do_echo rm -f "$tmp_file.*"
+        $do_exec rm -f "$tmp_file.*"
+        exit $status
+    fi
+
+    if [ $only_analyze = 1 -a -n "$output_file" ] ; then
+        configurator_output_file=$output_file
+    else
+        configurator_output_file=$key_file
+    fi
+    $do_echo $CONFIGURATOR "$tmp_file.anl" -o $configurator_output_file
+    $do_exec $CONFIGURATOR "$tmp_file.anl" -o $configurator_output_file
+
+    status=$?
+    $do_echo rm -f "$tmp_file.*"
+    $do_exec rm -f "$tmp_file.*"
+
+    if [ $only_analyze = 1 ] ; then
+        exit $status
+    fi
+fi
+
+if [ $need_compile = 1 ] ; then
+    if [ $has_dash_c = 0 ] ; then
+        compile_flgs="-c $compile_flgs"
+    fi
+    if [ $has_dash_c = 1 -a -n "$output_file" ] ; then
+        compile_flgs="$compile_flgs -o $output_file"
+    fi
+    compile_flgs="$compile_flgs -DCONFIG_KEYS=\\\"$PWD/$key_file\\\""
+    $do_echo $compiler $compile_flgs $compile_args $input_file
+    $do_exec $compiler $compile_flgs $compile_args $input_file
+    status=$?
+    if [ $status != 0 ] ; then
+        exit $status
+    fi
+fi
+
+if [ $need_link = 1 ] ; then
+    if [ -n "$output_file" ] ; then
+        link_flgs="$link_flgs -o $output_file"
+    fi
+    $do_echo "$linker $link_flgs $link_objs $link_args $link_libs"
+    $do_exec $linker $link_flgs $link_objs $link_args $link_libs
+    status=$?
+fi
+
+exit $status

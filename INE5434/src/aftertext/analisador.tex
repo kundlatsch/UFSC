@@ -1,0 +1,340 @@
+% ----------------------------------------------------------
+\chapter{Código do analisador}
+% ----------------------------------------------------------
+
+O simulador foi implementado utilizando a versão 3.7 do Python, e o gerencia-mento de pacotes foi feito com o Poetry. As dependências estão disponíveis no arquivo \texttt{pyproject.toml}.
+
+\begin{section}{\_\_main\_\_.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from factorial2k import *
+from data import RESULTS_PLANS_CREATED
+import seaborn as sb
+import pandas as pd
+import matplotlib.pyplot as plt
+from statistics import mean
+
+
+def normalize(values):
+    vmin = min(values)
+    vmax = max(values)
+    return [(v - vmin) / (vmax - vmin) for v in values]
+
+
+def main():
+    FACTORS_2KN = 4
+    results = RESULTS_PLANS_CREATED
+    EFFECTS_2KN = effects_table_method(FACTORS_2KN, results)
+
+    sb.set(style="darkgrid")
+
+    # 1 - Independent Errors
+    x = normalize(get_residuals(results, EFFECTS_2KN, FACTORS_2KN))
+    y = normalize(nonlinear_regression(EFFECTS_2KN, FACTORS_2KN)) #y_hat
+    plt.plot(x, y, 'bo')
+    plt.xlabel('Residuals', fontsize=10)
+    plt.ylabel('Predicted Value', fontsize=10)
+    plt.show()
+
+    # 2 - Normally Distributed Errors
+    r = []
+    for re in results:
+        r.append(re[0])
+    x = normalize(r)
+    y = normalize(nonlinear_regression(EFFECTS_2KN, FACTORS_2KN)) #y_hat
+    plt.plot([0,1], 'r')
+    plt.plot(x, y, 'bo')
+    plt.xlabel('Simulation Value', fontsize=10)
+    plt.ylabel('Predicted Value', fontsize=10)
+    plt.show()
+
+    # 3 - Constant Standard Deviation of Errors
+    x = [i for i in range(2 ** FACTORS_2KN)]
+    y = normalize(nonlinear_regression(EFFECTS_2KN, FACTORS_2KN))  # y_hat
+    m = mean(y)
+    y2 = [m for i in range(2 ** FACTORS_2KN)]
+    plt.plot(x, y, "bo")
+    plt.plot(x, y2, "r--")
+    plt.ylabel("Predicted Value", fontsize=10)
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{factorial2k.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+import pyDOE2 as pd
+import numpy as np
+from itertools import combinations
+import string
+
+
+def create_sign_table(factors):
+    # This combination string is used to create the factorial_string,
+    # because pyDOE2 input is the comlumns that we want to create in
+    # the signal table. Here we are using it to generate the 2k^N table,
+    # so we need the combination of N comlumns.
+
+    combination_string = ""
+    for _, letter in zip(range(0, factors), string.ascii_lowercase):
+        combination_string += letter
+
+    _combinations = [
+        "".join(l)
+        for i in range(len(combination_string))
+        for l in combinations(combination_string, i + 1)
+    ]
+
+    factors_string = " ".join(_combinations)
+    factorial_columns = pd.fracfact(factors_string)
+
+    image_column = np.ones((2 ** factors, 1))
+    sign_table = np.hstack((image_column, factorial_columns))
+    return sign_table
+
+
+def effects_table_method(factors, results):
+    results_column = np.array(results)
+    sign_table = create_sign_table(factors)
+
+    tpf = 2 ** factors
+    coefficients = [
+        float(np.dot(sign_table[:, i], results_column) / tpf) for i in range(tpf)
+    ]
+
+    return coefficients
+
+
+def variation_allocation(effects):
+    # The first elements represents q0, and is not important here
+    effects.pop(0)
+
+    allocation = [4 * effect * effect for effect in effects]
+    total_variation = sum(allocation)
+
+    percentages = [(100 * a) / total_variation for a in allocation]
+
+    return percentages
+
+
+def get_residuals(results, effects, factors):
+    predicted_results = nonlinear_regression(effects, factors)
+    return [float(predicted_results[i] - results[i]) for i in range(len(results))]
+
+
+def nonlinear_regression(coefficients, factors):
+    sign_table = create_sign_table(factors)
+    return [regression_eq(coefficients, r) for r in sign_table]
+
+
+def regression_eq(coefficients, independent_values):
+    map(lambda x: np.array(x), (independent_values, coefficients))
+    return sum(np.multiply(coefficients, independent_values))
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{data.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+# Model
+# RESULTS = [[1], [9], [5], [13], [3], [11], [7], [15], [2], [10], [6], [14], [4], [12], [8], [16]]
+# This are the corresponding indexes in the results table.
+# TODO: Get results automatically from the simulation files
+
+# Vtime
+RESULTS_VTIME = [
+    [4874.60],
+    [3226.35],
+    [152096.65],
+    [48257.85],
+    [20800.40],
+    [228349.49],
+    [168025.60],
+    [273475.84],
+    [4999.93],
+    [5000.00],
+    [153436.30],
+    [140958.00],
+    [20813.00],
+    [304313.00],
+    [168032.00],
+    [312032.00],
+]
+
+# Perceptions Processed
+RESULTS_PECEPTIONS_PROCESSED = [
+    [4749.20],
+    [1452.70],
+    [4749.10],
+    [1452.63],
+    [4749.20],
+    [1454.77],
+    [4749.20],
+    [1453.88],
+    [4751.26],
+    [2606.74],
+    [4816.31],
+    [4745.69],
+    [4750.14],
+    [1295.42],
+    [4750.03],
+    [1311.50],
+]
+
+# Plans Created
+RESULTS_PLANS_CREATED = [
+    [250.80],
+    [3547.3],
+    [250.9],
+    [3547.37],
+    [250.8],
+    [3545.23],
+    [250.8],
+    [3546.12],
+    [502],
+    [9304],
+    [2936.6],
+    [4066.4],
+    [251],
+    [4751],
+    [251],
+    [4751],
+]
+
+
+# Test
+RESULTS_2K2 = [[15], [45], [25], [75]]
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{tests/test\_factorial2k.py}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+from pytest import approx
+from src.factorial2k import (
+    effects_table_method,
+    variation_allocation,
+    nonlinear_regression,
+)
+
+
+# 2K^2 FACTORIAL DESIGN TESTS #
+FACTORS_2K2 = 2
+RESULTS_2K2 = [[15], [45], [25], [75]]
+EFFECTS_2K2 = effects_table_method(FACTORS_2K2, RESULTS_2K2)
+ALLOCATION_2K2 = variation_allocation(EFFECTS_2K2.copy())
+
+
+def test_effects2k2():
+    assert EFFECTS_2K2 == [40.0, 20.0, 10.0, 5.0]
+
+
+def test_variation2k2():
+    assert ALLOCATION_2K2 == approx([76, 19, 5], rel=1e-1, abs=1)
+
+
+# 2K^n FACTORIAL DESIGN TESTS #
+FACTORS_2KN = 3
+RESULTS_2KN = [[14], [22], [10], [34], [46], [58], [50], [86]]
+EFFECTS_2KN = effects_table_method(FACTORS_2KN, RESULTS_2KN)
+ALLOCATION_2KN = variation_allocation(EFFECTS_2KN.copy())
+
+
+def test_effects2kN():
+    assert EFFECTS_2KN == [40.0, 10.0, 5.0, 20.0, 5.0, 2.0, 3.0, 1.0]
+
+
+def test_variation2kN():
+    assert ALLOCATION_2KN == approx([18, 4, 71, 4, 1, 2, 0], rel=1e-1, abs=1)
+
+
+# VERIFYING THE ASSUMPTIONS
+
+
+def test_nonlinear_regression():
+    assert nonlinear_regression(EFFECTS_2K2, FACTORS_2K2) == [15.0, 45.0, 25.0, 75.0]
+
+    \end{minted}
+\end{section}
+\newpage
+
+\begin{section}{pyproject.toml}
+    \begin{minted}
+    [
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    breaklines=True,
+    fontsize=\footnotesize,
+    linenos
+    ]
+    {python}
+
+[tool.poetry]
+name = "factorial-design"
+version = "0.1.0"
+description = ""
+authors = ["kundlatsch <gustavo.kundlatsch@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pyDOE2 = "^1.3.0"
+pytest = "^5.4.1"
+seaborn = "^0.10.1"
+pandas = "^1.0.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+    \end{minted}
+\end{section}
+\newpage

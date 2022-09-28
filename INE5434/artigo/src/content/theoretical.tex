@@ -1,0 +1,96 @@
+\section{Fundamentação teórica}
+
+Alguns conceitos precisam ser bem definidos para que sejam utilizados mais tarde na formalização do modelo proposto. Esse capítulo apresenta essas definições iniciais.
+
+\subsection{Agente inteligente}
+
+Um agente inteligente é uma entidade autônoma, capaz de tomar as próprias decisões para atingir seus objetivos \cite{wooldridge1999intelligent}. Apesar da definição intuitiva ser simples, assim como no termo inteligência artificial não existe um consenso da comunidade sobre o que é um agente. Para este trabalho, compomos a seguinte formalização de agente inteligente:
+
+\vspace{0.2cm}
+
+\theoremstyle{definition}
+\begin{definition}
+    \label{def:agent}
+    Um agente é uma tripla $Ag = \langle K, P, \gamma \rangle$, onde:
+    \begin{itemize}
+        \item $K$ é uma base de conhecimentos, tal que $K = K_i \cup K_p$, onde $K_i$ é o conjunto de conhecimentos inicias do agente e $K_p$ os conhecimentos adquiridos através das percepções. $K_i$ é iniciado com valores arbitrários de acordo com a necessidade do agente e $K_p$ é iniciado vazio. Uma base de conhecimentos é uma estrutura que representa fatos a respeito do mundo e apresenta formas de raciocinar a respeito desses fatos para deduzir novos conhecimentos \cite{hayes1983building};
+        \item $P$ é o conjunto de planos do agente, sendo um plano definido como $plano = (\Psi, A, \Omega)$, onde $\Psi$ é o conjunto união formado pelas pré-condições das ações que compõem o plano, $A$ o conjunto de ações que compõe o plano e $\Omega$ o conjunto união formado pelas pós-condições das ações que compõem o plano. Por sua vez, uma ação é definida como $acao = (\psi, n, \omega)$, sendo $\psi$ um conjunto de pré-condições, $n$ um nome para a ação e $\omega$ um conjunto de pós-condições; e
+        \item $\gamma$ é a função de percepção, definida como $ \gamma(p, K) \rightarrow P_i $, onde $p$ é o conjunto de percepções recebidas, $K$ a base de conhecimentos de $Ag$ e $P_i$ o retorno da função, que é um subconjunto próprio do conjunto $P$ de planos do agente.
+    \end{itemize}{}
+\end{definition}{}
+
+A partir dessa definição, podemos construir o conceito de contexto, que será importante mais tarde para o modelo de revisão de percepções. O contexto de um agente é o conjunto de todos os símbolos compreendidos pelo agente, e cuja percepção de cada um desses símbolos resulta na execução de um conjunto de ações diretamente mapeadas.
+
+\vspace{0.2cm}
+
+\begin{definition}
+    O contexto $c$ de um agente $Ag$ é o domínio de sua função $\gamma$.
+    \label{definition::context}
+\end{definition}{}
+
+Para este trabalho, serão utilizados símbolos compostos para representar percepções e ações. Esses símbolos são formados da maneira \emph{predicado(caracteristica)}, onde o predicado é o elemento principal do símbolo e a característica uma propriedade secundária.
+
+\subsection{Percepção}
+
+Existem diversas definições para o termo ``percepção''. Podemos entender percepção como um conjunto de sensações que, através da maneira subjetiva que um dado agente o interpreta, representa determinadas entidades do ambiente \cite{gibson1950perception}. Ou seja, a percepção não é simplesmente a representação direta das entidades reais que existem no mundo, mas um processo complexo que varia para cada indivíduo.
+
+Para o modelo que iremos propor, baseado na Definição \ref{def:agent}, o conceito de percepção pode ser simplesmente definido como as entradas da função de percepção $\gamma$ de um agente. Vale destacar a diferença entre percepção e contexto, pois o contexto é constituído pelas percepções que fazem parte do domínio da função $\gamma$, ou seja, uma percepção é toda informação produzida pelo ambiente que o agente recebe, e contexto é o subconjunto das percepções que o agente possui planos para tratar.
+
+\subsubsection{Refinamento}
+
+Como o volume de percepções de um agente pode ser muito grande, e as percepções tomam determinado tempo para serem processadas, o número de percepções que chegam ao ciclo de raciocínio do agente pode ser reduzido para diminuir seu custo computacional. Neste trabalho, esse processo será chamado de refinamento, definido da seguinte maneira:
+
+\vspace{0.2cm}
+
+\begin{definition}
+    \label{def:refinamento}
+    Refinamento de percepções é uma função $\theta$ tal que, dado o conjunto de entradas de percepções $p$, reduz tais percepções para um subconjunto próprio $\rho$.
+\end{definition}
+
+\subsubsection{Anomalias}
+
+\label{anomalias}
+
+Anomalias são as percepções consideradas inválidas, geradas por alguma falha no processo de percepção. Toda percepção para a qual o agente não possui uma resposta mapeada em sua função de percepção é considerada uma anomalia. O conjunto de anomalias de um agente é o conjunto de todas as percepções possíveis que não fazem parte de seu contexto. A seguinte definição será utilizada:
+
+\vspace{0.2cm}
+
+\begin{definition}
+    Uma percepção $p$ de um agente $Ag$ com contexto $c$, é uma anomalia caso $p \notin c$ de $Ag$.
+\end{definition}
+
+Neste trabalho, as anomalias serão classificadas em dois grupos: alucinações e ilusões. Essa classificação foi inspirada no problema da percepção, um campo de estudo da filosofia \cite{perception-problem}.
+
+Uma ilusão é uma percepção da forma \textit{predicado(caracteristica)} onde ou o predicado ou a característica não faz parte do contexto do agente, ou seja, é uma percepção parcialmente correta. Uma alucinação é uma uma percepção da forma \textit{predicado(caracteristica)} onde nem o predicado nem a característica faz parte do predicado, ou seja, a percepção pode ser semanticamente correta mas ela não deveria ter sido realizada pelo agente.
+
+\subsection{Planejamento automatizado}
+
+Planejamento automatizado é um dos problemas fundamentais da Inteligência Artificial. As motivações para usar o planejamento automatizado são a capacidade de utilizar recursos de planejamento acessíveis e eficientes e reproduzir uma parte do processo cognitivo humano com um componente totalmente integrado de comportamento deliberativo \cite{GHALLAB20041}.
+
+Na Definição \ref{definition::autoplanning} é apresentada a noção abstrata de planejamento automático, descrita como um modelo conceitual simples que contém os elementos principais do problema, tendo sido originalmente apresentada por \cite{GHALLAB20041}.
+
+\vspace{0.2cm}
+
+\begin{definition}{}
+\label{definition::autoplanning}
+   % USAR MAIS TARDE PARA DEFINIR O BLOCO DE AUTOPLANEJAMENTO An automated planning block is a instance of the conceptual model of automated planning, described through the interaction between three components bellow \cite{GHALLAB20041}:
+   Um modelo conceitual de planejamento automatizado é descrito como a interação entre os seguintes três componentes:
+   
+    \begin{itemize}
+        \item Um sistema de transição de estados $\Sigma$, especificado por uma função de transição de estados $y$, de acordo com os eventos e ações que ele recebe. 
+        \item Um $controlador$, que dado uma entrada de estados $s$ do sistema, fornece como saída uma ação de acordo com algum plano.
+        \item Um $planejador$, que dado uma entrada de uma descrição de sistema $Z$, uma situação inicial e alguns objetivos, sintetiza um plano para o controlador a fim de alcançar o objetivo.
+    \end{itemize}
+    
+    Um sistema de transição de estados $\Sigma$ é uma quádrupla $\Sigma = \langle S, A, E, \Gamma \rangle$, onde:
+    
+    \begin{itemize}
+        \item $S = \{s_1, s_2, ..., s_{n}\}$ é um conjunto finito ou recursivamente enumerável de estados;
+        \item $A = \{a_1, a_2, ..., a_{n}\}$ é um conjunto finito ou recursivamente enumerável de ações;
+        \item $E = \{e_1, e_2, ..., e_{n}\}$ é um conjunto finito ou recursivamente enumerável de eventos; e 
+        \item $\Gamma: S \times A \times E \rightarrow 2^S$ é uma função de transição de estados. 
+    \end{itemize}
+     
+\end{definition}
+
+

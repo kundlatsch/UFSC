@@ -1,0 +1,941 @@
+diff --git a/Dockerfile b/Dockerfile
+new file mode 100644
+index 0000000..33be31f
+--- /dev/null
++++ b/Dockerfile
+@@ -0,0 +1,51 @@
++FROM ubuntu:focal
++
++WORKDIR /home
++
++ENV TZ=America/Sao_Paulo
++RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ
++
++RUN apt-get update && \
++    apt-get install -y \
++        bc \
++        bin86 \
++        build-essential \
++        g++-multilib \
++        gcc-multilib \
++        gdb \
++        gdb-multiarch \
++        make \
++        python3 \
++        python3-pip \
++        qemu \
++        qemu-kvm \
++        qemu-system-arm \
++        tar \
++        tcsh \
++        wget \
++        xterm && \
++    apt-get clean && \
++    rm -rf /var/lib/apt/lists/*
++
++RUN wget https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64.deb && \
++    dpkg -i dumb-init_*.deb && \
++    rm dumb-init_*.deb
++
++RUN wget -q -O ia32.tar.gz https://epos.lisha.ufsc.br/dl469 && \
++    tar -zxvf ia32.tar.gz && \
++    mkdir -p /usr/local/ia32/ && \
++    mv gcc-7.2.0 /usr/local/ia32/ && \
++    rm -r ia32.tar.gz
++
++RUN wget -q -O arm.tar.gz https://epos.lisha.ufsc.br/dl468 && \
++    tar -zxvf arm.tar.gz && \
++    mkdir -p /usr/local/arm/ && \
++    mv gcc-7.2.0 /usr/local/arm/ && \
++    rm -r arm.tar.gz
++
++ENV PATH="${PATH}:/usr/local/arm/gcc-7.2.0/bin/"
++
++VOLUME /code
++WORKDIR /code
++
++ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+diff --git a/app/hello/hello_traits.h b/app/hello/hello_traits.h
+index 77a3de8..512cac1 100644
+--- a/app/hello/hello_traits.h
++++ b/app/hello/hello_traits.h
+@@ -107,6 +107,7 @@ template<> struct Traits<System>: public Traits<Build>
+     static const bool multitask = (mode != Traits<Build>::LIBRARY);
+     static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
+     static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
++    static const bool sharedmemory = true;
+ 
+     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
+     static const unsigned int DUTY_CYCLE = 1000000; // ppm
+diff --git a/app/philosophers_dinner/philosophers_dinner_traits.h b/app/philosophers_dinner/philosophers_dinner_traits.h
+index 77a3de8..512cac1 100644
+--- a/app/philosophers_dinner/philosophers_dinner_traits.h
++++ b/app/philosophers_dinner/philosophers_dinner_traits.h
+@@ -107,6 +107,7 @@ template<> struct Traits<System>: public Traits<Build>
+     static const bool multitask = (mode != Traits<Build>::LIBRARY);
+     static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
+     static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
++    static const bool sharedmemory = true;
+ 
+     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
+     static const unsigned int DUTY_CYCLE = 1000000; // ppm
+diff --git a/app/producer_consumer/producer_consumer_traits.h b/app/producer_consumer/producer_consumer_traits.h
+index 77a3de8..512cac1 100644
+--- a/app/producer_consumer/producer_consumer_traits.h
++++ b/app/producer_consumer/producer_consumer_traits.h
+@@ -107,6 +107,7 @@ template<> struct Traits<System>: public Traits<Build>
+     static const bool multitask = (mode != Traits<Build>::LIBRARY);
+     static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
+     static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
++    static const bool sharedmemory = true;
+ 
+     static const unsigned long LIFE_SPAN = 1 * YEAR; // s
+     static const unsigned int DUTY_CYCLE = 1000000; // ppm
+diff --git a/app/test_deadline/makefile b/app/test_deadline/makefile
+new file mode 100644
+index 0000000..8a6578a
+--- /dev/null
++++ b/app/test_deadline/makefile
+@@ -0,0 +1,17 @@
++# EPOS Application Makefile
++
++include ../../makedefs
++
++all: install
++
++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
++
++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
++		$(ACC) $(ACCFLAGS) -o $@ $<
++
++install: $(APPLICATION)
++		$(INSTALL) $(APPLICATION) $(IMG)
++
++clean:
++		$(CLEAN) *.o $(APPLICATION)
+diff --git a/app/test_deadline/test_deadline.cc b/app/test_deadline/test_deadline.cc
+new file mode 100644
+index 0000000..9508a9e
+--- /dev/null
++++ b/app/test_deadline/test_deadline.cc
+@@ -0,0 +1,43 @@
++#include <utility/ostream.h>
++#include <real-time.h>
++
++using namespace EPOS;
++
++OStream cout;
++
++int testing();
++
++int main()
++{
++    Periodic_Thread::Configuration conf_a{5000, 1000, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
++    Periodic_Thread::Configuration conf_b{1500, 500, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
++    Periodic_Thread::Configuration conf_c{25000, 5000, Periodic_Thread::SAME, Periodic_Thread::UNKNOWN, 10, Thread::READY, Periodic_Thread::NORMAL, 16 * 1024};
++
++    Periodic_Thread * a = new Periodic_Thread(conf_a, &testing);
++    Periodic_Thread * b = new Periodic_Thread(conf_b, &testing);
++    Periodic_Thread * c = new Periodic_Thread(conf_c, &testing);
++
++    a -> join();
++    b -> join();
++    c -> join();
++
++
++    delete a;
++    delete b;
++    delete c;
++
++    cout << "Finishing test..." << endl;
++
++    return 0;
++}
++
++int testing() {
++  int i = 0;
++  while ((i < 10) and Periodic_Thread::wait_next()) // iterator stops infinite runs.
++  {
++    cout << "Job finished\n" << endl;
++    i++;
++  }
++
++  return 0;
++}
+\ No newline at end of file
+diff --git a/app/test_deadline/test_deadline_traits.h b/app/test_deadline/test_deadline_traits.h
+new file mode 100644
+index 0000000..2805c20
+--- /dev/null
++++ b/app/test_deadline/test_deadline_traits.h
+@@ -0,0 +1,159 @@
++#ifndef __traits_h
++#define __traits_h
++
++#include <system/config.h>
++
++__BEGIN_SYS
++
++// Build
++template<> struct Traits<Build>: public Traits_Tokens
++{
++    // Basic configuration
++    static const unsigned int MODE = LIBRARY;
++    static const unsigned int ARCHITECTURE = ARMv7;
++    static const unsigned int MACHINE = Cortex;
++    static const unsigned int MODEL = Raspberry_Pi3;
++    static const unsigned int CPUS = 1;
++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
++
++    // Default flags
++    static const bool enabled = true;
++    static const bool monitored = false;
++    static const bool debugged = false;
++    static const bool hysterically_debugged = false;
++
++    // Default aspects
++    typedef ALIST<> ASPECTS;
++};
++
++
++// Utilities
++template<> struct Traits<Debug>: public Traits<Build>
++{
++    static const bool error   = true;
++    static const bool warning = false;
++    static const bool info    = false;
++    static const bool trace   = true;
++};
++
++template<> struct Traits<Lists>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Spin>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Heaps>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Observers>: public Traits<Build>
++{
++    // Some observed objects are created before initializing the Display
++    // Enabling debug may cause trouble in some Machines
++    static const bool debugged = false;
++};
++
++
++// System Parts (mostly to fine control debugging)
++template<> struct Traits<Boot>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Setup>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Init>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Framework>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Aspect>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++
++__END_SYS
++
++// Mediators
++#include __ARCHITECTURE_TRAITS_H
++#include __MACHINE_TRAITS_H
++
++__BEGIN_SYS
++
++
++// API Components
++template<> struct Traits<Application>: public Traits<Build>
++{
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
++};
++
++template<> struct Traits<System>: public Traits<Build>
++{
++    static const unsigned int mode = Traits<Build>::MODE;
++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++    static const bool multiheap = multitask || Traits<Scratchpad>::enabled;
++    static const bool sharedmemory = true;
++
++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
++
++    static const bool reboot = true;
++
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
++};
++
++template<> struct Traits<Task>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multitask;
++};
++
++template<> struct Traits<Thread>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++    static const bool smp = Traits<System>::multicore;
++    static const bool trace_idle = hysterically_debugged;
++    static const bool simulate_capacity = false;
++
++    typedef DM Criterion;
++    static const unsigned int QUANTUM = 10000; // us
++};
++
++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
++{
++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
++};
++
++template<> struct Traits<Synchronizer>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++};
++
++template<> struct Traits<Alarm>: public Traits<Build>
++{
++    static const bool visible = hysterically_debugged;
++};
++
++template<> struct Traits<DM>: public Traits<Build>
++{
++    static const bool debugged = true;
++};
++
++__END_SYS
++
++#endif
+diff --git a/app/test_shared_memory/makefile b/app/test_shared_memory/makefile
+new file mode 100644
+index 0000000..8a6578a
+--- /dev/null
++++ b/app/test_shared_memory/makefile
+@@ -0,0 +1,17 @@
++# EPOS Application Makefile
++
++include ../../makedefs
++
++all: install
++
++$(APPLICATION):	$(APPLICATION).o $(LIB)/*
++		$(ALD) $(ALDFLAGS) -o $@ $(APPLICATION).o
++
++$(APPLICATION).o: $(APPLICATION).cc $(SRC)
++		$(ACC) $(ACCFLAGS) -o $@ $<
++
++install: $(APPLICATION)
++		$(INSTALL) $(APPLICATION) $(IMG)
++
++clean:
++		$(CLEAN) *.o $(APPLICATION)
+diff --git a/app/test_shared_memory/test_shared_memory.cc b/app/test_shared_memory/test_shared_memory.cc
+new file mode 100644
+index 0000000..5d4a190
+--- /dev/null
++++ b/app/test_shared_memory/test_shared_memory.cc
+@@ -0,0 +1,77 @@
++#include <utility/ostream.h>
++#include <process.h>
++
++using namespace EPOS;
++
++OStream cout;
++
++
++char * test_char = new (SHARED) char('a');
++
++int test1_b() {
++    *test_char = 'b';
++    return 0;
++}
++
++int test1_c() {
++    *test_char = 'c';
++    return 0;
++}
++
++int main() {
++
++    cout << "-----------------------" << endl;
++    cout << "Shared memory test" << endl;
++    cout << "-----------------------" << endl;
++
++    // Test 1: create a global variable in the shared memory 
++    // and manipulate it with two different threads
++    Thread * test1_b_thread = new Thread(&test1_b);
++    Thread * test1_c_thread = new Thread(&test1_c);
++
++    test1_b_thread->join();
++    test1_c_thread->join();
++
++    cout << "Asserting test char value" << endl;
++    assert(*test_char != 'a');
++    assert(*test_char != 'b');
++    assert(*test_char == 'c');
++
++    delete test_char;
++
++    // Test 2: after deleting a variable from the shared memory,
++    // create another one and change it's value
++    int * test_int = new (SHARED) int;
++    *test_int = 0;
++    *test_int += 1;
++
++    cout << "Asserting test int value" << endl;
++    assert(*test_int != 0);
++    assert(*test_int == 1);
++    assert(*test_int != 2);
++
++    delete test_int;
++
++    // Test 3: create and change the value of a variable in the
++    // system, application and shared heap
++
++    cout << "Asserting variables in different heaps" << endl;
++
++    int * test_shared_var = new (SHARED) int;
++    int * test_system_var = new (SYSTEM) int;
++    int * test_application_var = new int;
++    
++    *test_shared_var = 0;
++    *test_system_var = 1;
++    *test_application_var = 2;
++
++    ++*test_shared_var;
++    ++*test_system_var;
++    ++*test_application_var;
++
++    assert(*test_shared_var == 1);
++    assert(*test_system_var == 2);
++    assert(*test_application_var == 3);
++    
++    cout << "Finishing test..." << endl;
++}
+\ No newline at end of file
+diff --git a/app/test_shared_memory/test_shared_memory_traits.h b/app/test_shared_memory/test_shared_memory_traits.h
+new file mode 100644
+index 0000000..b5e047e
+--- /dev/null
++++ b/app/test_shared_memory/test_shared_memory_traits.h
+@@ -0,0 +1,156 @@
++#ifndef __traits_h
++#define __traits_h
++
++#include <system/config.h>
++
++__BEGIN_SYS
++
++// Build
++template<> struct Traits<Build>: public Traits_Tokens
++{
++    // Basic configuration
++    static const unsigned int MODE = LIBRARY;
++    static const unsigned int ARCHITECTURE = ARMv7;
++    static const unsigned int MACHINE = Cortex;
++    static const unsigned int MODEL = Raspberry_Pi3;
++    static const unsigned int CPUS = 1;
++    static const unsigned int NODES = 1; // (> 1 => NETWORKING)
++    static const unsigned int EXPECTED_SIMULATION_TIME = 60; // s (0 => not simulated)
++
++    // Default flags
++    static const bool enabled = true;
++    static const bool monitored = false;
++    static const bool debugged = true;
++    static const bool hysterically_debugged = false;
++
++    // Default aspects
++    typedef ALIST<> ASPECTS;
++};
++
++
++// Utilities
++template<> struct Traits<Debug>: public Traits<Build>
++{
++    static const bool error   = true;
++    static const bool warning = true;
++    static const bool info    = false;
++    static const bool trace   = false;
++};
++
++template<> struct Traits<Lists>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Spin>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Heaps>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++template<> struct Traits<Observers>: public Traits<Build>
++{
++    // Some observed objects are created before initializing the Display
++    // Enabling debug may cause trouble in some Machines
++    static const bool debugged = false;
++};
++
++
++// System Parts (mostly to fine control debugging)
++template<> struct Traits<Boot>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Setup>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Init>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Framework>: public Traits<Build>
++{
++};
++
++template<> struct Traits<Aspect>: public Traits<Build>
++{
++    static const bool debugged = hysterically_debugged;
++};
++
++
++__END_SYS
++
++// Mediators
++#include __ARCHITECTURE_TRAITS_H
++#include __MACHINE_TRAITS_H
++
++__BEGIN_SYS
++
++
++// API Components
++template<> struct Traits<Application>: public Traits<Build>
++{
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = Traits<Machine>::HEAP_SIZE;
++    static const unsigned int MAX_THREADS = Traits<Machine>::MAX_THREADS;
++};
++
++template<> struct Traits<System>: public Traits<Build>
++{
++    static const unsigned int mode = Traits<Build>::MODE;
++    static const bool multithread = (Traits<Build>::CPUS > 1) || (Traits<Application>::MAX_THREADS > 1);
++    static const bool multitask = (mode != Traits<Build>::LIBRARY);
++    static const bool multicore = (Traits<Build>::CPUS > 1) && multithread;
++    static const bool multiheap = true;
++    static const bool sharedmemory = true;
++
++    static const unsigned long LIFE_SPAN = 1 * YEAR; // s
++    static const unsigned int DUTY_CYCLE = 1000000; // ppm
++
++    static const bool reboot = true;
++
++    static const unsigned int STACK_SIZE = Traits<Machine>::STACK_SIZE;
++    static const unsigned int HEAP_SIZE = (Traits<Application>::MAX_THREADS + 1) * Traits<Application>::STACK_SIZE;
++};
++
++template<> struct Traits<Task>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multitask;
++};
++
++template<> struct Traits<Thread>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++    static const bool smp = Traits<System>::multicore;
++    static const bool trace_idle = hysterically_debugged;
++    static const bool simulate_capacity = false;
++
++    typedef DM Criterion;
++    static const bool preemptive = true;
++    static const unsigned int QUANTUM = 10000; // us
++};
++
++template<> struct Traits<Scheduler<Thread>>: public Traits<Build>
++{
++    static const bool debugged = Traits<Thread>::trace_idle || hysterically_debugged;
++};
++
++template<> struct Traits<Synchronizer>: public Traits<Build>
++{
++    static const bool enabled = Traits<System>::multithread;
++};
++
++template<> struct Traits<Alarm>: public Traits<Build>
++{
++    static const bool visible = hysterically_debugged;
++};
++
++
++__END_SYS
++
++#endif
+diff --git a/dockepos b/dockepos
+new file mode 100644
+index 0000000..7f801ce
+--- /dev/null
++++ b/dockepos
+@@ -0,0 +1,10 @@
++#! /bin/bash
++
++docker run -it --rm \
++-v $(pwd):/code \
++-v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
++-e "DISPLAY" \
++-e 'QEMU_AUDIO_DRV=none' \
++-u $(id -u):$(id -g) \
++pico/dockepos \
++$@
+diff --git a/include/architecture/mmu.h b/include/architecture/mmu.h
+index 17ea7d9..c3c4511 100644
+--- a/include/architecture/mmu.h
++++ b/include/architecture/mmu.h
+@@ -50,6 +50,7 @@ public:
+             IO   = 1 << 8, // Memory Mapped I/O (0=memory, 1=I/O)
+             SYS  = (PRE | RD | RW | EX),
+             APP  = (PRE | RD | RW | EX | USR),
++            SHR  = (PRE | RD | RW | EX | USR),
+             APPC = (PRE | RD | EX | USR),
+             APPD = (PRE | RD | RW | USR)
+         };
+diff --git a/include/real-time.h b/include/real-time.h
+index 4f53875..e5559fd 100644
+--- a/include/real-time.h
++++ b/include/real-time.h
+@@ -25,13 +25,14 @@ typedef Thread Aperiodic_Thread;
+ class Periodic_Thread: public Thread
+ {
+ public:
+-    enum {
+-        SAME    = Real_Time_Scheduler_Common::SAME,
+-        NOW     = Real_Time_Scheduler_Common::NOW,
+-        UNKNOWN = Real_Time_Scheduler_Common::UNKNOWN,
+-        ANY     = Real_Time_Scheduler_Common::ANY
++    enum : unsigned int {
++        SAME    = 0,
++        NOW     = 0,
++        UNKNOWN = 0,
++        ANY     = -1U
+     };
+ 
++
+ protected:
+     // Alarm Handler for periodic threads under static scheduling policies
+     class Static_Handler: public Semaphore_Handler
+@@ -75,7 +76,12 @@ public:
+ public:
+     template<typename ... Tn>
+     Periodic_Thread(const Microsecond & p, int (* entry)(Tn ...), Tn ... an)
+-    : Thread(Thread::Configuration(SUSPENDED, Criterion(p)), entry, an ...),
++    : Thread(Thread::Configuration(SUSPENDED, Criterion(p, p)), entry, an ...),
++      _semaphore(0), _handler(&_semaphore, this), _alarm(p, &_handler, INFINITE) { resume(); }
++
++    template<typename ... Tn>
++    Periodic_Thread(const Microsecond & p, const Microsecond d, int (* entry)(Tn ...), Tn ... an)
++    : Thread(Thread::Configuration(SUSPENDED, Criterion(d, p)), entry, an ...),
+       _semaphore(0), _handler(&_semaphore, this), _alarm(p, &_handler, INFINITE) { resume(); }
+ 
+     template<typename ... Tn>
+@@ -96,6 +102,7 @@ public:
+         Periodic_Thread * t = reinterpret_cast<Periodic_Thread *>(running());
+ 
+         db<Thread>(TRC) << "Thread::wait_next(this=" << t << ",times=" << t->_alarm.times() << ")" << endl;
++        db<DM> (TRC) << "Thread " << t << " started working. Period: " << t->criterion() << endl;
+ 
+         if(t->_alarm.times())
+             t->_semaphore.p();
+diff --git a/include/scheduler.h b/include/scheduler.h
+index 99bfd36..e86be96 100644
+--- a/include/scheduler.h
++++ b/include/scheduler.h
+@@ -145,6 +145,38 @@ public:
+     FCFS(int p = NORMAL, Tn & ... an);
+ };
+ 
++class Real_Time_Scheduler: public Priority
++{
++protected:
++    Real_Time_Scheduler(int p): Priority(p), _deadline(0), _period(0), _capacity(0) {}
++    Real_Time_Scheduler(int i, const Microsecond & d, const Microsecond & p, const Microsecond & c)
++    : Priority(i), _deadline(d), _period(p), _capacity(c) {}
++
++public:
++    const Microsecond period() { return _period; }
++    void period(const Microsecond & p) { _period = p; }
++
++public:
++    Microsecond _deadline;
++    Microsecond _period;
++    Microsecond _capacity;
++};
++
++// Deadline Monotonic
++class DM: public Real_Time_Scheduler
++{
++
++public:
++    static const bool timed = false;
++    static const bool dynamic = false;
++    static const bool preemptive = true;
++
++public:
++    DM(int p = APERIODIC): Real_Time_Scheduler(p) {}
++    DM(const Microsecond & d, const Microsecond & p = SAME, const Microsecond & c = UNKNOWN, unsigned int cpu = ANY)
++    : Real_Time_Scheduler(d, d, p, c) {}
++};
++
+ __END_SYS
+ 
+-#endif
++#endif
+\ No newline at end of file
+diff --git a/include/system.h b/include/system.h
+index 5215ef1..63b03e8 100644
+--- a/include/system.h
++++ b/include/system.h
+@@ -47,13 +47,29 @@ private:
+     static char _preheap[(Traits<System>::multiheap ? sizeof(Segment) : 0) + sizeof(Heap)];
+     static Segment * _heap_segment;
+     static Heap * _heap;
++    static Segment * _shared_segment;
++};
++
++// Class used to store and handle the shared memory heap with the "new (SHARED)" operator
++class Shared_Memory {
++    friend class Init_System;
++    friend void * ::malloc(size_t);
++    friend void ::free(void*);
++    friend void * ::operator new(size_t, const EPOS::Shared_Allocator&);
++    friend void * ::operator new[](size_t, const EPOS::Shared_Allocator&);
++    friend void ::operator delete(void*);
++    friend void ::operator delete[](void*);
++
++    private:
++    static char _preheap[sizeof(Segment) + sizeof(Heap)];
++    static Segment * _shared_heap_segment;
++    static Heap * _shared_heap;
+ };
+ 
+ __END_SYS
+ 
+ extern "C"
+ {
+-    // Standard C Library allocators
+     inline void * malloc(size_t bytes) {
+         __USING_SYS;
+         if(Traits<System>::multiheap)
+@@ -94,6 +110,14 @@ inline void * operator new[](size_t bytes, const EPOS::System_Allocator & alloca
+     return _SYS::System::_heap->alloc(bytes);
+ }
+ 
++inline void * operator new(size_t bytes, const EPOS::Shared_Allocator & allocator) {
++    return _SYS::Shared_Memory::_shared_heap->alloc(bytes);
++}
++
++inline void * operator new[](size_t bytes, const EPOS::Shared_Allocator & allocator) {
++    return _SYS::Shared_Memory::_shared_heap->alloc(bytes);
++}
++
+ // Delete cannot be declared inline due to virtual destructors
+ void operator delete(void * ptr);
+ void operator delete[](void * ptr);
+diff --git a/include/system/traits.h b/include/system/traits.h
+index 5e505ed..7aeb447 100644
+--- a/include/system/traits.h
++++ b/include/system/traits.h
+@@ -93,6 +93,7 @@ class Keypad;
+ // API Components
+ class System;
+ class Application;
++class Shared_Memory;
+ 
+ class Thread;
+ class Active;
+diff --git a/include/system/types.h b/include/system/types.h
+index 645c2df..d0259ba 100644
+--- a/include/system/types.h
++++ b/include/system/types.h
+@@ -9,6 +9,7 @@ __BEGIN_API
+ 
+ // Memory allocators
+ enum System_Allocator { SYSTEM };
++enum Shared_Allocator { SHARED };
+ enum Scratchpad_Allocator { SCRATCHPAD };
+ enum Color {
+     COLOR_0,  COLOR_1,  COLOR_2,  COLOR_3,  COLOR_4,  COLOR_5,  COLOR_6,  COLOR_7,
+@@ -44,6 +45,9 @@ inline void * operator new[](size_t s, void * a) { return a; }
+ void * operator new(size_t, const EPOS::System_Allocator &);
+ void * operator new[](size_t, const EPOS::System_Allocator &);
+ 
++void * operator new(size_t, const EPOS::Shared_Allocator &);
++void * operator new[](size_t, const EPOS::Shared_Allocator &);
++
+ void * operator new(size_t, const EPOS::Scratchpad_Allocator &);
+ void * operator new[](size_t, const EPOS::Scratchpad_Allocator &);
+ 
+diff --git a/include/time.h b/include/time.h
+index 8608ce0..7b7d168 100644
+--- a/include/time.h
++++ b/include/time.h
+@@ -34,6 +34,7 @@ class Alarm
+     friend class Alarm_Chronometer;             // for elapsed()
+     friend class Periodic_Thread;               // for ticks(), times(), and elapsed()
+     friend class FCFS;                          // for ticks() and elapsed()
++    friend class DM;
+ 
+ private:
+     typedef Timer_Common::Tick Tick;
+
+diff --git a/makedefs b/makedefs
+index 09760e0..9dd2176 100644
+--- a/makedefs
++++ b/makedefs
+@@ -93,8 +93,8 @@ UUID                    = $(shell cat /proc/sys/kernel/random/uuid | sed 's/-//g
+ 
+ # Compiler prefixes
+ ia32_COMP_PREFIX	:= /usr/bin/x86_64-linux-gnu-
+-armv7_COMP_PREFIX	:= /usr/bin/arm-none-eabi-
+-armv8_COMP_PREFIX	:= /usr/bin/arm-none-eabi-
++armv7_COMP_PREFIX       := /usr/local/arm/gcc-7.2.0/bin/arm-
++armv8_COMP_PREFIX       := /usr/local/arm/gcc-7.2.0/bin/arm-
+ rv32_COMP_PREFIX	:= /usr/local/rv32/bin/riscv32-unknown-linux-gnu-
+ rv64_COMP_PREFIX	:= /usr/bin/riscv64-linux-gnu-
+ COMP_PREFIX		= $($(ARCH)_COMP_PREFIX)
+@@ -116,11 +116,11 @@ cortex_CC_FLAGS		:= -mcpu=cortex-a9
+ cortex_AS_FLAGS		:= -mcpu=cortex-a9
+ cortex_LD_FLAGS		:=
+ cortex_EMULATOR		= qemu-system-arm -machine realview-pbx-a9 -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
+-cortex_DEBUGGER		:= arm-none-eabi-gdb
++cortex_DEBUGGER		:= gdb-multiarch
+ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
+ cortex_MAGIC		:= --omagic
+ cortex_CODE_NAME	:= .init
+-cortex_DATA_NAME	:= .data
++cortex_DATA_NAME	:=
+ cortex_IMG_SUFFIX	:= .bin
+ endif
+ 
+@@ -128,11 +128,11 @@ ifeq ($(MMOD),zynq)
+ cortex_CC_FLAGS		:= -mcpu=cortex-a9
+ cortex_AS_FLAGS		:= -mcpu=cortex-a9
+ cortex_EMULATOR		= qemu-system-arm -machine xilinx-zynq-a9  -smp $(CPUS) -m $(MEM_SIZE)k -serial null -serial mon:stdio -nographic -no-reboot -kernel 
+-cortex_DEBUGGER		:= arm-none-eabi-gdb
++cortex_DEBUGGER		:= gdb-multiarch
+ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
+ cortex_MAGIC		:= --omagic
+ cortex_CODE_NAME	:= .init
+-cortex_DATA_NAME	:= .data
++cortex_DATA_NAME	:=
+ cortex_IMG_SUFFIX	:= .bin
+ endif
+ 
+@@ -140,12 +140,12 @@ ifeq ($(MMOD),raspberry_pi3)
+ cortex_CC_FLAGS		:= -mcpu=cortex-a53 -mfloat-abi=hard -mfpu=vfp
+ cortex_AS_FLAGS		:= -mcpu=cortex-a53
+ cortex_LD_FLAGS		:=
+-cortex_EMULATOR		= qemu-system-aarch64 -M raspi2 -cpu cortex-a53 -smp 4 -m 1G -serial null -serial mon:stdio -nographic -no-reboot -device loader,file=$(APPLICATION).img,addr=$(IMAGE_ADDR),force-raw=on -kernel 
+-cortex_DEBUGGER		:= gdb
++cortex_EMULATOR		= qemu-system-aarch64 -M raspi2 -cpu cortex-a53 -smp 4 -m 1G -serial null -serial mon:stdio -nographic -no-reboot -kernel 
++cortex_DEBUGGER		:= gdb-multiarch
+ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
+-cortex_MAGIC		:= --nmagic
++cortex_MAGIC		:= --omagic
+ cortex_CODE_NAME	:= .init
+-cortex_DATA_NAME	:= .data
++cortex_DATA_NAME	:=
+ cortex_IMG_SUFFIX	:= .bin
+ endif
+ 
+@@ -154,7 +154,7 @@ cortex_EMULATOR		= qemu-system-arm -machine lm3s811evb -m $(MEM_SIZE)k -serial m
+ cortex_CC_FLAGS		:= -mcpu=cortex-m3 -mthumb -mabi=atpcs
+ cortex_AS_FLAGS		:= -mcpu=cortex-m3 -mthumb -meabi=gnu
+ cortex_LD_FLAGS		:=
+-cortex_DEBUGGER		:= arm-none-eabi-gdb
++cortex_DEBUGGER		:= gdb-multiarch
+ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
+ cortex_MAGIC		:= --omagic
+ cortex_CODE_NAME	:= .init
+@@ -167,7 +167,7 @@ cortex_EMULATOR		=
+ cortex_CC_FLAGS		:= -mcpu=cortex-m3 -mthumb -mabi=atpcs
+ cortex_AS_FLAGS		:= -mcpu=cortex-m3 -mthumb -meabi=gnu
+ cortex_LD_FLAGS		:=
+-cortex_DEBUGGER		:= arm-none-eabi-gdb
++cortex_DEBUGGER		:= gdb-multiarch
+ cortex_FLASHER		= $(TLS)/eposflash/eposflash-$(MMOD) -d /dev/ttyACM0 -f
+ cortex_MAGIC		:= --omagic
+ cortex_CODE_NAME	:= .init
+@@ -315,7 +315,7 @@ TEE		:= tee
+ ifndef DISPLAY
+ TERM        := sh -c
+ else
+-TERM        := konsole -e
++TERM        := xterm -e
+ endif
+ 
+ TOUCH		:= touch
+diff --git a/src/init/init_system.cc b/src/init/init_system.cc
+index fefda22..194f864 100644
+--- a/src/init/init_system.cc
++++ b/src/init/init_system.cc
+@@ -32,6 +32,19 @@ public:
+             System::_heap = new (&System::_preheap[0]) Heap(MMU::alloc(MMU::pages(HEAP_SIZE)), HEAP_SIZE);
+         db<Init>(INF) << "done!" << endl;
+ 
++        ///////////////////////////////
++
++        // If the trait sharedmemory is true, a segment with the same size of
++        // the system's heap will be allocated to be shared
++        db<Init>(INF) << "Initializing shared memory:" << endl;
++        if(Traits<System>::sharedmemory) {
++            Shared_Memory::_shared_heap_segment = new(&Shared_Memory::_preheap[0]) Segment(HEAP_SIZE, Segment::Flags::SHR);
++            Shared_Memory::_shared_heap = new(&Shared_Memory::_preheap[sizeof(Segment)]) Heap(Address_Space(MMU::current()).attach(Shared_Memory::_shared_heap_segment), Shared_Memory::_shared_heap_segment->size());
++        }
++        db<Init>(INF)<<"done!"<<endl;
++
++        ///////////////////////////////
++
+         db<Init>(INF) << "Initializing the machine: " << endl;
+         Machine::init();
+         db<Init>(INF) << "done!" << endl;
+diff --git a/src/system/system_scaffold.cc b/src/system/system_scaffold.cc
+index 93089ce..0599311 100644
+--- a/src/system/system_scaffold.cc
++++ b/src/system/system_scaffold.cc
+@@ -19,6 +19,9 @@ System_Info * System::_si = reinterpret_cast<System_Info *>(Memory_Map::SYS_INFO
+ char System::_preheap[];
+ Segment * System::_heap_segment;
+ Heap * System::_heap;
++char Shared_Memory::_preheap[];
++Segment * Shared_Memory:: _shared_heap_segment;
++Heap * Shared_Memory:: _shared_heap;
+ 
+ __END_SYS
+ 

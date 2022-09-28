@@ -1,0 +1,63 @@
+#!/bin/sh
+
+EPOS=
+APP=$EPOS/app
+IMG=$EPOS/img
+#MODES="LIBRARY BUILTIN KERNEL"
+MODES="LIBRARY"
+APPLICATIONS="hello philosophers_dinner producer_consumer"
+LIBRARY_TARGETS=("IA32 PC Legacy_PC" "RV32 RISCV SiFive_E" "ARMv7 Cortex LM3S811" "ARMv7 Cortex Realview_PBX" "ARMv7 Cortex Raspberry_Pi3" "ARMv8 Cortex Raspberry_Pi3")
+LIBRARY_TESTS="active_test alarm_test segment_test"
+BUILTIN_TARGETS=()
+BUILTIN_TESTS=""
+KERNEL_TARGETS=()
+KERNEL_TESTS=""
+
+set -e
+
+cd $EPOS
+
+for MODE in $MODES ; do
+    eval TARGETS=( \"\${${MODE}_TARGETS[@]}\" )
+    N_TARGETS=${#TARGETS[@]}
+    eval TESTS=\"\${${MODE}_TESTS[@]}\"
+    set -- $TESTS
+    TODO=$#
+    set -- $APPLICATIONS
+    let "TODO+=$#"
+
+    printf "\n********************************************************************************\n"
+    printf "\nPreparing test set for $N_TARGETS targets in mode $MODE: $APPLICATIONS $TESTS\n\n"
+    make linktest
+    for ((i = 0; i < N_TARGETS; i++)) do
+        set -- ${TARGETS[$i]}
+        ARCH=$1
+        MACH=$2
+        MMOD=$3
+        PREFIX=${MODE,,}"-"${ARCH,,}"-"${MACH,,}"-"${MMOD,,}
+        
+        printf "\n--------------------------------------------------------------------------------\n"
+        printf "Running test set for $MMOD (a $MACH on $ARCH) in mode $MODE\n\n"
+
+        DONE=0
+        for TEST in $APPLICATIONS $TESTS ; do
+            sed -e "s/^\(.*MODE = \).*;$/\1$MODE;/" -e "s/^\(.*ARCHITECTURE = \).*;$/\1$ARCH;/" -e "s/^\(.*MACHINE = \).*;$/\1$MACH;/" $APP/$TEST/$TEST""_traits.h -e "s/^\(.*MODEL = \).*;$/\1$MMOD;/" -i $APP/$TEST/$TEST""_traits.h
+            if [ -e "$IMG/${PREFIX}-${TEST}.out" ] ; then
+              let "DONE+=1"
+            fi
+        done
+        
+        if [ $DONE -eq $TODO ] ; then
+            continue
+        fi
+
+        make cleantest &> /dev/null
+        make "APPLICATIONS=$APPLICATIONS" "TESTS=$TESTS" gittest
+
+        for TEST in $APPLICATIONS $TESTS ; do
+            mv -f $IMG/$TEST     $IMG/$PREFIX"-"$TEST"" &> /dev/null || true
+            mv -f $IMG/$TEST.img $IMG/$PREFIX"-"$TEST".img" &> /dev/null || true
+            mv -f $IMG/$TEST.out $IMG/$PREFIX"-"$TEST".out" &> /dev/null || true
+        done
+    done
+done

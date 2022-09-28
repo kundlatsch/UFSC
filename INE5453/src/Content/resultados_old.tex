@@ -1,0 +1,145 @@
+\chapter{Resultados e Discussão}
+
+\noindent Uma vez que o modelo foi formalmente definido e seu pseudocódigo foi produzido, partimos para a implementação do agente. 
+A implementação proposta do modelo apresentado utiliza a linguagem Sigon\footnote{signos (sig) em operação (on)}.
+Ela foi escolhida pois ela operacionaliza e estende agentes como sistema multicontexto (SMC), permitindo implementar modelos lógicos em contextos, derivar crenças com base em funções não simbólicas,
+e flexibilizar a criação e relacionamento entre componentes do agente \cite{gelaim2019sigon}.
+Os resultados obtidos da implementação foram interpretados através de uma analise qualitativa.
+
+A implementação do agente é uma instância do exemplo \ref{example::robo2}, ao qual foi adicionado um sensor de pressão no cesto em que o agente deposita os presentes depois de embalados. Assim, podemos acompanhar a cada ciclo de raciocínio a alteração em seu banco de crenças.
+
+O estado inicial do agente, que também é seu código inicial, está mostrado abaixo:
+
+\begin{lstlisting}[caption={Estado inicial do agente Sigon.},label={list:total}]
+communication:
+    sensor("tactile", "runningMachine.getTaactilePerception").
+    sensor("camera", "agent.getCameraPerception").
+    sensor("basket", "agent.getPackagedObjects").
+    actuator("autoPlanner", "MIH.GeneratePlan").
+
+planner plan(X,Y,W,Z) :- communication plan(X,Y,W,Z).
+
+beliefs:
+    objetos_empacotados(0).
+    
+intentions:
+	empacotar(X).
+
+planner:
+	plan(empacotar(objeto(quadrado,_)),
+	[pegar(papel, azul) and embrulhar(objeto)],
+	[objeto(quadrado, _)], _)
+
+	plan(empacotar(objeto(circulo,liso)),
+	[pegar(papel, azul) and embrulhar(objeto)],
+	[objeto(circulo,liso)], _)
+
+	plan(empacotar(objeto(estrela,_)),
+	[pegar(papel, azul) and embrulhar(objeto)],
+	[objeto(estrela,_)], _)
+
+	plan(empacotar(objeto(circulo,listrado)),
+	[pegar(papel, vermelho) and embrulhar(objeto)],
+	[objeto(circulo, listrado)], _)
+
+	plan(empacotar(objeto(triangulo,liso)),
+	[pegar(papel, vermelho) and embrulhar(objeto)],
+	[objeto(circulo,liso)], _)
+
+	plan(empacotar(objeto(estrela,_)),
+	[pegar(papel, vermelho) and embrulhar(objeto)],
+	[objeto(estrela,_)], _)
+
+
+\end{lstlisting}
+
+Algumas considerações iniciais a respeito do código precisam ser realizadas para melhor entendimento da implementação. Na linha 5, encontra-se um atuador que é responsável por receber dos blocos de planejamento automatizado os planos novos que neles são gerados. Esses planos são adicionados pelo \emph{planner}, na linha 8. Além disso, os planos desse agente não possuem pós condição pois não é relevante para ele saber o que acontece com os objetos empacotados, uma vez que, para simplificar, assume-se que as ações são realizadas sem erros.
+
+\begin{example}{}
+    Para o primeiro exemplo da implementação, vamos considerar a percepção válida \texttt{quadrado(liso)}, recebida de forma única pelo agente (apenas uma das três esteiras recebeu um item). Ela é formada através dos sensores das linhas 2 e 3 do código inicial. Além disso, no mesmo ciclo o agente também receberá a percepção vinda do perceptor da linha 4, mas ela não causará nenhuma mudança pois o cesto de itens continua vazio. O código que será disparado pelas percepções do agente será:
+    \begin{lstlisting}
+intentions:
+    empacotar(X).
+
+planner:
+    	plan(empacotar(objeto(quadrado,_)),
+    	[pegar(papel, azul) and embrulhar(objeto)],
+    	[objeto(quadrado, _)], _)
+    \end{lstlisting}{}
+    
+    Através da intenção \texttt{empacotar(X)}, o plano mostrado acima será disparado, e o agente irá pegar o papel azul e embrulhar o quadrado liso. Esse é um exemplo simples de uma percepção válida, que não faz uso dos mecanismos do modelo de revisão de percepção.
+\end{example}
+
+\begin{example}
+    No segundo exemplo, vamos considerar que o agente recebe as percepções \texttt{quadrado(listrado)} e \texttt{triângulo(ondulado)} (por conta de uma falha de percepção causada pelo sensor tátil, como descrito no exemplo \ref{example::ilusao1}). Além dessas percepções, o contexto de crenças é atualizado para:
+    
+    \begin{lstlisting}
+beliefs:
+    objetos_empacotados(1).
+    \end{lstlisting}{}
+    
+    Como \texttt{quadrado(listrado)} é uma percepção válida, ela irá disparar a execução do mesmo plano do ciclo de raciocínio passado, utilizando o mesmo mecanismo. Entretanto, \texttt{triângulo(ondulado)} é uma ilusão. Por conta da alta complexidade dos métodos de planejamento automatizado, podemos assumir que o tempo para processar uma anomalia qualquer é maior do que o tempo para processar uma percepção válida. Dessa maneira, a função de processamento não permitirá que a anomalia detectada seja processada pelo bloco de planejamento automatizado. Assim, o estado final dessa execução será similar ao estado inicial. Vale notar que o objeto da anomalia não foi empacotado, ou seja, está sendo guardado ou segurado pelo agente em algum lugar, mas fora do cesto de objetos empacotados.
+    
+\end{example}{}
+
+\begin{example}
+    Por fim, o terceiro exemplo é um caso onde o planejamento automatizado será utilizado. Dessa vez, vamos considerar três percepções: uma válida e duas alucinações \texttt{pentagono(ondulado)}, além da atualização do contexto de crenças da maneira que foi feito no ciclo passado. Vamos assumir que o tempo de processamento de uma anomalia é menor que duas vezes o tempo de processamento de duas percepções válidas. Dessa maneira, a função de processamento permitirá que uma anomalia, escolhida aleatoriamente (como apresentado no algoritmo \ref{algorithm:model}), seja processada. Nesse caso, vamos considerar que o tipo escolhido foi alucinação, e como a lista contém apenas um elemento, a percepção \texttt{pentagono(ondulado)} será enviada para o bloco de planejamento automatizado.
+    
+    O planejamento automatizado pode ser implementado de diversas maneiras, mas como esse não é o foco da pesquisa, vamos considerar que ele cria um plano similar ao dos outros objetos. Levando em conta que um pentágono ondulado pode ser considerado similar a um círculo listrado, o plano criado pode utilizar papel vermelho, e o item pode ser embrulhado.
+    
+    \begin{lstlisting}
+plan(empacotar(objeto(pentagono,ondulado)),
+[pegar(papel, vermelho) and embrulhar(objeto)],
+[objeto(pentagono, ondulado)], _)
+    \end{lstlisting}
+    
+\end{example}{}
+
+Ao fim da execução desses três testes de mesa, o estado final do agente, seria o seguinte:
+
+\begin{lstlisting}[caption={Estado final do agente Sigon.},label={list:total}]
+communication:
+    sensor("tactile", "runningMachine.getTaactilePerception").
+    sensor("camera", "agent.getCameraPerception").
+    sensor("basket", "agent.getPackagedObjects").
+    actuator("autoPlanner", "MIH.GeneratePlan").
+
+planner plan(X,Y,W,Z) :- communication plan(X,Y,W,Z).
+
+beliefs:
+    objetos_empacotados(4).
+    
+intentions:
+	empacotar(X).
+
+planner:
+	plan(empacotar(objeto(quadrado,_)),
+	[pegar(papel, azul) and embrulhar(objeto)],
+	[objeto(quadrado, _)], _)
+
+	plan(empacotar(objeto(circulo,liso)),
+	[pegar(papel, azul) and embrulhar(objeto)],
+	[objeto(circulo,liso)], _)
+
+	plan(empacotar(objeto(estrela,_)),
+	[pegar(papel, azul) and embrulhar(objeto)],
+	[objeto(estrela,_)], _)
+
+	plan(empacotar(objeto(circulo,listrado)),
+	[pegar(papel, vermelho) and embrulhar(objeto)],
+	[objeto(circulo, listrado)], _)
+
+	plan(empacotar(objeto(triangulo,liso)),
+	[pegar(papel, vermelho) and embrulhar(objeto)],
+	[objeto(circulo,liso)], _)
+
+	plan(empacotar(objeto(estrela,_)),
+	[pegar(papel, vermelho) and embrulhar(objeto)],
+	[objeto(estrela,_)], _)
+    
+    plan(empacotar(objeto(pentagono,ondulado)),
+	[pegar(papel, vermelho) and embrulhar(objeto)],
+    [objeto(pentagono, ondulado)], _)
+\end{lstlisting}
+
+Apesar dos testes apresentados não serem capazes de revelar a eficiência em questão de tempo de execução e custo computacional, eles apresentam uma maneira do agente aprender novos planos com percepções que poderiam ser anteriormente descartáveis, o que era um dos objetivos do modelo proposto.

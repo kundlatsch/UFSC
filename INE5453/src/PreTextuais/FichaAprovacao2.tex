@@ -1,0 +1,62 @@
+% ---------------------------------------------------------------
+% ----------------  Folha de aprovação  -------------------------
+% ---------------------------------------------------------------
+% Modelo de Folha de aprovação. Você deverá substituir esta
+% folha na versão final da monografia por um pdf fornecido pelo  
+% colegiado do seu curso. Salve o modelo oficial como 
+% folhadeaprovacao_final.pdf e use o comando abaixo para 
+% inseri-lo na versão final do texto.
+
+%\begin{fichacatalografica}
+%    \includepdf{folhadeaprovacao_final.pdf}
+%\end{fichacatalografica} Esta folha será 
+
+
+\begin{folhadeaprovacao}
+
+
+\begin{tabularx}{.60\linewidth}{XX}
+\parbox[b][2cm][c]{2cm}{\centering \includegraphics[scale=0.2]{Figuras/brasao.jpeg}}
+& \parbox[b][2cm][c]{10cm}{ \MakeUppercase{\imprimirinstituicao }  \\ \MakeUppercase{\imprimirdepartamento }}\\
+  \end{tabularx}
+
+\vfill
+
+\begin{center}
+    \MakeUppercase{Folha de Aprovação} \\
+       	\vspace{2cm}	
+    {\Large \textbf{\MakeUppercase{\imprimirtitulo}}} \\
+		\vspace{1cm}
+        {\large \imprimirautor}\\
+\end{center}		
+
+\noindent \imprimirtipotrabalho~ defendida e aprovada em \imprimirlocal,~ \imprimirdata~,  pela banca examinadora constituída pelos professores:
+\vspace{2cm}
+\begin{center}
+
+       \rule{10cm}{.1pt} \\
+       {\imprimirorientador} \\ {\imprimirttorientador} \\
+			 Orientador 
+       \vfill
+			 \ifdefvoid{\imprimircoorientador}{}{
+       \rule{10cm}{.1pt} \\
+       \imprimircoorientador \\ \imprimirttcoorientador \\ Coorientador }
+			 \vfill
+       \rule{10cm}{.1pt} \\
+       {\imprimirexaminadorum} \\ {\imprimirttexaminadorum} \\ Examinador
+        \vfill
+        \ifdefvoid{\imprimirexaminadordois}{}{
+        \rule{10cm}{.1pt} \\
+        \imprimirexaminadordois \\ \imprimirttexaminadordois \\ Examinador}
+				\vfill
+        \ifdefvoid{\imprimirexaminadortres}{}{
+        \rule{10cm}{.1pt} \\
+        \imprimirexaminadortres \\ \imprimirttexaminadortres \\ Examinador}
+				\vfill
+        \ifdefvoid{\imprimirexaminadorquatro}{}{
+        \rule{10cm}{.1pt} \\
+        \imprimirexaminadorquatro \\ \imprimirttexaminadorquatro \\ Examinador}
+\end{center}
+  
+\end{folhadeaprovacao}
+% ---

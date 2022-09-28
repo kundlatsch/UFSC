@@ -1,0 +1,338 @@
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% Modelo UFSC para Trabalhos Academicos (tese de doutorado, dissertação de
+% mestrado) utilizando a classe abntex2
+%
+% Autor: Alisson Lopes Furlani
+% 	Modificações:
+%	- 27/08/2019: Alisson L. Furlani, add 'glossaries' package
+%   - 30/10/2019: Alisson L. Furlani, adjusted some spacing errors and changed math fonts
+%   - 17/01/2020: Alisson L. Furlani, updated certification page
+%   - 07/02/2020: Alisson L. Furlani, fixed table counter bug
+%   - 11/03/2020: Alisson L. Furlani, changed greek letters in math and fixed citation style
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,				% tamanho da fonte
+	%openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	oneside,			% para impressão no anverso. Oposto a twoside
+	a4paper,			% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	%french,				% idioma adicional para hifenização
+	%spanish,			% idioma adicional para hifenização
+	brazil				% o último idioma é o principal do documento
+	]{abntex2}
+
+\usepackage{setup/ufscthesisA4-alf}
+\addbibresource{aftertext/references.bib} % Seus arquivos de referências
+
+
+% MEUS PACOTES
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{csquotes}
+\usepackage[portuguese, linesnumbered]{algorithm2e}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{algorithm}
+% trocar label do algorithm para pt-br
+\makeatletter
+\renewcommand{\ALG@name}{Algoritmo}
+\makeatother
+\usepackage{tocbibind}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{minted}
+
+
+\usepackage{pdflscape}
+\usepackage{makecell}%To keep spacing of text in tables
+\setcellgapes{4pt}%parameter for the spacing
+
+\usepackage[table,xcdraw]{xcolor}
+ 
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcommand{\centered}[1]{\begin{tabular}{l} #1 \end{tabular}}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definição}
+\newtheorem{example}{Exemplo}[section]
+
+
+
+% SIGON
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Código}
+\usepackage{xcolor}
+\lstset{%
+    language=Python,
+    basicstyle=\small\ttfamily,%
+    numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=5pt,%
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+        morekeywords={plan, action, sensor, actuator, sense, member},
+    basicstyle={\small},
+    numberstyle=\tiny\color{gray},
+    keywordstyle={[2]\color{blue}},
+    keywordstyle={[3]\color{red}},
+    keywordstyle={[4]\color{black}},
+    otherkeywords={String,async,await,Task,var},
+    keywords=[2]{communication, beliefs, desires, intentions, planner},
+    keywords=[3]{:},
+    keywords=[4]{sensor, actuator},
+    commentstyle=\color{ForestGreen},
+    stringstyle=\color{red},
+    captionpos=b, 
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=3
+}%
+
+
+% ---
+% Filtering and Mapping Bibliographies
+% ---
+\DeclareSourcemap{
+	\maps[datatype=bibtex]{
+		% remove fields that are always useless
+		\map{
+			\step[fieldset=abstract, null]
+			\step[fieldset=pagetotal, null]
+		}
+		% remove URLs for types that are primarily printed
+%		\map{
+%			\pernottype{software}
+%			\pernottype{online}
+%			\pernottype{report}
+%			\pernottype{techreport}
+%			\pernottype{standard}
+%			\pernottype{manual}
+%			\pernottype{misc}
+%			\step[fieldset=url, null]
+%			\step[fieldset=urldate, null]
+%		}
+		\map{
+			\pertype{inproceedings}
+			% remove mostly redundant conference information
+			\step[fieldset=venue, null]
+			\step[fieldset=eventdate, null]
+			\step[fieldset=eventtitle, null]
+			% do not show ISBN for proceedings
+			\step[fieldset=isbn, null]
+			% Citavi bug
+			\step[fieldset=volume, null]
+		}
+	}
+}
+% ---
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+% FIXME Substituir 'Nome completo do autor' pelo seu nome.
+\autor{Gustavo Emanuel Kundlatsch}
+% FIXME Substituir 'Título do trabalho' pelo título da trabalho.
+\titulo{HAIL: um modelo de revisão de percepções\\de agentes inteligentes baseado em alucinação e ilusão}
+% FIXME Substituir 'Subtítulo (se houver)' pelo subtítulo da trabalho.  
+% Caso não tenha substítulo, comente a linha a seguir.
+%\subtitulo{subtítulo (se houver)}
+% FIXME Substituir 'XXXXXX' pelo nome do seu
+% orientador.
+\orientador{Dr. Thiago Ângelo Gelaim}
+% FIXME Se for orientado por uma mulher, comente a linha acima e descomente a linha a seguir.
+% \orientador[Orientadora]{Nome da orientadora, Dra.}
+% FIXME Substituir 'XXXXXX' pelo nome do seu
+% coorientador. Caso não tenha coorientador, comente a linha a seguir.
+\coorientador{Prof. Dr. Elder Rizzon Santos}
+% FIXME Se for coorientado por uma mulher, comente a linha acima e descomente a linha a seguir.
+% \coorientador[Coorientadora]{XXXXXX, Dra.}
+% FIXME Substituir '[ano]' pelo ano (ano) em que seu trabalho foi defendido.
+\ano{2021}
+% FIXME Substituir '[dia] de [mês] de [ano]' pela data em que ocorreu sua defesa.
+%\data{[dia] de [mês] de [ano]}
+% FIXME Substituir 'Local' pela cidade em que ocorreu sua defesa.
+\local{Florianópolis}
+\instituicaosigla{UFSC}
+\instituicao{Universidade Federal de Santa Catarina}
+% FIXME Substituir 'Dissertação/Tese' pelo tipo de trabalho (Tese, Dissertação). 
+\tipotrabalho{Monografia}
+% FIXME Substituir '[mestre/doutor] em XXXXXX' pela grau adequado.
+\formacao{bacharel em Ciências da Computação}
+% FIXME Substituir '[mestrado/doutorado]' pelo nivel adequado.
+\nivel{bacharel}
+% FIXME Substituir 'Programa de Pós-Graduação em XXXXXX' pela curso adequado.
+\programa{Curso de Graduação em Ciências da Computação}
+% FIXME Substituir 'Campus XXXXXX ou Centro de XXXXXX' pelo campus ou centro adequado.
+\centro{CAMPUS FLORIANÓPOLIS}
+\preambulo
+{%
+\imprimirtipotrabalho~submetida~ao~\imprimirprograma~da~\imprimirinstituicao~para~a~obtenção~do~título~de~\imprimirformacao.
+}
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+% ---
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={ufsc, latex, abntex2}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=black,%blue,          	% color of internal links
+    	citecolor=black,%blue,        		% color of links to bibliography
+    	filecolor=black,%magenta,      		% color of file links
+		urlcolor=black,%blue,
+		bookmarksdepth=4
+}
+\makeatother
+% ---
+
+% ---
+% compila a lista de abreviaturas e siglas e a lista de símbolos
+% ---
+
+% Declaração das siglas
+\siglalista{ABNT}{Associação Brasileira de Normas Técnicas}
+
+% Declaração dos simbolos
+\simbololista{C}{\ensuremath{C}}{Circunferência de um círculo}
+\simbololista{pi}{\ensuremath{\pi}}{Número pi} 
+\simbololista{r}{\ensuremath{r}}{Raio de um círculo}
+\simbololista{A}{\ensuremath{A}}{Área de um círculo}
+
+
+% compila a lista de abreviaturas e siglas e a lista de símbolos
+% \makenoidxglossaries 
+
+
+% ---
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% Espaçamento 1.5 entre linhas
+\OnehalfSpacing
+
+% Corrige justificação
+%\sloppy
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+% \pretextual %a macro \pretextual é acionado automaticamente no início de \begin{document}
+% ---
+% Capa, folha de rosto, ficha bibliografica, errata, folha de apróvação
+% Dedicatória, agradecimentos, epígrafe, resumos, listas
+% ---
+\input{beforetext/beforetext}
+% ---
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+\input{chapters/introducao}
+\input{chapters/conceitos}
+\input{chapters/revisao}
+\input{chapters/modelo}
+\input{chapters/formalizacao}
+\input{chapters/experimentos}
+\input{chapters/conclusao}
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\begingroup
+\printbibliography[title=REFERÊNCIAS]
+\endgroup
+
+% ----------------------------------------------------------
+% Glossário
+% ----------------------------------------------------------
+%
+% Consulte o manual da classe abntex2 para orientações sobre o glossário.
+%
+%\glossary
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices
+% ---
+\begin{apendicesenv}
+%	\partapendices*
+	\input{aftertext/simulador}
+	\input{aftertext/analisador}
+	\input{aftertext/artigo}
+\end{apendicesenv}
+% ---
+
+
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+
+% ---
+% Inicia os anexos
+% ---
+% \begin{anexosenv}
+% %	\partanexos*
+% 	\input{aftertext/anexo_a}
+% \end{anexosenv}
+
+%---------------------------------------------------------------------
+% INDICE REMISSIVO
+%---------------------------------------------------------------------
+%\phantompart
+%\printindex
+%---------------------------------------------------------------------
+
+\end{document}
