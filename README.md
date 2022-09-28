@@ -30,7 +30,7 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | INE5432 | [Bancos de Dados II](https://github.com/kundlatsch/UFSC/tree/master/INE5432) |
 | INE5433 | [Trabalho de Conclusão de Curso I (TCC)](https://github.com/kundlatsch/UFSC/tree/master/INE5433) |
 | INE5434 | [Trabalho de Conclusão de Curso II (TCC)](https://github.com/kundlatsch/UFSC/tree/master/INE5434) |
-| INE5453 | [Introdução ao Trabalho de Conclusão de Curso](https://github.com/kundlatsch/UFSC/tree/master/INE54543) |
+| INE5453 | [Introdução ao Trabalho de Conclusão de Curso](https://github.com/kundlatsch/UFSC/tree/master/INE5453) |
 | INE5455 | [Testes de Software](https://github.com/kundlatsch/UFSC/tree/master/INE5455) |
 | INE5600 | [Bancos de Dados III](https://github.com/kundlatsch/UFSC/tree/master/INE5600) |
 | INE5646 | [Programação Web](https://github.com/kundlatsch/UFSC/tree/master/INE5646) |
