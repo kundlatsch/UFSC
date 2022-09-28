@@ -22,6 +22,7 @@ Esse repositório contém os arquivos produzidos em todas as disciplinas cursada
 | INE5420 | [Computação Gráfica](https://github.com/kundlatsch/UFSC/tree/master/INE5420) |
 | INE5421 | [Linguagens Formais e Compiladores](https://github.com/kundlatsch/UFSC/tree/master/INE5421) |
 | INE5423 | [Banco de Dados I](https://github.com/kundlatsch/UFSC/tree/master/INE5423) |
+| INE5424 | [Sistemas Operacionais II](https://github.com/kundlatsch/UFSC/tree/master/INE5424) |
 | INE5426 | [Construção de Compiladores](https://github.com/kundlatsch/UFSC/tree/master/INE5426) |
 | INE5430 | [Planejamento e Gestão de Projetos](https://github.com/kundlatsch/UFSC/tree/master/INE5427) |
 | INE5429 | [Segurança em Computação](https://github.com/kundlatsch/UFSC/tree/master/INE5429) |
