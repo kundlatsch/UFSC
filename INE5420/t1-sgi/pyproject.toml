@@ -12,7 +12,7 @@ python = "^3.9"
 PyQt5 = "^5.15.2"
 black = "^20.8b1"
 pytest = "^6.2.2"
-numpy = "^1.20.1"
+numpy = "^1.22.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^20.8b1", allow-prereleases = true}
